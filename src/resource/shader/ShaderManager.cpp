@@ -4,11 +4,11 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/08/04
+*	@updated : 2026/09/28
 *============================================================*/
 #include "ShaderManager.h"
 #include "DeviceManager.h"
-#include "Utility.h"
+#include "FileUtility.h"
 #include <d3d11.h>
 
 using namespace Microsoft::WRL;

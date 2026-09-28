@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/01
-*	@updated : 2026/09/16
+*	@updated : 2026/09/28
 *============================================================*/
 #include "ModelRenderer.h"
 #include "ModelManager.h"
@@ -13,7 +13,7 @@
 #include "Texture.h"
 #include "BufferManager.h"
 #include "GameObject.h"
-#include "Utility.h"
+#include "FileUtility.h"
 
 void ModelRenderer::Draw() const
 {

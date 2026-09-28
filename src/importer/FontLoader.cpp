@@ -4,10 +4,10 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/04
-*	@updated : 2026/09/16
+*	@updated : 2026/09/28
 *============================================================*/
 #include "FontLoader.h"
-#include "Utility.h"
+#include "StringUtility.h"
 #include <Windows.h>
 
 #pragma comment(lib, "dwrite.lib")

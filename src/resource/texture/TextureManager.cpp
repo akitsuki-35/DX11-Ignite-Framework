@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/30
-*	@updated : 2026/09/16
+*	@updated : 2026/09/26
 *============================================================*/
 #include "TextureManager.h"
 #include "Texture.h"
 #include "DeviceManager.h"
-#include "Utility.h"
+#include "FileUtility.h"
+#include "StringUtility.h"
 #include <DirectXTex/DirectXTex.h>
 
 using namespace DirectX;

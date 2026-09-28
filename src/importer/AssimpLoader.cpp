@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/09/16
+*	@updated : 2026/09/28
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -13,7 +13,7 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Animation.h"
-#include "Utility.h"
+#include "FileUtility.h"
 #include <DirectXTex/DirectXTex.h>
 
 // assimp関連

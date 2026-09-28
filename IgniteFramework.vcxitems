@@ -78,7 +78,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\Utility.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)external\include\ImGui\imconfig.h" />
@@ -154,7 +156,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\Utility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)external\include\ImGui\imgui.ini" />
