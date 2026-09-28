@@ -160,7 +160,6 @@ bool AssimpLoader::calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton
 			std::string name = aiBone->mName.C_Str();
 
 			// Skeleton登録済みボーン検索
-			//int index = skeleton.GetBoneIndex(name);
 			int index = skeleton.FindBone(aiBone->mName.C_Str());
 
 			if (index < 0) {
@@ -174,9 +173,6 @@ bool AssimpLoader::calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton
 
 			// オフセット計算
 			bone.Offset = convertMatrix(aiBone->mOffsetMatrix);
-			
-			//XMMATRIX offset = XMMatrixInverse(nullptr, bindGlobal);
-			//XMStoreFloat4x4(&bone.Offset, offset);
 		}
 	}
 
