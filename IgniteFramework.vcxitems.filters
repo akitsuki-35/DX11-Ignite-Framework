@@ -78,7 +78,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\Utility.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.h">
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\math\BoneTransform.h">
@@ -297,9 +297,18 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)external\include\minimp3\minimp3.h">
       <Filter>external\minimp3</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Shaker.h">
+      <Filter>components</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\Utility.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp">
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\math\BoneTransform.cpp">
@@ -481,6 +490,15 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)external\include\stb_vorbis\stb_vorbis.c">
       <Filter>external\stb_vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Shaker.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.cpp">
+      <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

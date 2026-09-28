@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/12
-*	@updated : 2026/09/16
+*	@updated : 2026/09/28
 *============================================================*/
 #include "TextRenderer.h"
 #include "Texture.h"
@@ -14,7 +14,7 @@
 #include "BufferManager.h"
 #include "UIStyle.h"
 #include "GameObject.h"
-#include "Utility.h"
+#include "StringUtility.h"
 #include "D3D11Config.h"
 #include "Config.h"
 #include <d3d11.h>

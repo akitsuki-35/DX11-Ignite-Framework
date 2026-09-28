@@ -1,13 +1,12 @@
 ﻿/*============================================================
-*	@file	 : Utility.cpp
-*	@brief	 : 汎用ユーティリティ
+*	@file	 : FileUtility.cpp
+*	@brief	 : ファイル関連ユーティリティ
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
-* 　@date	 : 2026/07/30
-*	@updated : 2026/09/16
+* 　@date	 : 2026/09/28
+*	@updated : 2026/09/28
 *============================================================*/
-#include "Utility.h"
-#include "Easing.h"
+#include "FileUtility.h"
 #include <fstream>
 #include <cassert>
 #include <shlwapi.h>
@@ -80,49 +79,4 @@ std::string Utility::File::getFileExtension(const std::string& filePath)
 	}
 
 	return ext;
-}
-
-std::wstring Utility::String::toWideString(const std::string& string)
-{
-	// std::string→std::wstringに変換
-
-	if (string.empty())
-	{
-		return{};
-	}
-
-	// 終端文字を含む文字列を取得
-	const int size = MultiByteToWideChar(CP_ACP, 0, string.c_str(), -1, nullptr, 0);
-
-	assert(size > 0);
-
-	std::wstring wide(size - 1, L'\0');
-
-	MultiByteToWideChar(CP_ACP, 0, string.c_str(), -1, wide.data(), size);
-
-	return wide;
-}
-
-double Utility::Easing::CalculateRatio(double current, double duration)
-{
-	// イージング用ratio算出
-
-	if (duration <= 0.0) return 1.0;
-
-	double elapsed = duration - current;
-
-	double ratio = elapsed / duration;
-
-	return (ratio > 1.0) ? 1.0 : (ratio < 0.0) ? 0.0 : ratio;
-}
-
-float Utility::Easing::CalculateEase(double current, double duration, easing_functions easeType)
-{
-	// イージング用ease算出
-
-	double ratio = CalculateRatio(current, duration);
-
-	float ease = static_cast<float>(getEasingFunction(easeType)(ratio));
-
-	return ease;
 }

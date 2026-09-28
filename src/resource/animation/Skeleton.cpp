@@ -64,7 +64,7 @@ void Skeleton::updateGlobal(int index)
         DirectX::XMMATRIX parentGlobal = DirectX::XMLoadFloat4x4(&mBones[bone.ParentIndex].Global);
         
         // 子Global = 親Global * 子Local
-        DirectX::XMMATRIX global = parentGlobal * local;
+        DirectX::XMMATRIX global = local * parentGlobal;
         DirectX::XMStoreFloat4x4(&bone.Global, global);
     }
 
@@ -114,7 +114,7 @@ void Skeleton::calculateBindGlobal(int index)
         XMMATRIX parentBindGlobal = XMLoadFloat4x4(&mBones[bone.ParentIndex].BindGlobal);
 
         // 子BindGlobal = 親BindGlobal * 子BindLocal
-        XMStoreFloat4x4(&bone.BindGlobal, parentBindGlobal * local);
+        XMStoreFloat4x4(&bone.BindGlobal, local * parentBindGlobal);
     }
 
     // 子ボーンを更新
@@ -141,7 +141,7 @@ void Skeleton::updateSkinningMatrices()
         DirectX::XMMATRIX offset = DirectX::XMLoadFloat4x4(&bone.Offset);
 
         // スキニング行列作成
-        DirectX::XMMATRIX skinning = globalInverse * global * offset;
+        DirectX::XMMATRIX skinning = offset * global * globalInverse;
         DirectX::XMStoreFloat4x4(&mSkinningMatrices[i], skinning);
     }
 }

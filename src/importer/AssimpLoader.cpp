@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/09/16
+*	@updated : 2026/09/28
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -13,7 +13,7 @@
 #include "Model.h"
 #include "Texture.h"
 #include "Animation.h"
-#include "Utility.h"
+#include "FileUtility.h"
 #include <DirectXTex/DirectXTex.h>
 
 // assimp関連
@@ -160,7 +160,7 @@ bool AssimpLoader::calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton
 			std::string name = aiBone->mName.C_Str();
 
 			// Skeleton登録済みボーン検索
-			int index = skeleton.GetBoneIndex(name);
+			int index = skeleton.FindBone(aiBone->mName.C_Str());
 
 			if (index < 0) {
 				continue;
@@ -173,9 +173,6 @@ bool AssimpLoader::calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton
 
 			// オフセット計算
 			bone.Offset = convertMatrix(aiBone->mOffsetMatrix);
-			
-			XMMATRIX offset = XMMatrixInverse(nullptr, bindGlobal);
-			XMStoreFloat4x4(&bone.Offset, offset);
 		}
 	}
 
