@@ -62,7 +62,7 @@ private:
 
 public:
 	// テクスチャ読み込み
-	UIRenderer* LoadTexture(const char* fileName);
+	UIRenderer* LoadTexture(const char* fileName, bool isMip = false);
 
 	// ゲッター
 	UICanvas& GetCanvas() { return mCanvas; }

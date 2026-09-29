@@ -47,12 +47,12 @@ private:
 
 public:
 	// ロード
-	Texture* Load(const char* texturePath);
+	Texture* Load(const char* texturePath, bool isMip);
 
 	// クリア
 	void Clear();
 
 private:
 	// テクスチャ生成
-	bool generateTexture(Texture& texture, const std::string& path);
+	bool generateTexture(Texture& texture, const std::string& path, bool isMip);
 };

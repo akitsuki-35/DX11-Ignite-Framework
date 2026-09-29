@@ -47,9 +47,9 @@ DirectX::XMMATRIX SpriteRenderer::getWorldMatrix() const
 	return _mOwner->GetTransform().GetWorldMatrix();
 }
 
-SpriteRenderer* SpriteRenderer::LoadTexture(const char* fileName)
+SpriteRenderer* SpriteRenderer::LoadTexture(const char* fileName, bool isMip)
 {
 	// テクスチャ読み込み
-	_mTexture = TextureManager::getInstance().Load(fileName);
+	_mTexture = TextureManager::getInstance().Load(fileName, isMip);
 	return this;
 }

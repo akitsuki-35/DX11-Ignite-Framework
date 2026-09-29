@@ -441,7 +441,7 @@ void AssimpLoader::loadMaterials(const aiScene* scene, Model& model, const std::
 				std::filesystem::path mtlTexPath = dir / path.C_Str();
 
 				// mtlファイル登録テクスチャをロード
-				material._Texture = TextureManager::getInstance().Load(mtlTexPath.string().c_str());
+				material._Texture = TextureManager::getInstance().Load(mtlTexPath.string().c_str(), false);
 
 				if (!material._Texture) {
 					return;
