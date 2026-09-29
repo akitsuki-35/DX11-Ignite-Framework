@@ -52,7 +52,7 @@ private:
 
 public:
 	// テクスチャ読み込み
-	SpriteRenderer* LoadTexture(const char* fileName);
+	SpriteRenderer* LoadTexture(const char* fileName, bool isMip = false);
 
 	// ゲッター
 	Mesh& GetMesh() { return mMesh; }

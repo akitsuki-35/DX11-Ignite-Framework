@@ -15,7 +15,7 @@
 
 using namespace DirectX;
 
-Texture* TextureManager::Load(const char* texturePath)
+Texture* TextureManager::Load(const char* texturePath, bool isMip)
 {
 	// キャッシュ取得用にパスを正規化
 	std::string key = Utility::File::normalizePath(texturePath);
@@ -30,7 +30,7 @@ Texture* TextureManager::Load(const char* texturePath)
 	// テクスチャリソース生成
 	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
 
-	if (!generateTexture(*texture, key)) {
+	if (!generateTexture(*texture, key, isMip)) {
 		return nullptr;
 	}
 
@@ -48,7 +48,7 @@ void TextureManager::Clear()
 	mTextures.clear();
 }
 
-bool TextureManager::generateTexture(Texture& texture, const std::string& path)
+bool TextureManager::generateTexture(Texture& texture, const std::string& path, bool isMip)
 {
 	// パスをstd::wstringに変換
 	const std::wstring wide = Utility::String::toWideString(path);
@@ -56,12 +56,25 @@ bool TextureManager::generateTexture(Texture& texture, const std::string& path)
 	// テクスチャ読込
 	TexMetadata metaData{};
 	ScratchImage image{};
+
 	HRESULT hr = LoadFromWICFile(wide.c_str(), WIC_FLAGS_NONE, &metaData, image);
 	if (FAILED(hr)) return false;
 
-	hr = CreateShaderResourceView(D3D11::DeviceManager::getInstance().GetDevice(),
-		image.GetImages(), image.GetImageCount(), metaData, texture._mSRV.GetAddressOf());
-	if (FAILED(hr)) return false;
+	if (isMip) {
+		// ミップマップ生成
+		ScratchImage mipChain{};
+		GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+			TEX_FILTER_DEFAULT, 0, mipChain);
+
+		hr = CreateShaderResourceView(D3D11::DeviceManager::getInstance().GetDevice(),
+			mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), texture._mSRV.GetAddressOf());
+		if (FAILED(hr)) return false;
+	}
+	else {
+		hr = CreateShaderResourceView(D3D11::DeviceManager::getInstance().GetDevice(),
+			image.GetImages(), image.GetImageCount(), metaData, texture._mSRV.GetAddressOf());
+		if (FAILED(hr)) return false;
+	}
 
 	texture.mSize = { static_cast<UINT>(metaData.width), static_cast<UINT>(metaData.height) };
 

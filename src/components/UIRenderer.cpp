@@ -77,9 +77,9 @@ DirectX::XMMATRIX UIRenderer::getWorldMatrix() const
 	return _mOwner->GetTransform().GetWorldMatrix();
 }
 
-UIRenderer* UIRenderer::LoadTexture(const char* fileName)
+UIRenderer* UIRenderer::LoadTexture(const char* fileName, bool isMip)
 {
 	// テクスチャ読み込み
-	_mTexture = TextureManager::getInstance().Load(fileName);
+	_mTexture = TextureManager::getInstance().Load(fileName, isMip);
 	return this;
 }

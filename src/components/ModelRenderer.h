@@ -89,7 +89,7 @@ public:
 	ModelRenderer* LoadModel(const char* fileName);
 
 	// テクスチャ読み込み
-	ModelRenderer* LoadTexture(std::string textureName, TextureType type = TextureType::Albedo);
+	ModelRenderer* LoadTexture(std::string textureName, TextureType type = TextureType::Albedo, bool isMip = false);
 
 	// ゲッター
 	Model* GetModel() const{ return _mModel; }

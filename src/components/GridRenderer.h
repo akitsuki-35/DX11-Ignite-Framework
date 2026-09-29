@@ -43,7 +43,7 @@ public:
 	~GridRenderer() override = default;
 
 	// グリッド設定
-	void Set(int xCount, int zCount, float size);
+	GridRenderer* Set(int xCount, int zCount, float size, const char* textureName, bool isMip = false);
 
 	// 描画
 	void Draw() const override;

@@ -69,7 +69,7 @@ private:
 
 public:
 	// テクスチャ読み込み
-	ParticleRenderer* LoadTexture(const char* fileName);
+	ParticleRenderer* LoadTexture(const char* fileName, bool isMip = false);
 
 	// ゲッター
 	Mesh& GetMesh() { return mMesh; }

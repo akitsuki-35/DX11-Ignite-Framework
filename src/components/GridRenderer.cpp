@@ -16,7 +16,7 @@
 
 using namespace DirectX;
 
-void GridRenderer::Set(int xCount, int zCount, float size)
+GridRenderer* GridRenderer::Set(int xCount, int zCount, float size, const char* textureName, bool isMip)
 {
 	// 頂点数の算出
 	const int X_V_COUNT = xCount + 1;
@@ -68,9 +68,11 @@ void GridRenderer::Set(int xCount, int zCount, float size)
 
 	D3D11::DeviceManager::getInstance().GetDevice()->CreateBuffer(&bd, &sd, mVertexBuffer.GetAddressOf());
 
-	_mTexture = TextureManager::getInstance().Load("assets\\textures\\white.png");
+	_mTexture = TextureManager::getInstance().Load(textureName, isMip);
 
 	delete[] pV;
+
+	return this;
 }
 
 void GridRenderer::Draw() const

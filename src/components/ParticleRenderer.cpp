@@ -139,9 +139,9 @@ void ParticleRenderer::subColorDraw(const DirectX::XMMATRIX& rotation) const
 	}
 }
 
-ParticleRenderer* ParticleRenderer::LoadTexture(const char* fileName)
+ParticleRenderer* ParticleRenderer::LoadTexture(const char* fileName, bool isMip)
 {
 	// テクスチャ読み込み
-	_mTexture = TextureManager::getInstance().Load(fileName);
+	_mTexture = TextureManager::getInstance().Load(fileName, isMip);
 	return this;
 }

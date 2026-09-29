@@ -64,10 +64,6 @@ void ModelRenderer::Draw() const
                 // 埋め込みテクスチャを使用して描画
                 _mModel->mMaterials[subset.MaterialIndex]._Texture->Bind();
             }
-            else {
-                Texture* dummy = TextureManager::getInstance().Load("assets\\textures\\white.png");
-                dummy->Bind();
-            }
 
             // マップテクスチャをセット
             setMapTextures();
@@ -96,34 +92,34 @@ ModelRenderer* ModelRenderer::LoadModel(const char* fileName)
     return this;
 }
 
-ModelRenderer* ModelRenderer::LoadTexture(std::string textureName, TextureType type)
+ModelRenderer* ModelRenderer::LoadTexture(std::string textureName, TextureType type, bool isMip)
 {
     // 指定タイプにテクスチャをロード
     switch (type)
     {
     case TextureType::Albedo:
         mTextures.Albedo = TextureManager::getInstance().Load(
-            converttoTexturePath(textureName).c_str());
+            converttoTexturePath(textureName).c_str(), isMip);
         break;
 
     case TextureType::Normal:
         mTextures.Normal = TextureManager::getInstance().Load(
-            converttoTexturePath(textureName).c_str());
+            converttoTexturePath(textureName).c_str(), isMip);
         break;
 
     case TextureType::Roughness:
         mTextures.Roughness = TextureManager::getInstance().Load(
-            converttoTexturePath(textureName).c_str());
+            converttoTexturePath(textureName).c_str(), isMip);
         break;
 
     case TextureType::Metalness:
         mTextures.Metalness = TextureManager::getInstance().Load(
-            converttoTexturePath(textureName).c_str());
+            converttoTexturePath(textureName).c_str(), isMip);
         break;
 
     case TextureType::Ramp:
         mTextures.Rump = TextureManager::getInstance().Load(
-            converttoTexturePath(textureName).c_str());
+            converttoTexturePath(textureName).c_str(), isMip);
         break;
 
     default:
