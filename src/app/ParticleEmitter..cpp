@@ -11,6 +11,7 @@
 #include "ParticleBox.h"
 #include "MeshTypes.h"
 #include "Timer.h"
+#include "Scene.h"
 
 using namespace MeshType;
 using namespace DirectX;
@@ -41,6 +42,8 @@ void ParticleEmitter::Finalize()
 
 void ParticleEmitter::Update(double deltaTime)
 {
+	if (Scene::IsHitStop() || Scene::IsPause()) return;
+
 	_mType->Update(deltaTime);
 
 	// インターバル毎にパーティクル発射

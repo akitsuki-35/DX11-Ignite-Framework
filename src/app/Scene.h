@@ -40,6 +40,10 @@ public:
 	static void SetPause(const bool& isPause) { mPause = isPause; }
 	static void SetHitStop(const bool& isHitStop) { mHitStop = isHitStop; };
 
+	// ポーズ・ヒットストップフラグ取得
+	static bool IsPause() { return mPause; }
+	static bool IsHitStop() { return mHitStop; }
+
 	/*------------------------------------------------------------
 		テンプレート関数
 	------------------------------------------------------------*/
