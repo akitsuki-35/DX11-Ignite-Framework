@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/11
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #include "FontManager.h"
 #include "FontLoader.h"
@@ -15,7 +15,7 @@
 
 using namespace Microsoft::WRL;
 
-Font* FontManager::GetFont(const std::string& keyName)
+FONT* FontManager::GetFont(const std::string& keyName)
 {	
     // キャッシュが存在すれば返す
     auto it = mFonts.find(keyName);
@@ -27,7 +27,7 @@ Font* FontManager::GetFont(const std::string& keyName)
     return nullptr;
 }
 
-Glyph* FontManager::GetGlyph(const GlyphKey& key)
+GLYPH* FontManager::GetGlyph(const GLYPHKEY& key)
 {
 	// キャッシュが存在すれば返す
 	auto it = mAtlas.find(key);
@@ -37,14 +37,14 @@ Glyph* FontManager::GetGlyph(const GlyphKey& key)
 	}
 
 	// 文字テクスチャ生成
-	std::unique_ptr<Glyph> glyph = std::make_unique<Glyph>();
+	std::unique_ptr<GLYPH> glyph = std::make_unique<GLYPH>();
 
 	if (!generateGlyph(*glyph, key)) {
 		return nullptr;
 	}
 
     // 文字テクスチャを一時変数に格納
-    Glyph* g = glyph.get();
+    GLYPH* g = glyph.get();
 
     // コンテナへ登録
     mAtlas.emplace(key, std::move(glyph));
@@ -52,7 +52,7 @@ Glyph* FontManager::GetGlyph(const GlyphKey& key)
 	return g;
 }
 
-Font* FontManager::Register(const std::string& keyName, const char* fontPath)
+FONT* FontManager::Register(const std::string& keyName, const char* fontPath)
 {
     // 登録済みならreturn
     if (mFonts.contains(keyName)) {
@@ -60,7 +60,7 @@ Font* FontManager::Register(const std::string& keyName, const char* fontPath)
     }
 
     // フォント生成
-    std::unique_ptr<Font> font = std::make_unique<Font>();
+    std::unique_ptr<FONT> font = std::make_unique<FONT>();
 
     if (!FontLoader::Load(_mFactory.Get(), *font, fontPath)) {
         return nullptr;
@@ -78,7 +78,7 @@ void FontManager::Clear()
     mFonts.clear();
 }
 
-bool FontManager::generateGlyph(Glyph& glyph, const GlyphKey& key)
+bool FontManager::generateGlyph(GLYPH& glyph, const GLYPHKEY& key)
 {
     // 文字コードをGlyphインデックスに変換
     UINT16 glyphIndex = 0;

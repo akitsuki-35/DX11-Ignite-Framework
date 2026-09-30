@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/27
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -21,7 +21,7 @@ namespace ParticleType {
 		Box(ParticleEmitter* emitter)
 			: Base(emitter) {}
 
-		void Emission(ParticleDesc& desc) override;
+		void Emission(PARTICLE_DESC& desc) override;
 
 		std::string_view GetTypeName() const override { return "Box"; };
 	};

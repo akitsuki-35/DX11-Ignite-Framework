@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/04
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -13,7 +13,7 @@
 #include <wrl/client.h>
 
 // フォントデータ構造体
-struct Font {
+struct FONT {
 	// フォントフェース
 	Microsoft::WRL::ComPtr<IDWriteFontFace> Face{ nullptr };
 	
@@ -38,5 +38,5 @@ public:
 	static IDWriteFactory* Initialize();
 
 	// フォントロード
-	static bool Load(IDWriteFactory* factory, Font& font, const char* fontPath);
+	static bool Load(IDWriteFactory* factory, FONT& font, const char* fontPath);
 };

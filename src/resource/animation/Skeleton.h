@@ -21,7 +21,7 @@ class Skeleton final
 {
 public:
     // ボーン構造体
-    struct Bone
+    struct BONE
     {
         // ボーン名
         std::string Name{};
@@ -48,7 +48,7 @@ private:
     std::unordered_map<std::string, int> mBoneMap{};
 
     // ボーン配列
-    std::vector<Bone> mBones{};
+    std::vector<BONE> mBones{};
 
     // スキニング行列
     std::vector<DirectX::XMFLOAT4X4>mSkinningMatrices{};
@@ -58,7 +58,7 @@ private:
 
 public:
     // ボーン登録
-    int AddBone(const Bone& bone);
+    int AddBone(const BONE& bone);
 
     // ボーン取得
     int FindBone(const std::string& name) const;
@@ -74,7 +74,7 @@ public:
 
     // ゲッター
     int GetBoneIndex(const std::string& name);
-    Bone& GetBone(size_t index) { return mBones[index]; }
+    BONE& GetBone(size_t index) { return mBones[index]; }
     size_t GetBoneCount() const { return mBones.size(); }
     const std::vector<DirectX::XMFLOAT4X4>& GetSkinningMatrices() const { return mSkinningMatrices; }
 

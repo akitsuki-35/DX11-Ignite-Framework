@@ -13,10 +13,10 @@ DirectX11 / C++20によるゲーム開発用フレームワーク。サブモジ
 * Flyweightを用いた高速・安全なリソース管理を提供します。
 * ファイル読み込み・ファイルパス変換等のユーティリティを提供します。
 * ゲームオブジェクトに紐づき、汎用的なサブシステム・描画を導入するコンポーネント機能を提供します。
-* 自作パーティクルシミュレーター[https://github.com/akitsuki-35/DX11-Particle-Simulator]と連携し、csvファイルからパーティクルパラメータを読み込む機能を提供します。
+* 自作パーティクルシミュレーター[ https://github.com/akitsuki-35/DX11-Particle-Simulator ]と連携し、csvファイルからパーティクルパラメータを読み込む機能を提供します。
 
 ## 開発実績
-* 「A.X.I.A」[https://github.com/akitsuki-35/DX11-GameProject-AXIA]
+* 「A.X.I.A」[ https://github.com/akitsuki-35/DX11-GameProject-AXIA ]
    * ジャンル：3Dシューティングゲーム
    * 開発期間：3ヶ月
    * 制作人数：1人
@@ -47,10 +47,16 @@ DirectX11 / C++20によるゲーム開発用フレームワーク。サブモジ
 | publicメンバ関数 | PascalCase | FunctionName |
 | privateメンバ関数 | camelCase | functionName |
 
+### 列挙体
+| Type | Style | Sample |
+| ---- | ---- | ---- |
+| 列挙体 | PascalCase | EnumName |
+| 列挙体変数 | PascalCase | EnumValue |
+
 ### 構造体
 | Type | Style | Sample |
 | ---- | ---- | ---- |
-| 構造体 | PascalCase | StructName |
+| 構造体 | UPPER_SNAKE_CASE | STRUCT_NAME |
 | 構造体変数 | PascalCase | StructValue |
 
 ## ディレクトリ

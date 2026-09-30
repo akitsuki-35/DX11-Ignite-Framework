@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -58,8 +58,8 @@ private:
     bool setSkeleton();
 
     // ボーンアニメーション計算
-    void calculateBoneTransform(const Animation::Channel& channel, double time);
-    Vector3 calculatePosition(const std::vector<Animation::KeyPosition>& keys, double time);
-    Quaternion calculateRotation(const std::vector<Animation::KeyRotation>& keys, double time);
-    Vector3 calculateScale(const std::vector<Animation::KeyScale>& keys, double time);
+    void calculateBoneTransform(const Animation::CHANNEL& channel, double time);
+    Vector3 calculatePosition(const std::vector<Animation::KEY_POSITION>& keys, double time);
+    Quaternion calculateRotation(const std::vector<Animation::KEY_ROTATION>& keys, double time);
+    Vector3 calculateScale(const std::vector<Animation::KEY_SCALE>& keys, double time);
 };

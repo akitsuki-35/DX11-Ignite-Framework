@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -16,7 +16,7 @@
 /*------------------------------------------------------------
 	初期化用データ構造体
 ------------------------------------------------------------*/
-struct ParticleDesc {
+struct PARTICLE_DESC {
 	// 散布方向
 	Vector3 Velocity{ 0.0f, 10.0f, 0.0f };
 
@@ -60,7 +60,7 @@ private:
 	std::vector<Particle> mParticles{};
 
 	// データ構造体
-	ParticleDesc mDesc{};
+	PARTICLE_DESC mDesc{};
 
 	// 発射インターバル
 	double mMaxInterval{ 0.1 };
@@ -91,7 +91,7 @@ public:
 	int GetParticleMax() const { return PARTICLE_MAX; }
 	std::vector<Particle>& GetParticles() { return mParticles; }
 	int GetCount() const { return mCount; }
-	ParticleDesc GetDesc() const { return mDesc; }
+	PARTICLE_DESC GetDesc() const { return mDesc; }
 	int GetLife() const { return  mDesc.Life; }
 
 	// セッター

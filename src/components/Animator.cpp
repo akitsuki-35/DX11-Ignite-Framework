@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -68,18 +68,18 @@ bool Animator::setSkeleton()
     return true;
 }
 
-void Animator::calculateBoneTransform(const Animation::Channel& channel, double time)
+void Animator::calculateBoneTransform(const Animation::CHANNEL& channel, double time)
 {
     BoneTransform transform{};
 
     // 座標更新
-    transform.Position = calculatePosition(channel.Positions, time);
+    transform.mPosition = calculatePosition(channel.Positions, time);
 
     // 回転更新
-    transform.Rotation = calculateRotation(channel.Rotations, time);
+    transform.mRotation = calculateRotation(channel.Rotations, time);
 
     // スケール更新
-    transform.Scale = calculateScale(channel.Scales, time);
+    transform.mScale = calculateScale(channel.Scales, time);
 
     auto& bone = _mSkeleton->GetBone(channel.BoneIndex);
 
@@ -89,7 +89,7 @@ void Animator::calculateBoneTransform(const Animation::Channel& channel, double 
     XMStoreFloat4x4(&bone.Local, finalLocal);
 }
 
-Vector3 Animator::calculatePosition(const std::vector<Animation::KeyPosition>& keys, double time)
+Vector3 Animator::calculatePosition(const std::vector<Animation::KEY_POSITION>& keys, double time)
 {
     if (keys.empty()) {
         return { 0.0f, 0.0f, 0.0f };
@@ -116,7 +116,7 @@ Vector3 Animator::calculatePosition(const std::vector<Animation::KeyPosition>& k
     return Vector3::Lerp(current.Position, next.Position, factor);
 }
 
-Quaternion Animator::calculateRotation(const std::vector<Animation::KeyRotation>& keys, double time)
+Quaternion Animator::calculateRotation(const std::vector<Animation::KEY_ROTATION>& keys, double time)
 {
     if (keys.empty()) {
         return { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -143,7 +143,7 @@ Quaternion Animator::calculateRotation(const std::vector<Animation::KeyRotation>
     return Quaternion::Slerp(current.Rotation, next.Rotation, factor);
 }
 
-Vector3 Animator::calculateScale(const std::vector<Animation::KeyScale>& keys, double time)
+Vector3 Animator::calculateScale(const std::vector<Animation::KEY_SCALE>& keys, double time)
 {
     if (keys.empty()) {
         return { 1.0f, 1.0f, 1.0f };

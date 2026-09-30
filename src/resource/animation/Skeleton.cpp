@@ -4,12 +4,12 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #include "Skeleton.h"
 using namespace DirectX;
 
-int Skeleton::AddBone(const Bone& bone)
+int Skeleton::AddBone(const BONE& bone)
 {
     // 新規ボーン登録
     int index = static_cast<int>(mBones.size());
@@ -35,7 +35,7 @@ void Skeleton::Update()
 {
     for (size_t i = 0; i < mBones.size(); i++)
     {
-        Bone& bone = mBones[i];
+        BONE& bone = mBones[i];
 
         if (bone.ParentIndex == -1) {
             // グローバル行列更新
@@ -49,7 +49,7 @@ void Skeleton::Update()
 
 void Skeleton::updateGlobal(int index)
 {
-    Bone& bone = mBones[index];
+    BONE& bone = mBones[index];
     
     // ボーンのローカル行列取得
     DirectX::XMMATRIX local = DirectX::XMLoadFloat4x4(&bone.Local);
@@ -100,7 +100,7 @@ int Skeleton::GetBoneIndex(const std::string& name)
 
 void Skeleton::calculateBindGlobal(int index)
 {
-    Bone& bone = mBones[index];
+    BONE& bone = mBones[index];
 
     // BindLocal取得
     XMMATRIX local = XMLoadFloat4x4(&bone.BindLocal);
@@ -132,7 +132,7 @@ void Skeleton::updateSkinningMatrices()
     DirectX::XMMATRIX globalInverse = XMLoadFloat4x4(&mGlobalInverse);
 
     for (size_t i = 0; i < mBones.size(); ++i) {
-        const Bone& bone = mBones[i];
+        const BONE& bone = mBones[i];
 
         // アニメーション適用後のグローバル行列を取得
         DirectX::XMMATRIX global = DirectX::XMLoadFloat4x4(&bone.Global);

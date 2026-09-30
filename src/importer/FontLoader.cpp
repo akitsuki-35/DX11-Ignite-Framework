@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/04
-*	@updated : 2026/09/28
+*	@updated : 2026/09/30
 *============================================================*/
 #include "FontLoader.h"
 #include "StringUtility.h"
@@ -27,7 +27,7 @@ IDWriteFactory* FontLoader::Initialize()
 	return factory.Get();
 }
 
-bool FontLoader::Load(IDWriteFactory* factory, Font& font, const char* fontPath)
+bool FontLoader::Load(IDWriteFactory* factory, FONT& font, const char* fontPath)
 {
 	if (!factory || !fontPath) {
 		return false;

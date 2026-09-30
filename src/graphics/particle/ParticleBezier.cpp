@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/28
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #include "ParticleBezier.h"
 #include "ParticleBox.h"
@@ -23,7 +23,7 @@ void ParticleType::Bezier::Update(double deltaTime)
 	Base::Update(deltaTime);
 }
 
-void ParticleType::Bezier::Emission(ParticleDesc& desc)
+void ParticleType::Bezier::Emission(PARTICLE_DESC& desc)
 {
 	// エミッタ本体から発射数とパーティクル配列を取得
 	int count = _mEmitter->GetCount();
