@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/19
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -16,7 +16,7 @@
 	前方宣言
 ------------------------------------------------------------*/
 class ParticleEmitter;
-struct ParticleDesc;
+struct PARTICLE_DESC;
 
 /*============================================================
 *	@namespace	: ParticleType
@@ -40,7 +40,7 @@ namespace ParticleType {
 		virtual ~Base() = default;
 
 		// パーティクル発射
-		virtual void Emission(ParticleDesc& desc) = 0;
+		virtual void Emission(PARTICLE_DESC& desc) = 0;
 
 		// 発射後パーティクルの更新
 		virtual void Update(double deltaTime);

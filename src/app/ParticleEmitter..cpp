@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #include "ParticleEmitter.h"
 #include "ParticleRenderer.h"

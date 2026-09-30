@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/28
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -28,7 +28,7 @@ namespace ParticleType {
 
 		void Update(double deltaTime) override;
 
-		void Emission(ParticleDesc& desc) override;
+		void Emission(PARTICLE_DESC& desc) override;
 
 		// ベジエ曲線取得
 		BezierCurve& GetBezier() { return mBezier; }

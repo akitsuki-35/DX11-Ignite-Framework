@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/09/28
+*	@updated : 2026/09/30
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -118,7 +118,7 @@ bool AssimpLoader::loadBones(const aiNode* node, Skeleton& skeleton, int parentI
 
 	// 未登録ボーンの追加
 	if (boneIndex == -1) {
-		Skeleton::Bone bone{};
+		Skeleton::BONE bone{};
 
 		bone.Name = node->mName.C_Str();
 
@@ -166,7 +166,7 @@ bool AssimpLoader::calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton
 				continue;
 			}
 
-			Skeleton::Bone& bone = skeleton.GetBone(index);
+			Skeleton::BONE& bone = skeleton.GetBone(index);
 
 			// BindGlobal取得
 			XMMATRIX bindGlobal = XMLoadFloat4x4(&bone.BindGlobal);
@@ -528,7 +528,7 @@ bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, co
 		}
 
 		// アニメーションチャンネル作成
-		Animation::Channel channel{};
+		Animation::CHANNEL channel{};
 		channel.BoneIndex = boneIndex;
 
 		/*--------------------------------------------------
@@ -537,7 +537,7 @@ bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, co
 		for (UINT i = 0; i < aiChannel->mNumPositionKeys; i++) {
 			const aiVectorKey& key = aiChannel->mPositionKeys[i];
 
-			Animation::KeyPosition position{};
+			Animation::KEY_POSITION position{};
 
 			position.Time = static_cast<double>(key.mTime);
 			position.Position = { key.mValue.x, key.mValue.y, key.mValue.z };
@@ -551,7 +551,7 @@ bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, co
 		for (UINT i = 0; i < aiChannel->mNumRotationKeys; i++) {
 			const aiQuatKey& key = aiChannel->mRotationKeys[i];
 
-			Animation::KeyRotation rotation{};
+			Animation::KEY_ROTATION rotation{};
 
 			rotation.Time = static_cast<double>(key.mTime);
 			rotation.Rotation = { key.mValue.x, key.mValue.y, key.mValue.z, key.mValue.w };
@@ -566,7 +566,7 @@ bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, co
 		for (UINT i = 0; i < aiChannel->mNumScalingKeys; i++) {
 			const aiVectorKey& key = aiChannel->mScalingKeys[i];
 
-			Animation::KeyScale scale{};
+			Animation::KEY_SCALE scale{};
 
 			scale.Time = static_cast<double>(key.mTime);
 			scale.Scale = { key.mValue.x, key.mValue.y, key.mValue.z };

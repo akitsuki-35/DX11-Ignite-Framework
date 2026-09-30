@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/12
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -16,8 +16,8 @@
 ------------------------------------------------------------*/
 class Texture;
 class Transform;
-struct Font;
-struct Glyph;
+struct FONT;
+struct GLYPH;
 
 /*============================================================
 *	@class	: UIRenderer
@@ -27,7 +27,7 @@ class TextRenderer : public UIRenderer
 {
 private:
 	// フォント
-	Font* _mFont{};
+	FONT* _mFont{};
 
 	// 表示文字列
 	std::wstring mText{};
@@ -64,7 +64,7 @@ public:
 
 private:
 	// ドロップシャドウ描画
-	void shadowDraw(const Glyph* glyph, const Transform& transform) const;
+	void shadowDraw(const GLYPH* glyph, const Transform& transform) const;
 
 	DirectX::XMMATRIX getWorldMatrix() = delete;
 

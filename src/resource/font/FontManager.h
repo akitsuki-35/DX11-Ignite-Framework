@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/11
-*	@updated : 2026/09/21
+*	@updated : 2026/09/30
 *============================================================*/
 #pragma once
 
@@ -22,7 +22,7 @@ class Texture;
 /*------------------------------------------------------------
 	文字テクスチャデータ
 ------------------------------------------------------------*/
-struct Glyph
+struct GLYPH
 {
 	// テクスチャ本体
 	std::shared_ptr<Texture> Texture{ nullptr };
@@ -40,10 +40,10 @@ struct Glyph
 /*------------------------------------------------------------
 	文字探索用キー
 ------------------------------------------------------------*/
-struct GlyphKey
+struct GLYPHKEY
 {
 	// フォント
-	Font* Font{};
+	FONT* Font{};
 
 	// 文字
 	uint32_t Codepoint{};
@@ -51,17 +51,17 @@ struct GlyphKey
 	// フォントサイズ
 	int Size{};
 
-	bool operator==(const GlyphKey& o) const {
+	bool operator==(const GLYPHKEY& o) const {
 		return Font == o.Font && Codepoint == o.Codepoint && Size == o.Size;
 	}
 };
 
 // ハッシュ化
 template <>
-struct std::hash<GlyphKey> {
-	size_t operator()(const GlyphKey& k) const {
+struct std::hash<GLYPHKEY> {
+	size_t operator()(const GLYPHKEY& k) const {
 
-		size_t h1 = std::hash<const Font*>()(k.Font);
+		size_t h1 = std::hash<const FONT*>()(k.Font);
 		size_t h2 = std::hash<uint32_t>()(k.Codepoint);
 		size_t h3 = std::hash<int>()(k.Size);
 
@@ -104,10 +104,10 @@ private:
 ----------------------------------------------------*/
 private:
 	// フォントコンテナ
-	std::unordered_map<std::string, std::unique_ptr<Font>> mFonts{};
+	std::unordered_map<std::string, std::unique_ptr<FONT>> mFonts{};
 
 	// 文字テクスチャキャッシュ
-	std::unordered_map<GlyphKey, std::unique_ptr<Glyph>> mAtlas{};
+	std::unordered_map<GLYPHKEY, std::unique_ptr<GLYPH>> mAtlas{};
 
 	// DirectWriteファクトリ
 	Microsoft::WRL::ComPtr<IDWriteFactory> _mFactory{ nullptr };
@@ -117,18 +117,18 @@ public:
 	void Initialize(IDWriteFactory* factory) { _mFactory = factory; }
 
 	// フォント取得
-	Font* GetFont(const std::string& keyName);
+	FONT* GetFont(const std::string& keyName);
 	
 	// 文字テクスチャ取得
-	Glyph* GetGlyph(const GlyphKey& key);
+	GLYPH* GetGlyph(const GLYPHKEY& key);
 
 	// フォント登録
-	Font* Register(const std::string& keyName, const char* fontPath);
+	FONT* Register(const std::string& keyName, const char* fontPath);
 
 	// クリア
 	void Clear();
 
 private:
 	// 文字テクスチャ生成
-	bool generateGlyph(Glyph& glyph, const GlyphKey& key);
+	bool generateGlyph(GLYPH& glyph, const GLYPHKEY& key);
 };

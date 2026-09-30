@@ -4,12 +4,12 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/27
-*	@updated : 2026/09/16
+*	@updated : 2026/09/30
 *============================================================*/
 #include "ParticleBox.h"
 #include "ParticleEmitter.h"
 
-void ParticleType::Box::Emission(ParticleDesc& desc)
+void ParticleType::Box::Emission(PARTICLE_DESC& desc)
 {
 	// エミッタ本体から発射数とパーティクル配列を取得
 	int count = _mEmitter->GetCount();
