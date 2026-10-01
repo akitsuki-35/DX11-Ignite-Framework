@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/09/16
+*	@updated : 2026/10/01
 *============================================================*/
 #pragma once
 
@@ -21,6 +21,15 @@ public:
     float y{};
     float z{};
     float w{ 1.0f };
+
+public:
+    constexpr Quaternion() = default;
+    constexpr Quaternion(const Quaternion& quaternion)
+        : x(quaternion.x), y(quaternion.y), z(quaternion.z), w(quaternion.w) {}
+    constexpr Quaternion(const float& x, const float& y, const float& z, const float& w)
+        : x(x), y(y), z(z), w(w) {}
+    constexpr Quaternion(const DirectX::XMFLOAT4& float4)
+        : x(float4.x), y(float4.y), z(float4.z), w(float4.w) {}
 
     // XMMATRIXへ変換
     DirectX::XMMATRIX ToMatrix() const {

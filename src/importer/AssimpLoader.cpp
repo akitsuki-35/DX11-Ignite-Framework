@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/09/30
+*	@updated : 2026/10/01
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -21,12 +21,12 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "assimp/matrix4x4.h"
+#include "assimp/config.h"
 
 using namespace Element;
 using namespace DirectX;
 
-namespace
-{
+namespace {
 	XMFLOAT4X4 convertMatrix(const aiMatrix4x4& m) {
 		XMFLOAT4X4 out {
 			m.a1, m.b1, m.c1, m.d1,
@@ -60,46 +60,59 @@ bool AssimpLoader::GenerateModel(Model& model, const std::string& path)
 
 	Assimp::Importer importer{};
 
+	// FBXのPivotノードをAssimp補助ノードとして展開しない
+	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
 	// モデルロード
 	const aiScene* scene = importer.ReadFile(
 		path,
 		aiProcess_Triangulate |
 		aiProcess_ConvertToLeftHanded |
 		aiProcess_JoinIdenticalVertices |
-		aiProcess_GenSmoothNormals
+		aiProcess_GenSmoothNormals |
+		aiProcess_LimitBoneWeights
 	);
 
 	// 読み込み失敗時はreturn
-	if (!scene) {
+	if (!scene || !scene->mRootNode) {
 		OutputDebugStringA(importer.GetErrorString());
 		return false;
 	}
 
+	// ノード読み込み
+	if (!loadNodes(scene->mRootNode, model.mSkeleton, -1)) {
+		return false;
+	}
+
 	// ボーン読み込み
-	if (!loadBones(scene->mRootNode, model.mSkeleton, -1)) {
+	if (!loadBones(scene, model.mSkeleton)) {
 		return false;
 	}
 
-	// バインドポーズ計算
-	model.mSkeleton.CalculateBindPose();
+	// グローバル逆行列作成
+	aiMatrix4x4 inverseRoot = scene->mRootNode->mTransformation.Inverse();
+	model.mSkeleton.SetGlobalInverse(convertMatrix(inverseRoot));
 
-	// ボーンのオフセット行列作成
-	if (!calculateBoneOffsets(scene, model.mSkeleton)) {
-		return false;
-	}
+	// スキニング行列作成
+	model.mSkeleton.ToBindPose();
+	model.mSkeleton.Update();
 
 	// メッシュ読み込み
-	if (!loadMeshes(scene, model, model.mSkeleton))
+	if (!loadMeshes(scene, model, model.mSkeleton)) {
 		return false;
+	}
 
 	// アニメーション読み込み
 	if (scene->mAnimations) {
-		AiAnimationLoader::loadAnimations(scene, model.mSkeleton);
+		if (!AiAnimationLoader::loadAnimations(scene, model.mSkeleton)) {
+			return false;
+		}
 	}
 
 	// 埋め込みテクスチャ読み込み
-	if (!loadTextures(scene, model))
+	if (!loadTextures(scene, model)) {
 		return false;
+	}
 
 	// マテリアル読み込み
 	loadMaterials(scene, model, path);
@@ -109,75 +122,75 @@ bool AssimpLoader::GenerateModel(Model& model, const std::string& path)
 	return true;
 }
 
-bool AssimpLoader::loadBones(const aiNode* node, Skeleton& skeleton, int parentIndex)
+bool AssimpLoader::loadNodes(const aiNode* node, Skeleton& skeleton, int parentIndex)
 {
-	// ボーン階層登録
-
-	// ノード名対応ボーン検索
-	int boneIndex = skeleton.FindBone(node->mName.C_Str());
-
-	// 未登録ボーンの追加
-	if (boneIndex == -1) {
-		Skeleton::BONE bone{};
-
-		bone.Name = node->mName.C_Str();
-
-		// ローカル行列作成
-		bone.BindLocal = convertMatrix(node->mTransformation);
-
-		// BindLocalをLocalで初期化
-		bone.Local = bone.BindLocal;
-
-		boneIndex = skeleton.AddBone(bone);
+	if (!node) {
+		return false;
 	}
 
-	// 親子関係を登録
-	auto& bone = skeleton.GetBone(boneIndex);
-	bone.ParentIndex = parentIndex;
+	// ノード生成
+	Skeleton::NODE newNode{};
 
-	// 子ノードを処理
-	for (UINT i = 0; i < node->mNumChildren; i++) {
-		loadBones(node->mChildren[i], skeleton, boneIndex);
+	newNode.Name = node->mName.C_Str();
+	newNode.ParentIndex = parentIndex;
+
+	// ローカル行列作成
+	newNode.BindLocal = convertMatrix(node->mTransformation);
+
+	// LocalとGlobal初期化
+	newNode.Local = newNode.BindLocal;
+	newNode.Global = newNode.BindLocal;
+
+	int nodeIndex = skeleton.AddNode(newNode);
+
+	// 親子関係を登録
+	for (uint32_t i = 0; i < node->mNumChildren; ++i) {
+		if (!loadNodes(node->mChildren[i], skeleton, nodeIndex)) {
+			return false;
+		}
 	}
 
 	return true;
 }
 
-bool AssimpLoader::calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton)
+bool AssimpLoader::loadBones(const aiScene* scene, Skeleton& skeleton)
 {
-	// シーン逆行列計算
-	aiMatrix4x4 inverse = scene->mRootNode->mTransformation.Inverse();
-	skeleton.SetGlobalInverse(convertMatrix(inverse));
-
-	// 全メッシュからボーン情報取得
-	for (UINT i = 0; i < scene->mNumMeshes; i++)
-	{
-		const aiMesh* mesh = scene->mMeshes[i];
-
-		// メッシュ内のボーンを探索
-		for (UINT j = 0; j < mesh->mNumBones; j++) {
-			const aiBone* aiBone = mesh->mBones[j];
-			std::string name = aiBone->mName.C_Str();
-
-			// Skeleton登録済みボーン検索
-			int index = skeleton.FindBone(aiBone->mName.C_Str());
-
-			if (index < 0) {
-				continue;
-			}
-
-			Skeleton::BONE& bone = skeleton.GetBone(index);
-
-			// BindGlobal取得
-			XMMATRIX bindGlobal = XMLoadFloat4x4(&bone.BindGlobal);
-
-			// オフセット計算
-			bone.Offset = convertMatrix(aiBone->mOffsetMatrix);
-		}
+	if (!scene) {
+		return false;
 	}
 
-	// スキニング行列適用
-	skeleton.Update();
+	// ボーン登録
+	for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
+		const aiMesh* mesh = scene->mMeshes[i];
+		if (!mesh) continue;
+
+		for (uint32_t j = 0; j < mesh->mNumBones; ++j) {
+			const aiBone* bone = mesh->mBones[j];
+			if (!bone) continue;
+
+			std::string boneName = bone->mName.C_Str();
+
+			int boneIndex = skeleton.FindBone(boneName);
+			if (boneIndex >= 0) continue;
+
+			if (skeleton.GetBoneCount() >= Element::MAX_BONE) {
+				return false;
+			}
+
+			int nodeIndex = skeleton.FindNode(boneName);
+
+			if (nodeIndex < 0) {
+				return false;
+			}
+
+			Skeleton::BONE newBone{};
+			newBone.Name = boneName;
+			newBone.NodeIndex = nodeIndex;
+			newBone.Offset = convertMatrix(bone->mOffsetMatrix);
+
+			skeleton.AddBone(newBone);
+		}
+	}
 
 	return true;
 }
@@ -209,27 +222,33 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 			頂点ウェイト取得
 		----------------------------------------------------*/
 		for (UINT boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++) {
-			const aiBone* aiBone = mesh->mBones[boneIndex];
+			const aiBone* bone = mesh->mBones[boneIndex];
 
 			// ボーンインデックス取得
-			int skeletonIndex = skeleton.FindBone(aiBone->mName.C_Str());
+			int skeletonIndex = skeleton.FindBone(bone->mName.C_Str());
 
 			if (skeletonIndex < 0) {
 				continue;
 			}
 
-			// ウェイト情報取得
-			for (UINT weightIndex = 0; weightIndex < aiBone->mNumWeights; weightIndex++) {
-				UINT vertexId = aiBone->mWeights[weightIndex].mVertexId;
+			assert(skeletonIndex < Element::MAX_BONE);
 
-				float weight = aiBone->mWeights[weightIndex].mWeight;
+			// ウェイト情報取得
+			for (UINT weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+				UINT vertexId = bone->mWeights[weightIndex].mVertexId;
+
+				float weight = bone->mWeights[weightIndex].mWeight;
+
+				if (vertexId >= vertices.size()) continue;
+
+				Element::VERTEX3D& vertex = vertices[vertexId];
 
 				// BoneWeightsとBoneIndicesを登録
-				for (int slot = 0; slot < 4; slot++) {
-					if (vertices[vertexId].BoneWeights[slot] == 0.0f && vertices[vertexId].BoneIndices[slot] == 0) {
-						vertices[vertexId].BoneIndices[slot] = static_cast<uint32_t>(skeletonIndex);
+				for (int slot = 0; slot < 4; ++slot) {
+					if (vertex.BoneWeights[slot] == 0.0f) {
+						vertex.BoneIndices[slot] = static_cast<uint32_t>(skeletonIndex);
 
-						vertices[vertexId].BoneWeights[slot] = weight;
+						vertex.BoneWeights[slot] = weight;
 
 						break;
 					}
@@ -517,19 +536,18 @@ bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, co
 	for (UINT channelIndex = 0; channelIndex < aiAnim->mNumChannels; channelIndex++) {
 		const aiNodeAnim* aiChannel = aiAnim->mChannels[channelIndex];
 
-		// ボーン名取得
-		std::string boneName = aiChannel->mNodeName.C_Str();
+		// ノード名取得
+		std::string nodeName = aiChannel->mNodeName.C_Str();
 
-		// ボーンインデックス取得
-		int boneIndex = skeleton.FindBone(boneName);
+		// ノードインデックス取得
+		int nodeIndex = skeleton.FindNode(nodeName);
 
-		if (boneIndex == -1) {
-			continue;
-		}
+		if (nodeIndex < 0) continue;
 
 		// アニメーションチャンネル作成
 		Animation::CHANNEL channel{};
-		channel.BoneIndex = boneIndex;
+		channel.NodeName = nodeName;
+		channel.NodeIndex = nodeIndex;
 
 		/*--------------------------------------------------
 			移動キー
