@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/09/16
+*	@updated : 2026/10/01
 *============================================================*/
 #include "BufferManager.h"
 #include "DeviceManager.h"
@@ -157,16 +157,19 @@ void D3D11::BufferManager::SetBoneMatrices(const Skeleton& skeleton)
 	// ボーン行列設定
 	Element::BONE buffer{};
 
+	const DirectX::XMMATRIX identity = DirectX::XMMatrixIdentity();
+
+	// 単位行列で初期化
+	for (auto& matrix : buffer.Matrices) {
+		DirectX::XMStoreFloat4x4(&matrix, identity);
+	}
+
 	const auto& matrices = skeleton.GetSkinningMatrices();
 
-	const size_t count = std::min(matrices.size(),static_cast<size_t>(Element::MAX_BONES));
+	assert(matrices.size() <= Element::MAX_BONE);
 
-	for (size_t i = 0; i < count; i++) {
-		DirectX::XMMATRIX matrix = DirectX::XMLoadFloat4x4(&matrices[i]);
-
-		matrix = DirectX::XMMatrixTranspose(matrix);
-
-		DirectX::XMStoreFloat4x4(&buffer.Matrices[i], matrix);
+	for (size_t i = 0; i < matrices.size(); i++) {
+		buffer.Matrices[i] = matrices[i];
 	}
 
 	DeviceManager::getInstance().GetContext()->UpdateSubresource(_mBones.Get(),

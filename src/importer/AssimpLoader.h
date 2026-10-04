@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/09/16
+*	@updated : 2026/10/01
 *============================================================*/
 #pragma once
 
@@ -62,11 +62,11 @@ public:
 	bool GenerateModel(Model& model, const std::string& path);
 
 private:
-	// ボーン取得
-	bool loadBones(const aiNode* node, Skeleton& skeleton, int parentIndex);
+	// ノード取得
+	bool loadNodes(const aiNode* node, Skeleton& skeleton, int parentIndex);
 
-	// ボーンのオフセット行列作成
-	bool calculateBoneOffsets(const aiScene* scene, Skeleton& skeleton);
+	// ボーン取得
+	bool loadBones(const aiScene* scene, Skeleton& skeleton);
 
 	// メッシュ生成
 	bool loadMeshes(const aiScene* scene, Model& model, const Skeleton& skeleton);

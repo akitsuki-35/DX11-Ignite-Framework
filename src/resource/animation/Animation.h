@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/09/30
+*	@updated : 2026/10/01
 *============================================================*/
 #pragma once
 
 #include "Vector3.h"
 #include "Quaternion.h"
+#include <string>
 #include <vector>
 #include <DirectXMath.h>
 
@@ -46,8 +47,9 @@ public:
     // アニメーションチャンネル
     struct CHANNEL
     {
-        // ボーン番号
-        int BoneIndex{ -1 };
+        // ノード情報
+        std::string NodeName{};
+        int NodeIndex{ -1 };
 
         std::vector<KEY_POSITION> Positions{};
         std::vector<KEY_ROTATION> Rotations{};
