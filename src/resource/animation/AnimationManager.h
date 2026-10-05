@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/09/21
+*	@updated : 2026/10/05
 *============================================================*/
 #pragma once
 
@@ -46,6 +46,9 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<Animation>> mAnimations{};
 
 public:
+	// ロード
+	Animation* Load(const char* animPath);
+
 	// ロード済みアニメーションを取得
 	Animation* Get(const std::string& keyName);
 

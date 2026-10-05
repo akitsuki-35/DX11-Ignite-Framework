@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/01
+*	@updated : 2026/10/05
 *============================================================*/
 #pragma once
 
@@ -61,6 +61,9 @@ public:
 	// モデル生成
 	bool GenerateModel(Model& model, const std::string& path);
 
+	// FBXアニメーション読み込み
+	bool LoadFBXAnimation(Animation& anim, const std::string& path);
+
 private:
 	// ノード取得
 	bool loadNodes(const aiNode* node, Skeleton& skeleton, int parentIndex);
@@ -95,10 +98,11 @@ private:
 		AiAnimationLoader() = delete;
 
 		// アニメーション取得
-		static bool loadAnimations(const aiScene* scene, const Skeleton& skeleton);
+		static bool loadAnimations(const aiScene* scene, const Skeleton& skeleton,
+			const std::string& key, const bool isPrefix = false);
 
 		// 単一アニメーション取得
 		static bool loadAnimationClip(const aiScene* scene, const Skeleton& skeleton,
-			Animation& animation,UINT index);
+			Animation& animation, UINT index);
 	};
 };

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/09/28
-*	@updated : 2026/09/28
+*	@updated : 2026/10/05
 *============================================================*/
 #pragma once
 
@@ -26,6 +26,9 @@ namespace Utility {
 
 		// ディレクトリのパス取得
 		std::filesystem::path getDirectoryPath(const char* filePath);
+
+		// ディレクトリ名パス無しのファイル名取得
+		std::string getFileName(const std::string& filePath);
 
 		// ファイル拡張子取得
 		std::string getFileExtension(const std::string& filePath);
