@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/09/16
+*	@updated : 2026/10/05
 *============================================================*/
 #include "DeviceManager.h"
 #include "SystemWindow.h"
@@ -134,8 +134,8 @@ bool D3D11::DeviceManager::generateDepthStencilView()
 	ID3D11RenderTargetView* const rtvs[] = { _mRenderTargetView.Get() };
 	_mContext->OMSetRenderTargets(1, rtvs, _mDepthStencilView.Get());
 
-	assert(_mRenderTargetView != nullptr);
-	assert(_mDepthStencilView != nullptr);
+	assert(_mRenderTargetView);
+	assert(_mDepthStencilView);
 
 	return true;
 }
