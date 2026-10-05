@@ -22,7 +22,7 @@ Animator::Animator(GameObject* owner)
     : Component(owner)
 {
     // モデルのスケルトン取得
-    assert(setSkeleton());
+    setSkeleton();
 }
 
 void Animator::Finalize()
