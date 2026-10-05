@@ -4,14 +4,14 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/30
-*	@updated : 2026/09/28
+*	@updated : 2026/10/05
 *============================================================*/
 #include "ModelManager.h"
 #include "AssimpLoader.h"
 #include "FileUtility.h"
 #include "Model.h"
 
-Model* ModelManager::Load(const char* modelPath)
+Model* ModelManager::Load(const char* modelPath, const bool& isAnimLoad)
 {
 	// キャッシュ取得用にパスを正規化
 	std::string key = Utility::File::normalizePath(modelPath);
@@ -27,7 +27,7 @@ Model* ModelManager::Load(const char* modelPath)
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 
 	// Loaderからモデルをインポート
-	if (!AssimpLoader::getInstance().GenerateModel(*model, key)) {
+	if (!AssimpLoader::getInstance().GenerateModel(*model, key, isAnimLoad)) {
 		return nullptr;
 	}
 

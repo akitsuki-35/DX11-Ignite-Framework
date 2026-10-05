@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/31
-*	@updated : 2026/09/30
+*	@updated : 2026/10/05
 *============================================================*/
 #pragma once
 
@@ -86,7 +86,7 @@ private:
 
 public:
 	// モデル読み込み
-	ModelRenderer* LoadModel(const char* fileName);
+	ModelRenderer* LoadModel(const char* fileName, const bool& isAnimLoad = false);
 
 	// テクスチャ読み込み
 	ModelRenderer* LoadTexture(std::string textureName, TextureType type = TextureType::Albedo, bool isMip = false);

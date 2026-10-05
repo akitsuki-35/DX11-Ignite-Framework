@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/01
+*	@updated : 2026/10/05
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -26,6 +26,7 @@
 using namespace Element;
 using namespace DirectX;
 
+// 補助関数宣言
 namespace {
 	XMFLOAT4X4 convertMatrix(const aiMatrix4x4& m) {
 		XMFLOAT4X4 out {
@@ -35,6 +36,23 @@ namespace {
 			m.a4, m.b4, m.c4, m.d4
 		};
 		return out;
+	}
+
+	const aiScene* generateScene(Assimp::Importer& importer, const std::string& path) {
+		// FBXのPivotノードをAssimp補助ノードとして展開しない
+		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
+		// モデルロード
+		const aiScene* scene = importer.ReadFile(
+			path,
+			aiProcess_Triangulate |
+			aiProcess_ConvertToLeftHanded |
+			aiProcess_JoinIdenticalVertices |
+			aiProcess_GenSmoothNormals |
+			aiProcess_LimitBoneWeights
+		);
+
+		return scene;
 	}
 }
 
@@ -54,24 +72,13 @@ namespace AssimpDebug {
 }
 #endif
 
-bool AssimpLoader::GenerateModel(Model& model, const std::string& path)
+bool AssimpLoader::GenerateModel(Model& model, const std::string& path, const bool& isAnimLoad)
 {
 	mTextureMap.clear();
 
 	Assimp::Importer importer{};
 
-	// FBXのPivotノードをAssimp補助ノードとして展開しない
-	importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-
-	// モデルロード
-	const aiScene* scene = importer.ReadFile(
-		path,
-		aiProcess_Triangulate |
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_GenSmoothNormals |
-		aiProcess_LimitBoneWeights
-	);
+	const aiScene* scene = generateScene(importer, path);
 
 	// 読み込み失敗時はreturn
 	if (!scene || !scene->mRootNode) {
@@ -102,10 +109,12 @@ bool AssimpLoader::GenerateModel(Model& model, const std::string& path)
 		return false;
 	}
 
-	// アニメーション読み込み
-	if (scene->mAnimations) {
-		if (!AiAnimationLoader::loadAnimations(scene, model.mSkeleton)) {
-			return false;
+	// 埋め込みアニメーション読み込み
+	if (isAnimLoad) {
+		if (scene->mAnimations) {
+			if (!AiAnimationLoader::loadAnimations(scene, Utility::File::getFileName(path), true)) {
+				return false;
+			}
 		}
 	}
 
@@ -118,6 +127,27 @@ bool AssimpLoader::GenerateModel(Model& model, const std::string& path)
 	loadMaterials(scene, model, path);
 
 	mTextureMap.clear();
+
+	return true;
+}
+
+bool AssimpLoader::LoadFBXAnimation(const std::string& keyName, const std::string& filePath)
+{
+	Assimp::Importer importer{};
+
+	const aiScene* scene = generateScene(importer, filePath);
+
+	// 読み込み失敗時はreturn
+	if (!scene || !scene->mRootNode) {
+		OutputDebugStringA(importer.GetErrorString());
+		return false;
+	}
+
+	if (scene->mAnimations) {
+		if (!AiAnimationLoader::loadAnimations(scene, keyName)) {
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -491,7 +521,7 @@ void AssimpLoader::loadMaterials(const aiScene* scene, Model& model, const std::
 /*--------------------------------------------------
 	アニメーションロード
 ----------------------------------------------------*/
-bool AssimpLoader::AiAnimationLoader::loadAnimations(const aiScene* scene, const Skeleton& skeleton)
+bool AssimpLoader::AiAnimationLoader::loadAnimations(const aiScene* scene, const std::string& key, const bool isPrefix)
 {
 	// アニメーションなしの場合は無視
 	if (scene->mNumAnimations == 0) {
@@ -503,17 +533,26 @@ bool AssimpLoader::AiAnimationLoader::loadAnimations(const aiScene* scene, const
 		auto animation = std::make_unique<Animation>();
 
 		// 単一アニメーション取得
-		loadAnimationClip(scene, skeleton, *animation, i);
+		loadAnimationClip(scene, *animation, i);
 
-		// Managerに登録
-		std::string name = scene->mAnimations[i]->mName.C_Str();
+		// Manager登録処理
+		std::string name{};
+		if (isPrefix) {
+			// 埋め込みアニメーションの場合はファイル名を接頭辞として使用
+			name = key + "_" + std::to_string(i);
+		}
+		else {
+			// 外部から明示的に読み込んだ場合は引数をそのままキー名にする
+			name = key;
+		}
+		
 		AnimationManager::getInstance().Register(name, std::move(animation));
 	}
 
 	return true;
 }
 
-bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, const Skeleton& skeleton, Animation& animation, UINT index)
+bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, Animation& animation, UINT index)
 {
 	// アニメーションなしの場合は無視
 	if (scene->mNumAnimations == 0) {
@@ -539,15 +578,10 @@ bool AssimpLoader::AiAnimationLoader::loadAnimationClip(const aiScene* scene, co
 		// ノード名取得
 		std::string nodeName = aiChannel->mNodeName.C_Str();
 
-		// ノードインデックス取得
-		int nodeIndex = skeleton.FindNode(nodeName);
-
-		if (nodeIndex < 0) continue;
-
 		// アニメーションチャンネル作成
 		Animation::CHANNEL channel{};
 		channel.NodeName = nodeName;
-		channel.NodeIndex = nodeIndex;
+		channel.NodeIndex = -1;
 
 		/*--------------------------------------------------
 			移動キー

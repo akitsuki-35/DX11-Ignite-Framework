@@ -4,10 +4,32 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/09/16
+*	@updated : 2026/10/05
 *============================================================*/
 #include "AnimationManager.h"
+#include "AssimpLoader.h"
+#include "FileUtility.h"
 #include "Animation.h"
+
+Animation* AnimationManager::Load(std::string keyName, const char* animPath)
+{
+	// キャッシュが存在すれば返す
+	auto it = mAnimations.find(keyName);
+
+	if (it != mAnimations.end()) {
+		return it->second.get();
+	}
+
+	// アニメーションをインポート
+	if (!AssimpLoader::getInstance().LoadFBXAnimation(keyName, Utility::File::normalizePath(animPath))) {
+		return nullptr;
+	}
+
+	// アニメーション取得
+	Animation* anim = Get(keyName);
+
+	return anim;
+}
 
 Animation* AnimationManager::Get(const std::string& keyName)
 {

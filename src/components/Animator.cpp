@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/01
+*	@updated : 2026/10/05
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -18,10 +18,38 @@
 
 using namespace DirectX;
 
+Animator::Animator(GameObject* owner)
+    : Component(owner)
+{
+    // モデルのスケルトン取得
+    assert(setSkeleton());
+}
+
+void Animator::Finalize()
+{
+    _mSkeleton = nullptr;
+    _mAnimation = nullptr;
+}
+
+Animator* Animator::Load(std::string keyName, const char* fileName)
+{
+    _mAnimation = AnimationManager::getInstance().Load(keyName, fileName);
+    
+    // ロードしたアニメーションをセット
+    Set(keyName);
+
+    // ノードテーブル作成
+    generateNodeTable(keyName);
+
+    return this;
+}
+
 void Animator::Set(const std::string& keyName)
 {
     _mAnimation = AnimationManager::getInstance().Get(keyName);
-    assert(setSkeleton());
+
+    mAnimKey = keyName;
+    
     mCurrentTime = 0.0;
 }
 
@@ -36,9 +64,12 @@ void Animator::Update(double deltaTime)
     // 全ノードをバインドポーズに戻す
     _mSkeleton->ToBindPose();
 
-    // チャンネル更新
-    for (auto& channel : _mAnimation->GetChannels()) {
-        calculateBoneTransform(channel, mCurrentTime);
+    // ノードテーブル参照でアニメーション更新
+    const auto& channels = _mAnimation->GetChannels();
+    const auto& table = mNodeTable.at(mAnimKey);
+
+    for (size_t i = 0; i < channels.size(); ++i) {
+        calculateBoneTransform(channels[i], table[i], mCurrentTime);
     }
 
     _mSkeleton->Update();
@@ -76,14 +107,28 @@ bool Animator::setSkeleton()
     return true;
 }
 
-void Animator::calculateBoneTransform(const Animation::CHANNEL& channel, double time)
+void Animator::generateNodeTable(const std::string& keyName)
 {
-    if (channel.NodeIndex < 0 || static_cast<size_t>(channel.NodeIndex) >= _mSkeleton->GetNodeCount()) {
+    mNodeTable[keyName].clear();
+
+    if (!_mAnimation || !_mSkeleton) return;
+
+    const auto& channels = _mAnimation->GetChannels();
+
+    // アニメーションチャンネルからノードテーブルを作成
+    for (size_t i = 0; i < channels.size(); ++i) {
+        mNodeTable[keyName].push_back(_mSkeleton->FindNode(channels[i].NodeName));
+    }
+}
+
+void Animator::calculateBoneTransform(const Animation::CHANNEL& channel, int nodeIndex, double time)
+{
+    if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= _mSkeleton->GetNodeCount()) {
         return;
     }
 
     // ノード取得
-    auto& node = _mSkeleton->GetNode(channel.NodeIndex);
+    auto& node = _mSkeleton->GetNode(nodeIndex);
 
     BoneTransform transform{};
 

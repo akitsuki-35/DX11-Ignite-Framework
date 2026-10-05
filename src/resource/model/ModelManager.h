@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/30
-*	@updated : 2026/09/21
+*	@updated : 2026/10/05
 *============================================================*/
 #pragma once
 
@@ -47,7 +47,7 @@ private:
 
 public:
 	// ロード
-	Model* Load(const char* modelPath);
+	Model* Load(const char* modelPath, const bool& isAnimLoad);
 
 	// クリア
 	void Clear();

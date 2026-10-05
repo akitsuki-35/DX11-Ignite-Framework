@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/09/28
-*	@updated : 2026/09/28
+*	@updated : 2026/10/05
 *============================================================*/
 #include "FileUtility.h"
 #include <fstream>
@@ -65,6 +65,21 @@ std::filesystem::path Utility::File::getDirectoryPath(const char* filePath)
 	directory += "\\";
 
 	return directory;
+}
+
+std::string Utility::File::getFileName(const std::string& filePath)
+{
+	// 生ファイル名取得
+	auto slashPos = filePath.find_last_of("/\\");
+	auto dotPos = filePath.find_last_of('.');
+
+	size_t startPos = (slashPos == std::string::npos) ? 0 : slashPos + 1;
+
+	if (dotPos != std::string::npos && dotPos > startPos) {
+		return filePath.substr(startPos, dotPos - startPos);
+	}
+
+	return filePath.substr(startPos);
 }
 
 std::string Utility::File::getFileExtension(const std::string& filePath)
