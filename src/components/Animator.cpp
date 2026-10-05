@@ -25,11 +25,23 @@ Animator::Animator(GameObject* owner)
     assert(setSkeleton());
 }
 
-Animator* Animator::Load(const char* fileName)
+void Animator::Finalize()
 {
-    _mAnimation = AnimationManager::getInstance().Load(fileName);
+    _mSkeleton = nullptr;
+    _mAnimation = nullptr;
+}
 
-    return nullptr;
+Animator* Animator::Load(std::string keyName, const char* fileName)
+{
+    _mAnimation = AnimationManager::getInstance().Load(keyName, fileName);
+    
+    // ロードしたアニメーションをセット
+    Set(keyName);
+
+    // ノードテーブル作成
+    generateNodeTable(keyName);
+
+    return this;
 }
 
 void Animator::Set(const std::string& keyName)
@@ -37,9 +49,6 @@ void Animator::Set(const std::string& keyName)
     _mAnimation = AnimationManager::getInstance().Get(keyName);
 
     mAnimKey = keyName;
-    
-    // ノードテーブル作成
-    generateNodeTable(keyName);
     
     mCurrentTime = 0.0;
 }

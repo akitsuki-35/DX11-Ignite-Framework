@@ -11,32 +11,24 @@
 #include "FileUtility.h"
 #include "Animation.h"
 
-Animation* AnimationManager::Load(const char* animPath)
+Animation* AnimationManager::Load(std::string keyName, const char* animPath)
 {
-	// キャッシュ取得用にパスを正規化
-	std::string key = Utility::File::normalizePath(animPath);
-
 	// キャッシュが存在すれば返す
-	auto it = mAnimations.find(key);
+	auto it = mAnimations.find(keyName);
 
 	if (it != mAnimations.end()) {
 		return it->second.get();
 	}
 
-	// アニメーション生成
-	std::unique_ptr<Animation> anim = std::make_unique<Animation>();
+	// アニメーションをインポート
+	if (!AssimpLoader::getInstance().LoadFBXAnimation(keyName, Utility::File::normalizePath(animPath))) {
+		return nullptr;
+	}
 
-	//// アニメーションをインポート
-	//if (!AssimpLoader::AiAnimationLoader::loadAnimationClip(*anim, key)) {
-	//	return nullptr;
-	//}
+	// アニメーション取得
+	Animation* anim = Get(keyName);
 
-	Animation* a = anim.get();
-
-	// アニメーション登録
-	mAnimations.emplace(key, std::move(anim));
-
-	return a;
+	return anim;
 }
 
 Animation* AnimationManager::Get(const std::string& keyName)

@@ -44,19 +44,19 @@ private:
 public:
     Animator(GameObject* owner);
 
-    void Finalize() override {
-        _mSkeleton = nullptr;
-        _mAnimation = nullptr;
-    }
+    void Finalize() override;
 
     // アニメーション読み込み
-    Animator* Load(const char* fileName);
+    Animator* Load(std::string keyName, const char* fileName);
 
     // アニメーションをセット
     void Set(const std::string& keyName);
 
     // 更新
     void Update(double deltaTime) override;
+
+    // アニメーション名取得
+    std::string GetAnimKey() const { return mAnimKey; }
 
     // 経過時間取得
     double GetTime() const { return mCurrentTime; }

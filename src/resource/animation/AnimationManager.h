@@ -47,7 +47,7 @@ private:
 
 public:
 	// ロード
-	Animation* Load(const char* animPath);
+	Animation* Load(std::string keyName, const char* animPath);
 
 	// ロード済みアニメーションを取得
 	Animation* Get(const std::string& keyName);

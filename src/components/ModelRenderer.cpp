@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/01
-*	@updated : 2026/09/28
+*	@updated : 2026/10/05
 *============================================================*/
 #include "ModelRenderer.h"
 #include "ModelManager.h"
@@ -82,9 +82,9 @@ DirectX::XMMATRIX ModelRenderer::getWorldMatrix() const
     return _mOwner->GetTransform().GetWorldMatrix();
 }
 
-ModelRenderer* ModelRenderer::LoadModel(const char* fileName)
+ModelRenderer* ModelRenderer::LoadModel(const char* fileName, const bool& isAnimLoad)
 {
-    _mModel = ModelManager::getInstance().Load(fileName);
+    _mModel = ModelManager::getInstance().Load(fileName, isAnimLoad);
 
     // モデルディレクトリ取得
     mDirectory = Utility::File::getDirectoryPath(fileName);
