@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/09/20
+*	@updated : 2026/10/06
 *============================================================*/
 #include "Application.h"
 #include "Scene.h"
@@ -40,6 +40,11 @@ void Application::Finalize()
 
 		_mCurrentScene = std::move(_mNextScene);
 		_mCurrentScene->Initialize();
+	}
+	else {
+		if (_mCurrentScene) {
+			_mCurrentScene->Finalize();
+		}
 	}
 }
 

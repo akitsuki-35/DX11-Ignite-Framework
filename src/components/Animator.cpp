@@ -4,17 +4,15 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/05
+*	@updated : 2026/10/06
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
-#include "BoneTransform.h"
 #include "AnimationManager.h"
 #include "ModelRenderer.h"
 #include "GameObject.h"
 #include <cmath>
 #include <algorithm>
-#include <cassert>
 
 using namespace DirectX;
 
@@ -28,58 +26,221 @@ Animator::Animator(GameObject* owner)
 void Animator::Finalize()
 {
     _mSkeleton = nullptr;
-    _mAnimation = nullptr;
+    mNext._Animation = nullptr;
+    mCurrent._Animation = nullptr;
 }
 
-Animator* Animator::Load(std::string keyName, const char* fileName)
+Animator* Animator::Load(std::string keyName, const char* fileName, const bool& isSet)
 {
-    _mAnimation = AnimationManager::getInstance().Load(keyName, fileName);
+    Animation* animation = AnimationManager::getInstance().Load(keyName, fileName);
     
-    // ロードしたアニメーションをセット
-    Set(keyName);
-
     // ノードテーブル作成
-    generateNodeTable(keyName);
+    generateNodeTable(keyName, animation);
+
+    // ロードしたアニメーションをセット
+    if (isSet) {
+        Set(keyName);
+    }
 
     return this;
 }
 
-void Animator::Set(const std::string& keyName)
+void Animator::Set(const std::string& keyName, const bool& isLoop, const double& duration)
 {
-    _mAnimation = AnimationManager::getInstance().Get(keyName);
+    if (mNext.Name == keyName) {
+        return;
+    }
 
-    mAnimKey = keyName;
-    
-    mCurrentTime = 0.0;
+    Animation* animation = AnimationManager::getInstance().Get(keyName);
+
+    if (!animation) {
+        return;
+    }
+
+    if (!mNodeTable.contains(keyName)) {
+        generateNodeTable(keyName, animation);
+    }
+
+    mNext._Animation = animation;
+    mNext.Name = keyName;
+    mNext.ElapsedTime = 0.0;
+    mNext.IsLoop = isLoop;
+
+    // Currentが存在する場合はアニメーションブレンド処理
+    if (!mCurrent._Animation) {
+        mCurrent = mNext;
+    }
+    else {
+        animBlend(duration);
+    }
 }
 
 void Animator::Update(double deltaTime)
 {
-    if (!_mAnimation || !_mSkeleton) {
+    if (!mCurrent._Animation || !mNext._Animation || !_mSkeleton) {
         return;
     }
 
-    double duration = _mAnimation->GetDuration();
+    // Current != Nextの場合はブレンド処理
+    if(mCurrent.Name != mNext.Name){
+        updateBlend(deltaTime);
+    }
+    else {
+        updateCurrent(deltaTime);
+    }
+}
 
+bool Animator::IsPlaying(std::string keyName) const
+{
+    if (mCurrent.Name == keyName || mNext.Name == keyName) {
+        if (!IsFinished(keyName)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Animator::IsFinished(std::string keyName) const
+{
+    if (mCurrent.Name != keyName && mNext.Name != keyName) {
+        return false;
+    }
+
+    return mCurrent.ElapsedTime >= mCurrent._Animation->GetDuration();
+}
+
+bool Animator::IsBlending(std::string keyName) const
+{
+    if (mNext.Name != keyName) {
+        return false;
+    }
+
+    return mCurrent.Name != mNext.Name;
+}
+
+void Animator::updateCurrent(double deltaTime)
+{
     // 全ノードをバインドポーズに戻す
     _mSkeleton->ToBindPose();
 
     // ノードテーブル参照でアニメーション更新
-    const auto& channels = _mAnimation->GetChannels();
-    const auto& table = mNodeTable.at(mAnimKey);
+    const auto& channels = mCurrent._Animation->GetChannels();
+    const auto& table = mNodeTable.at(mCurrent.Name);
 
     for (size_t i = 0; i < channels.size(); ++i) {
-        calculateBoneTransform(channels[i], table[i], mCurrentTime);
+        updateBoneTransform(channels[i], table[i], mCurrent.ElapsedTime);
     }
 
     _mSkeleton->Update();
 
-    // Tickへ変換
-    mCurrentTime += deltaTime * _mAnimation->GetTicksPerSecond();
+    // 経過時間更新
+    mCurrent.ElapsedTime += deltaTime * mCurrent._Animation->GetTicksPerSecond();
 
-    // アニメーションループ
+    looping(mCurrent);
+}
+
+void Animator::updateBlend(double deltaTime)
+{
+    // 全ノードをバインドポーズに戻す
+    _mSkeleton->ToBindPose();
+
+    // 現在アニメーションのチャンネルとテーブル取得
+    const auto& currentChannels = mCurrent._Animation->GetChannels();
+    const auto& currentTable = mNodeTable.at(mCurrent.Name);
+
+    // 次アニメーションのチャンネルとテーブル取得
+    const auto& nextChannels = mNext._Animation->GetChannels();
+    const auto& nextTable = mNodeTable.at(mNext.Name);
+
+    // Next用の逆引きノードテーブル作成
+    std::vector<int> nextNodes(_mSkeleton->GetNodeCount(), -1);
+
+    for (size_t i = 0; i < nextTable.size(); ++i) {
+        int nodeIndex = nextTable[i];
+
+        if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= nextNodes.size()) {
+            continue;
+        }
+
+        nextNodes[nodeIndex] = static_cast<int>(i);
+    }
+
+    // ウェイト算出
+    float weight = 1.0f;
+    if (mBlendDuration > 0.0) {
+        weight = std::clamp(static_cast<float>(mBlendTime / mBlendDuration), 0.0f, 1.0f);
+
+        // エルミート補間
+        weight = weight * weight * (3.0f - 2.0f * weight);
+    }
+
+    // チャンネル更新
+    // 逆引きテーブルを元にNextを更新する
+    for (size_t i = 0; i < currentChannels.size(); ++i) {
+        const int nodeIndex = currentTable[i];
+
+        if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= _mSkeleton->GetNodeCount()) {
+            continue;
+        }
+
+        const int nextIndex = nextNodes[nodeIndex];
+
+        if (nextIndex < 0 || static_cast<size_t>(nextIndex) >= nextChannels.size()) {
+            updateBoneTransform(currentChannels[i], nodeIndex, mCurrent.ElapsedTime);
+            continue;
+        }
+
+        // 現在アニメーションのトランスフォーム更新
+        BoneTransform current = calculateBoneTransform(currentChannels[i], mCurrent.ElapsedTime);
+
+        // 次アニメーションのトランスフォーム更新
+        BoneTransform next = calculateBoneTransform(nextChannels[nextIndex], mNext.ElapsedTime);
+
+        // ブレンド処理
+        BoneTransform blend{};
+        blend.mPosition = Vector3::Lerp(current.mPosition, next.mPosition, weight);
+        blend.mRotation = Quaternion::Slerp(current.mRotation, next.mRotation, weight);
+        blend.mScale = Vector3::Lerp(current.mScale, next.mScale, weight);
+
+        auto& node = _mSkeleton->GetNode(nodeIndex);
+        XMStoreFloat4x4(&node.Local, blend.ToMatrix());
+    }
+
+    _mSkeleton->Update();
+
+    // 現在アニメーションと次アニメーションの経過時間を更新
+    mCurrent.ElapsedTime += deltaTime * mCurrent._Animation->GetTicksPerSecond();
+    mNext.ElapsedTime += deltaTime * mNext._Animation->GetTicksPerSecond();
+
+    // 各アニメーションのループ
+    looping(mCurrent);
+    looping(mNext);
+
+    // ブレンド進行
+    mBlendTime += deltaTime;
+
+    // ブレンド完了処理
+    if (mBlendTime >= mBlendDuration) {
+        // Current == Next
+        mCurrent = mNext;
+
+        mBlendTime = 0.0f;
+        mBlendDuration = 0.0f;
+    }
+}
+
+void Animator::looping(ANIMATION& animation)
+{
+    // ループフラグに準じたループ処理
+    double duration = animation._Animation->GetDuration();
     if (duration > 0.0) {
-        mCurrentTime = std::fmod(mCurrentTime, duration);
+        if (animation.IsLoop) {
+            animation.ElapsedTime = std::fmod(animation.ElapsedTime, duration);
+        }
+        else {
+            animation.ElapsedTime = std::min(animation.ElapsedTime, duration);
+        }
     }
 }
 
@@ -107,13 +268,13 @@ bool Animator::setSkeleton()
     return true;
 }
 
-void Animator::generateNodeTable(const std::string& keyName)
+void Animator::generateNodeTable(const std::string& keyName, const Animation* animation)
 {
     mNodeTable[keyName].clear();
 
-    if (!_mAnimation || !_mSkeleton) return;
+    if (!animation || !_mSkeleton) return;
 
-    const auto& channels = _mAnimation->GetChannels();
+    const auto& channels = animation->GetChannels();
 
     // アニメーションチャンネルからノードテーブルを作成
     for (size_t i = 0; i < channels.size(); ++i) {
@@ -121,7 +282,7 @@ void Animator::generateNodeTable(const std::string& keyName)
     }
 }
 
-void Animator::calculateBoneTransform(const Animation::CHANNEL& channel, int nodeIndex, double time)
+void Animator::updateBoneTransform(const Animation::CHANNEL& channel, int nodeIndex, double time)
 {
     if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= _mSkeleton->GetNodeCount()) {
         return;
@@ -132,26 +293,42 @@ void Animator::calculateBoneTransform(const Animation::CHANNEL& channel, int nod
 
     BoneTransform transform{};
 
-    // 座標更新
-    transform.mPosition = calculatePosition(channel.Positions, time);
-
-    // 回転更新
-    transform.mRotation = calculateRotation(channel.Rotations, time);
-
-    // スケール更新
-    transform.mScale = calculateScale(channel.Scales, time);
+    // トランスフォーム計算
+    transform = calculateBoneTransform(channel, time);
 
     // BindLocalを作らない
     XMStoreFloat4x4(&node.Local, transform.ToMatrix());
 }
 
+BoneTransform Animator::calculateBoneTransform(const Animation::CHANNEL& channel, double time)
+{
+    BoneTransform transform{};
+
+    // 座標計算
+    transform.mPosition = calculatePosition(channel.Positions, time);
+
+    // 回転計算
+    transform.mRotation = calculateRotation(channel.Rotations, time);
+
+    // スケール計算
+    transform.mScale = calculateScale(channel.Scales, time);
+
+    return transform;
+}
+
 Vector3 Animator::calculatePosition(const std::vector<Animation::KEY_POSITION>& keys, double time)
 {
-    assert(!keys.empty());
+    if (keys.empty()) {
+        return Vector3{};
+    }
 
     // キーが1つのみの場合は補間しない
-    if (keys.size() == 1) {
-        return keys[0].Position;
+    if (keys.size() == 1 || time <= keys.front().Time) {
+        return keys.front().Position;
+    }
+
+    if (time >= keys.back().Time) {
+        return keys.back().Position;
     }
 
     int index = 0;
@@ -163,62 +340,100 @@ Vector3 Animator::calculatePosition(const std::vector<Animation::KEY_POSITION>& 
         }
     }
 
-    const auto& current = keys[index];
-    const auto& next = keys[index + 1];
+    for (size_t i = 0; i + 1 < keys.size(); ++i) {
+        const auto& current = keys[i];
+        const auto& next = keys[i + 1];
 
-    float factor = static_cast<float>((time - current.Time) / (next.Time - current.Time));
+        if (time <= next.Time) {
+            const double interval = next.Time - current.Time;
 
-    return Vector3::Lerp(current.Position, next.Position, factor);
+            if (interval <= 0.0) {
+                return current.Position;
+            }
+
+            const float factor = std::clamp(static_cast<float>((time - current.Time) / interval), 0.0f, 1.0f);
+
+            return Vector3::Lerp(current.Position, next.Position, factor);
+        }
+    }
+
+    return keys.back().Position;
 }
 
 Quaternion Animator::calculateRotation(const std::vector<Animation::KEY_ROTATION>& keys, double time)
 {
-    assert(!keys.empty());
-
-    // キーが1つのみの場合は補間しない
-    if (keys.size() == 1) {
-        return keys[0].Rotation;
+    if (keys.empty()) {
+        return Quaternion{};
     }
 
-    int index = 0;
+    // キーが1つのみの場合は補間しない
+    if (keys.size() == 1 || time <= keys.front().Time) {
+        return keys.front().Rotation;
+    }
 
-    for (int i = 0; i < static_cast<int>(keys.size()) - 1; i++) {
-        if (time < keys[i + 1].Time) {
-            index = i;
-            break;
+    if (time >= keys.back().Time) {
+        return keys.back().Rotation;
+    }
+
+    for (size_t i = 0; i + 1 < keys.size(); ++i) {
+        const auto& current = keys[i];
+        const auto& next = keys[i + 1];
+
+        if (time <= next.Time) {
+            const double interval = next.Time - current.Time;
+
+            if (interval <= 0.0) {
+                return current.Rotation;
+            }
+
+            const float factor = std::clamp(static_cast<float>((time - current.Time) / interval), 0.0f, 1.0f);
+
+            return Quaternion::Slerp(current.Rotation, next.Rotation, factor);
         }
     }
 
-    const auto& current = keys[index];
-    const auto& next = keys[index + 1];
-
-    float factor = static_cast<float>((time - current.Time) / (next.Time - current.Time));
-
-    return Quaternion::Slerp(current.Rotation, next.Rotation, factor);
+    return keys.back().Rotation;
 }
 
 Vector3 Animator::calculateScale(const std::vector<Animation::KEY_SCALE>& keys, double time)
 {
-    assert(!keys.empty());
-
-    // キーが1つのみの場合は補間しない
-    if (keys.size() == 1) {
-        return keys[0].Scale;
+    if (keys.empty()) {
+        return Vector3{ 1.0f, 1.0f, 1.0f };
     }
 
-    int index = 0;
+    // キーが1つのみの場合は補間しない
+    if (keys.size() == 1 || time <= keys.front().Time) {
+        return keys.front().Scale;
+    }
 
-    for (int i = 0; i < static_cast<int>(keys.size()) - 1; i++) {
-        if (time < keys[i + 1].Time) {
-            index = i;
-            break;
+    if (time >= keys.back().Time) {
+        return keys.back().Scale;
+    }
+
+    for (size_t i = 0; i + 1 < keys.size(); ++i) {
+        const auto& current = keys[i];
+        const auto& next = keys[i + 1];
+
+        if (time <= next.Time) {
+            const double interval = next.Time - current.Time;
+
+            if (interval <= 0.0) {
+                return current.Scale;
+            }
+
+            const float factor = std::clamp(static_cast<float>((time - current.Time) / interval), 0.0f, 1.0f);
+
+            return Vector3::Lerp(current.Scale, next.Scale, factor);
         }
     }
 
-    const auto& current = keys[index];
-    const auto& next = keys[index + 1];
+    return keys.back().Scale;
+}
 
-    float factor = static_cast<float>((time - current.Time) / (next.Time - current.Time));
+void Animator::animBlend(const double& duration)
+{
+    mNext.ElapsedTime = 0.0;
 
-    return Vector3::Lerp(current.Scale, next.Scale, factor);
+    mBlendTime = 0.0;
+    mBlendDuration = duration;
 }
