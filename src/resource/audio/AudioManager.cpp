@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/09
-*	@updated : 2026/09/28
+*	@updated : 2026/10/06
 *============================================================*/
 #include "AudioManager.h"
 #include "Audio.h"
@@ -215,7 +215,6 @@ bool AudioManager::loadOgg(Audio& audio, const std::string& path)
 
 	// OGG情報
 	stb_vorbis_info info = stb_vorbis_get_info(vorbis);
-
 
 	// メタデータ取得
 	stb_vorbis_comment vc = stb_vorbis_get_comment(vorbis);
