@@ -21,17 +21,40 @@ void Keyboard::Update()
 	(void)GetKeyboardState(mKeyState);
 }
 
-bool Keyboard::GetKeyPress(Key keyCode)
+bool Keyboard::IsPressed(KEY keyCode)
 {
-	return (mKeyState[static_cast<BYTE>(keyCode)] & 0x80) != 0;
+	// キーが押されている
+	for (KeyCode key : keyCode.keys) {
+		if ((mKeyState[static_cast<BYTE>(key)] & 0x80) != 0) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool Keyboard::GetKeyTrigger(Key keyCode)
+bool Keyboard::IsTriggered(KEY keyCode)
 {
-	return ((mKeyState[static_cast<BYTE>(keyCode)] & 0x80) && !(mOldKeyState[static_cast<BYTE>(keyCode)] & 0x80));
+	// キーが押された
+	for (KeyCode key : keyCode.keys) {
+		if (((mKeyState[static_cast<BYTE>(key)] & 0x80) &&
+			!(mOldKeyState[static_cast<BYTE>(key)] & 0x80))) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool Keyboard::GetKeyRelease(Key keyCode)
+bool Keyboard::IsReleaseed(KEY keyCode)
 {
-	return ((mOldKeyState[static_cast<BYTE>(keyCode)] & 0x80) && !(mKeyState[static_cast<BYTE>(keyCode)] & 0x80));
+	// キーが離された
+	for (KeyCode key : keyCode.keys) {
+		if (((mOldKeyState[static_cast<BYTE>(key)] & 0x80) && 
+			!(mKeyState[static_cast<BYTE>(key)] & 0x80))) {
+			return true;
+		}
+	}
+
+	return false;
 }

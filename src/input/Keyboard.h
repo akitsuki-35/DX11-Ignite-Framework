@@ -9,12 +9,15 @@
 #pragma once
 
 #include <Windows.h>
+#include <vector>
 
 /*------------------------------------------------------------
 	キーボード名前解決テーブル
 ------------------------------------------------------------*/
-enum class Key : BYTE
+enum class KeyCode : BYTE
 {
+	None = 0x00,
+
 	V0 = '0',
 	V1 = '1',
 	V2 = '2',
@@ -121,6 +124,34 @@ enum class Key : BYTE
 	NonConvert = VK_NONCONVERT
 };
 
+/*------------------------------------------------------------
+	キー構造体
+------------------------------------------------------------*/
+struct KEY
+{
+	std::vector<KeyCode> keys{};
+
+	KEY() = default;
+	KEY(KeyCode key) { if (key != KeyCode::None) keys.push_back(key); }
+};
+
+/*------------------------------------------------------------
+	複数キー対応用オペレーター
+------------------------------------------------------------*/
+inline KEY operator||(KeyCode a, KeyCode b)
+{
+	KEY g{};
+	g.keys.push_back(a);
+	g.keys.push_back(b);
+	return g;
+}
+
+inline KEY operator||(KEY g, KeyCode b)
+{
+	g.keys.push_back(b);
+	return g;
+}
+
 /*============================================================
 *	@class	: Keyboard
 *	@brief	: キーボード入力
@@ -139,11 +170,11 @@ public:
 	static void Update();
 
 	// キーが押されている？
-	static bool GetKeyPress(Key keyCode);
+	static bool IsPressed(KEY keyCode);
 
 	// キーが押された瞬間？
-	static bool GetKeyTrigger(Key keyCode);
+	static bool IsTriggered(KEY keyCode);
 
 	// キーが離された？
-	static bool GetKeyRelease(Key keyCode);
+	static bool IsReleaseed(KEY keyCode);
 };

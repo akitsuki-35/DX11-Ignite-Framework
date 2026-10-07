@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/06
+*	@updated : 2026/10/07
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -59,11 +59,6 @@ void Animator::Set(const std::string& keyName, const bool& isLoop, const double&
 
     if (!mNodeTable.contains(keyName)) {
         generateNodeTable(keyName, animation);
-    }
-
-    // 既に別のアニメーションがブレンド中なら、そのアニメーションをCurrentとする
-    if (IsBlending(mNext.Name)) {
-        mCurrent = mNext;
     }
 
     mNext._Animation = animation;

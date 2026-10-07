@@ -13,19 +13,20 @@ void Input::Initialize()
 	Keyboard::Initialize();
 	GamePad::Initialize();
 
-	mKeyBinds = {
-		{ Button::A, { Key::Z, Pad::A }},
-		{ Button::B, { Key::X, Pad::B }},
-		{ Button::X, { Key::C, Pad::X }},
-		{ Button::Y, { Key::V, Pad::Y }},
-		{ Button::L, { Key::Q, Pad::L }},
-		{ Button::R, { Key::W, Pad::R }},
-		{ Button::Left, { Key::A, Pad::Left }},
-		{ Button::Right, { Key::D, Pad::Right }},
-		{ Button::Up, { Key::W, Pad::Up }},
-		{ Button::Down, { Key::S, Pad::Down }},
-		{ Button::Start, { Key::Enter, Pad::Start }},
-		{ Button::Select, { Key::Space, Pad::Select }}
+	// キーマップ初期化
+	mKeyMap = {
+		{ InputKey::A, { KeyCode::Space || KeyCode::Enter, ButtonCode::A }},
+		{ InputKey::B, { KeyCode::C, ButtonCode::B }},
+		{ InputKey::X, { KeyCode::Z, ButtonCode::X }},
+		{ InputKey::Y, { KeyCode::X, ButtonCode::Y }},
+		{ InputKey::L, { KeyCode::Q, ButtonCode::L }},
+		{ InputKey::R, { KeyCode::E, ButtonCode::R }},
+		{ InputKey::Left, { KeyCode::A, ButtonCode::Left }},
+		{ InputKey::Right, { KeyCode::D, ButtonCode::Right }},
+		{ InputKey::Up, { KeyCode::W, ButtonCode::Up }},
+		{ InputKey::Down, { KeyCode::S, ButtonCode::Down }},
+		{ InputKey::Start, { KeyCode::Enter, ButtonCode::Start }},
+		{ InputKey::Select, { KeyCode::Space, ButtonCode::Select }}
 	};
 }
 
@@ -35,48 +36,48 @@ void Input::Update()
 	GamePad::Update();
 }
 
-bool Input::GetPress(Button button, int index)
+bool Input::IsPressed(InputKey input, int index)
 {
 	// ボタンが押されているか
-	auto it = mKeyBinds.find(button);
-	if (it == mKeyBinds.end()) {
+	auto it = mKeyMap.find(input);
+	if (it == mKeyMap.end()) {
 		return false;
 	}
 
-	return Keyboard::GetKeyPress(it->second.BindKey) || 
-		GamePad::GetButtonPress(it->second.BindButton,index);
+	return Keyboard::IsPressed(it->second.Key) || 
+		GamePad::IsPressed(it->second.Button,index);
 }
 
-bool Input::GetTrigger(Button button, int index)
+bool Input::IsTriggered(InputKey input, int index)
 {
 	// ボタンが押された瞬間か
-	auto it = mKeyBinds.find(button);
-	if (it == mKeyBinds.end()) {
+	auto it = mKeyMap.find(input);
+	if (it == mKeyMap.end()) {
 		return false;
 	}
 
-	return Keyboard::GetKeyTrigger(it->second.BindKey) || 
-		GamePad::GetButtonTrigger(it->second.BindButton,index);
+	return Keyboard::IsTriggered(it->second.Key) || 
+		GamePad::IsTriggered(it->second.Button,index);
 }
 
-bool Input::GetRelease(Button button, int index)
+bool Input::IsReleaseed(InputKey input, int index)
 {
 	// ボタンが離されたか
-	auto it = mKeyBinds.find(button);
-	if (it == mKeyBinds.end()) {
+	auto it = mKeyMap.find(input);
+	if (it == mKeyMap.end()) {
 		return false;
 	}
 
-	return Keyboard::GetKeyRelease(it->second.BindKey) ||
-		GamePad::GetButtonRelease(it->second.BindButton, index);
+	return Keyboard::IsReleaseed(it->second.Key) ||
+		GamePad::IsReleaseed(it->second.Button, index);
 }
 
-float Input::GetAxisX(int index)
+float Input::GetAxisX(bool digitalEnable, int index)
 {
 	// 左右アナログ入力
 
 	// コントローラーのスティックを参照
-	float stickX = GamePad::GetLeftStickX(index);
+	float stickX = GamePad::GetLeftAxisX(index);
 	if (abs(stickX) > 0.0f) {
 		return stickX;
 	}
@@ -84,23 +85,35 @@ float Input::GetAxisX(int index)
 	// スティックが動いていなければキーボードまたは十字キーバインドを見る
 	float keyX = 0.0f;
 
-	if (GetPress(Button::Left, index)) {
-		keyX -= 1.0f;
-	}
+	if (digitalEnable) {
+		if (IsPressed(InputKey::Left, index)) {
+			keyX -= 1.0f;
+		}
 
-	if (GetPress(Button::Right, index)) {
-		keyX += 1.0f;
+		if (IsPressed(InputKey::Right, index)) {
+			keyX += 1.0f;
+		}
+	}
+	else {
+		// デジタルボタン無効の場合はパッドの十字キーを判定しない
+		if (Keyboard::IsPressed(mKeyMap[InputKey::Left].Key)) {
+			keyX -= 1.0f;
+		}
+
+		if (Keyboard::IsPressed(mKeyMap[InputKey::Right].Key)) {
+			keyX += 1.0f;
+		}
 	}
 
 	return keyX;
 }
 
-float Input::GetAxisY(int index)
+float Input::GetAxisY(bool digitalEnable, int index)
 {
 	// 上下アナログ入力
 
 	// コントローラーのスティックを参照
-	float stickY = GamePad::GetLeftStickY(index);
+	float stickY = GamePad::GetLeftAxisY(index);
 	if (abs(stickY) > 0.0f) {
 		return stickY;
 	}
@@ -108,19 +121,32 @@ float Input::GetAxisY(int index)
 	// スティックが動いていなければキーボードまたは十字キーバインドを見る
 	float keyY = 0.0f;
 
-	if (GetPress(Button::Up, index)) {
-		keyY += 1.0f;
-	}
+	if (digitalEnable) {
+		if (IsPressed(InputKey::Up, index)) {
+			keyY += 1.0f;
+		}
 
-	if (GetPress(Button::Down, index)) {
-		keyY -= 1.0f;
+		if (IsPressed(InputKey::Down, index)) {
+			keyY -= 1.0f;
+		}
+	}
+	else {
+		// デジタルボタン無効の場合はパッドの十字キーを判定しない
+		if (Keyboard::IsPressed(mKeyMap[InputKey::Up].Key)) {
+			keyY += 1.0f;
+		}
+
+		if (Keyboard::IsPressed(mKeyMap[InputKey::Down].Key)) {
+			keyY -= 1.0f;
+		}
 	}
 
 	return keyY;
 }
 
-void Input::SetKeyBind(Button button, Key key, Pad padButton)
+void Input::SetKeyMap(InputKey input, KEY key, BUTTON padButton)
 {
-	mKeyBinds[button].BindKey = key;
-	mKeyBinds[button].BindButton = padButton;
+	// キーマップ書き換え
+	mKeyMap[input].Key = key;
+	mKeyMap[input].Button = padButton;
 }

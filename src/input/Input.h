@@ -15,7 +15,7 @@
 /*------------------------------------------------------------
 	ボタン列挙体
 ------------------------------------------------------------*/
-enum class Button : int
+enum class InputKey : int
 {
 	A,
 	B,
@@ -34,12 +34,12 @@ enum class Button : int
 };
 
 /*------------------------------------------------------------
-	キーバインド構造体
+	キーマップ構造体
 ------------------------------------------------------------*/
-struct KEY_BIND
+struct KEY_MAP
 {
-	Key BindKey{};
-	Pad BindButton{};
+	KEY Key{};
+	BUTTON Button{};
 };
 
 /*============================================================
@@ -49,7 +49,7 @@ struct KEY_BIND
 class Input final
 {
 private:
-	static inline std::map<Button, KEY_BIND> mKeyBinds{};
+	static inline std::map<InputKey, KEY_MAP> mKeyMap{};
 
 private:
 	Input() = delete;
@@ -59,14 +59,14 @@ public:
 	static void Update();
 
 	// ボタン入力
-	static bool GetPress(Button button, int index = 0);
-	static bool GetTrigger(Button button, int index = 0);
-	static bool GetRelease(Button button, int index = 0);
+	static bool IsPressed(InputKey input, int index = 0);
+	static bool IsTriggered(InputKey input, int index = 0);
+	static bool IsReleaseed(InputKey input, int index = 0);
 
 	// アナログ入力
-	static float GetAxisX(int index = 0);
-	static float GetAxisY(int index = 0);
+	static float GetAxisX(bool digitalEnable = true, int index = 0);
+	static float GetAxisY(bool digitalEnable = true, int index = 0);
 
 	// アプリケーション側からバインドを書き換える
-	static void SetKeyBind(Button button, Key key, Pad padButton);
+	static void SetKeyMap(InputKey input, KEY key, BUTTON button);
 };

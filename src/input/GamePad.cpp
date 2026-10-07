@@ -37,40 +37,66 @@ bool GamePad::IsConnected(int index)
 	return mGamePads[index].Connected;
 }
 
-bool GamePad::GetButtonPress(Pad button, int index)
+bool GamePad::IsPressed(BUTTON button, int index)
 {
 	if (!IsConnected(index)) {
 		return false;
 	}
 
-	return (mGamePads[index].PadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
+	// ボタンが押されている
+	for (ButtonCode b : button.buttons) {
+		WORD mask = static_cast<WORD>(b);
+		if ((mGamePads[index].PadState.Gamepad.wButtons & mask) != 0) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool GamePad::GetButtonTrigger(Pad button, int index)
+bool GamePad::IsTriggered(BUTTON button, int index)
 {
 	if (!IsConnected(index)) {
 		return false;
 	}
 
-	bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
-	bool current = (mGamePads[index].PadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
+	// ボタンが押された
+	for (ButtonCode b : button.buttons) {
+		WORD mask = static_cast<WORD>(b);
 
-	return (!old && current);
+		bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & mask) != 0;
+		bool current = (mGamePads[index].PadState.Gamepad.wButtons & mask) != 0;
+
+		if (!old && current) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool GamePad::GetButtonRelease(Pad button, int index)
+bool GamePad::IsReleaseed(BUTTON button, int index)
 {
 	if (!IsConnected(index)) {
 		return false;
 	}
 
-	bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
-	bool current = (mGamePads[index].PadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
+	// ボタンが離された
+	for (ButtonCode b : button.buttons) {
+		WORD mask = static_cast<WORD>(b);
 
-	return (old && !current);
+		bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & mask) != 0;
+		bool current = (mGamePads[index].PadState.Gamepad.wButtons & mask) != 0;
+
+		if (old && !current) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
-float GamePad::GetLeftStickX(int index)
+float GamePad::GetLeftAxisX(int index)
 {
 	if (!IsConnected(index)) {
 		return false;
@@ -87,7 +113,7 @@ float GamePad::GetLeftStickX(int index)
 	return (rawX < 0) ? (static_cast<float>(rawX) / 32768.0f) : (static_cast<float>(rawX) / 32767.0f);
 }
 
-float GamePad::GetLeftStickY(int index)
+float GamePad::GetLeftAxisY(int index)
 {
 	if (!IsConnected(index)) {
 		return false;
@@ -104,7 +130,7 @@ float GamePad::GetLeftStickY(int index)
 	return (rawY < 0) ? (static_cast<float>(rawY) / 32768.0f) : (static_cast<float>(rawY) / 32767.0f);
 }
 
-float GamePad::GetRightStickX(int index)
+float GamePad::GetRightAxisX(int index)
 {
 	if (!IsConnected(index)) {
 		return false;
@@ -121,7 +147,7 @@ float GamePad::GetRightStickX(int index)
 	return (rawX < 0) ? (static_cast<float>(rawX) / 32768.0f) : (static_cast<float>(rawX) / 32767.0f);
 }
 
-float GamePad::GetRightStickY(int index)
+float GamePad::GetRightAxisY(int index)
 {
 	if (!IsConnected(index)) {
 		return false;
