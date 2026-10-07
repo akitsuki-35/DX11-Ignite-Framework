@@ -61,6 +61,11 @@ void Animator::Set(const std::string& keyName, const bool& isLoop, const double&
         generateNodeTable(keyName, animation);
     }
 
+    // 既に別のアニメーションがブレンド中なら、そのアニメーションをCurrentとする
+    if (IsBlending(mNext.Name)) {
+        mCurrent = mNext;
+    }
+
     mNext._Animation = animation;
     mNext.Name = keyName;
     mNext.ElapsedTime = 0.0;

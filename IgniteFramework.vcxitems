@@ -61,7 +61,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\importer\AssimpLoader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\importer\CSVHandler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\importer\FontLoader.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\input\Input.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\input\Keyboard.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\math\BezierCurve.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\math\BoneTransform.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\math\Easing.cpp" />
@@ -134,7 +134,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\importer\AssimpLoader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\importer\CSVHandler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\importer\FontLoader.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\input\Input.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\input\Controller.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\input\Keyboard.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\math\BezierCurve.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\math\BoneTransform.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\math\Easing.h" />

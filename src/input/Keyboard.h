@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-class Input
+class Keyboard
 {
 private:
 	static BYTE m_OldKeyState[256];
