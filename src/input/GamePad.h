@@ -12,6 +12,27 @@
 #include <Xinput.h>
 #pragma comment(lib, "xinput.lib")
 
+/*------------------------------------------------------------
+	ゲームパッド名前解決テーブル
+------------------------------------------------------------*/
+enum class Pad : WORD
+{
+	A = XINPUT_GAMEPAD_A,
+	B = XINPUT_GAMEPAD_B,
+	X = XINPUT_GAMEPAD_X,
+	Y = XINPUT_GAMEPAD_Y,
+	Left = XINPUT_GAMEPAD_DPAD_LEFT,
+	Right = XINPUT_GAMEPAD_DPAD_RIGHT,
+	Up = XINPUT_GAMEPAD_DPAD_UP,
+	Down = XINPUT_GAMEPAD_DPAD_DOWN,
+	L = XINPUT_GAMEPAD_LEFT_SHOULDER,
+	R = XINPUT_GAMEPAD_RIGHT_SHOULDER,
+	Start = XINPUT_GAMEPAD_START,
+	Select = XINPUT_GAMEPAD_BACK,
+	StickL = XINPUT_GAMEPAD_LEFT_THUMB,
+	StickR = XINPUT_GAMEPAD_RIGHT_THUMB
+};
+
 /*============================================================
 *	@class	: GamePad
 *	@brief	: ゲームパッド入力
@@ -42,9 +63,9 @@ public:
 	static bool IsConnected(int index = 0);
 
 	// ボタン入力
-	static bool GetButtonPress(WORD button, int index = 0);
-	static bool GetButtonTrigger(WORD button, int index = 0);
-	static bool GetButtonRelease(WORD button, int index = 0);
+	static bool GetButtonPress(Pad button, int index = 0);
+	static bool GetButtonTrigger(Pad button, int index = 0);
+	static bool GetButtonRelease(Pad button, int index = 0);
 
 	// アナログスティック入力
 	static float GetLeftStickX(int index = 0);

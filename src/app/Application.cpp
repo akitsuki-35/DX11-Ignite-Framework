@@ -11,8 +11,7 @@
 #include "SystemTimer.h"
 #include "Graphics.h"
 #include "Transition.h"
-#include "Keyboard.h"
-#include "GamePad.h"
+#include "Input.h"
 #include "AudioPlayer.h"
 #include <cassert>
 
@@ -55,8 +54,7 @@ void Application::Finalize()
 void Application::Update(double deltaTime)
 {
 	Transition::getInstance().Update(deltaTime);
-	Keyboard::Update();
-	GamePad::Update();
+	Input::Update();
 
 	// 現在シーン更新
 	if (_mCurrentScene) {

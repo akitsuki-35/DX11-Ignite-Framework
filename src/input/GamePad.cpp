@@ -37,35 +37,35 @@ bool GamePad::IsConnected(int index)
 	return mGamePads[index].Connected;
 }
 
-bool GamePad::GetButtonPress(WORD button, int index)
+bool GamePad::GetButtonPress(Pad button, int index)
 {
 	if (!IsConnected(index)) {
 		return false;
 	}
 
-	return (mGamePads[index].PadState.Gamepad.wButtons & button) != 0;
+	return (mGamePads[index].PadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
 }
 
-bool GamePad::GetButtonTrigger(WORD button, int index)
+bool GamePad::GetButtonTrigger(Pad button, int index)
 {
 	if (!IsConnected(index)) {
 		return false;
 	}
 
-	bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & button) != 0;
-	bool current = (mGamePads[index].PadState.Gamepad.wButtons & button) != 0;
+	bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
+	bool current = (mGamePads[index].PadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
 
 	return (!old && current);
 }
 
-bool GamePad::GetButtonRelease(WORD button, int index)
+bool GamePad::GetButtonRelease(Pad button, int index)
 {
 	if (!IsConnected(index)) {
 		return false;
 	}
 
-	bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & button) != 0;
-	bool current = (mGamePads[index].PadState.Gamepad.wButtons & button) != 0;
+	bool old = (mGamePads[index].OldPadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
+	bool current = (mGamePads[index].PadState.Gamepad.wButtons & static_cast<WORD>(button)) != 0;
 
 	return (old && !current);
 }

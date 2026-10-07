@@ -21,17 +21,17 @@ void Keyboard::Update()
 	(void)GetKeyboardState(mKeyState);
 }
 
-bool Keyboard::GetKeyPress(BYTE keyCode)
+bool Keyboard::GetKeyPress(Key keyCode)
 {
-	return (mKeyState[keyCode] & 0x80) != 0;
+	return (mKeyState[static_cast<BYTE>(keyCode)] & 0x80) != 0;
 }
 
-bool Keyboard::GetKeyTrigger(BYTE keyCode)
+bool Keyboard::GetKeyTrigger(Key keyCode)
 {
-	return ((mKeyState[keyCode] & 0x80) && !(mOldKeyState[keyCode] & 0x80));
+	return ((mKeyState[static_cast<BYTE>(keyCode)] & 0x80) && !(mOldKeyState[static_cast<BYTE>(keyCode)] & 0x80));
 }
 
-bool Keyboard::GetKeyRelease(BYTE keyCode)
+bool Keyboard::GetKeyRelease(Key keyCode)
 {
-	return ((mOldKeyState[keyCode] & 0x80) && !(mKeyState[keyCode] & 0x80));
+	return ((mOldKeyState[static_cast<BYTE>(keyCode)] & 0x80) && !(mKeyState[static_cast<BYTE>(keyCode)] & 0x80));
 }
