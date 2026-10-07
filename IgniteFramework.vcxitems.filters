@@ -306,7 +306,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.h">
       <Filter>utility</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\input\Controller.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\input\GamePad.h">
       <Filter>input</Filter>
     </ClInclude>
   </ItemGroup>
@@ -502,6 +502,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.cpp">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\input\GamePad.cpp">
+      <Filter>input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

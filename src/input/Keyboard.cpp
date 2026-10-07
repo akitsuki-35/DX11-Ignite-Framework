@@ -1,35 +1,37 @@
-﻿
+﻿/*============================================================
+*	@file	 : Keyboard.cpp
+*	@brief	 : キーボード入力
+*
+* 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
+* 　@date	 : 2026/10/07
+*	@updated : 2026/10/07
+*============================================================*/
 #include "Keyboard.h"
-#pragma comment (lib, "winmm.lib")
-
-BYTE Keyboard::m_OldKeyState[256];
-BYTE Keyboard::m_KeyState[256];
 
 void Keyboard::Initialize()
 {
-	memset( m_OldKeyState, 0, 256 );
-	memset( m_KeyState, 0, 256 );
-
-}
-
-void Keyboard::Finalize()
-{
-
+	memset(mOldKeyState, 0, 256);
+	memset(mKeyState, 0, 256);
 }
 
 void Keyboard::Update()
 {
-	memcpy(m_OldKeyState, m_KeyState, 256);
+	memcpy(mOldKeyState, mKeyState, 256);
 
-	(void)GetKeyboardState(m_KeyState);
+	(void)GetKeyboardState(mKeyState);
 }
 
-bool Keyboard::GetKeyPress(BYTE KeyCode)
+bool Keyboard::GetKeyPress(BYTE keyCode)
 {
-	return (m_KeyState[KeyCode] & 0x80) != 0;
+	return (mKeyState[keyCode] & 0x80) != 0;
 }
 
-bool Keyboard::GetKeyTrigger(BYTE KeyCode)
+bool Keyboard::GetKeyTrigger(BYTE keyCode)
 {
-	return ((m_KeyState[KeyCode] & 0x80) && !(m_OldKeyState[KeyCode] & 0x80));
+	return ((mKeyState[keyCode] & 0x80) && !(mOldKeyState[keyCode] & 0x80));
+}
+
+bool Keyboard::GetKeyRelease(BYTE keyCode)
+{
+	return ((mOldKeyState[keyCode] & 0x80) && !(mKeyState[keyCode] & 0x80));
 }

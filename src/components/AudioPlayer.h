@@ -25,8 +25,8 @@ struct IXAudio2SourceVoice;
 class AudioPlayer : public Component
 {
 private:
-	static IXAudio2* mXaudio;
-	static IXAudio2MasteringVoice* mMasteringVoice;
+	static inline IXAudio2* mXaudio{};
+	static inline IXAudio2MasteringVoice* mMasteringVoice{};
 
 	IXAudio2SourceVoice* mSourceVoice{ nullptr };
 	Audio* _mAudio{ nullptr };
