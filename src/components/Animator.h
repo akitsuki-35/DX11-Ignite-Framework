@@ -57,14 +57,14 @@ public:
 
     void Finalize() override;
 
+    // 更新
+    void Update(double deltaTime) override;
+
     // アニメーション読み込み
     Animator* Load(std::string keyName, const char* fileName, const bool& isSet = false);
 
     // アニメーションをセット
     void Set(const std::string& keyName, const bool& isLoop = true, const double& duration = 0.25);
-
-    // 更新
-    void Update(double deltaTime) override;
 
     // 経過時間取得
     double GetTime() const { return mCurrent.ElapsedTime; }

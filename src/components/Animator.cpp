@@ -29,6 +29,21 @@ void Animator::Finalize()
     mCurrent._Animation = nullptr;
 }
 
+void Animator::Update(double deltaTime)
+{
+    if (!mCurrent._Animation || !mNext._Animation) {
+        return;
+    }
+
+    // Current != Nextの場合はブレンド処理
+    if (mCurrent.Name != mNext.Name) {
+        updateBlend(deltaTime);
+    }
+    else {
+        updateCurrent(deltaTime);
+    }
+}
+
 Animator* Animator::Load(std::string keyName, const char* fileName, const bool& isSet)
 {
     Animation* animation = AnimationManager::getInstance().Load(keyName, fileName);
@@ -71,21 +86,6 @@ void Animator::Set(const std::string& keyName, const bool& isLoop, const double&
     }
     else {
         animBlend(duration);
-    }
-}
-
-void Animator::Update(double deltaTime)
-{
-    if (!mCurrent._Animation || !mNext._Animation) {
-        return;
-    }
-
-    // Current != Nextの場合はブレンド処理
-    if(mCurrent.Name != mNext.Name){
-        updateBlend(deltaTime);
-    }
-    else {
-        updateCurrent(deltaTime);
     }
 }
 
