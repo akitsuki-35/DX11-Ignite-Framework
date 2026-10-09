@@ -4,13 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/09/09
-*	@updated : 2026/09/16
+*	@updated : 2026/10/09
 *============================================================*/
 #include "GameObject.h"
 
 bool GameObject::Destroy()
 {
-	// 削除フラグがオンならオブジェクト削除
+	// オブジェクト削除予約済み→オブジェクト削除
 	if (mDestroy) {
 		Finalize();
 		return true;
@@ -22,6 +22,7 @@ bool GameObject::Destroy()
 
 void GameObject::Finalize()
 {
+	// コンポーネントの終了処理を呼ぶ
 	for (const auto& component : mComponents) {
 		component->Finalize();
 	}
@@ -30,6 +31,7 @@ void GameObject::Finalize()
 
 void GameObject::Update(double deltaTime)
 {
+	// コンポーネントの更新処理を呼ぶ
 	for (const auto& component : mComponents) {
 		component->Update(deltaTime);
 	}
@@ -37,6 +39,7 @@ void GameObject::Update(double deltaTime)
 
 void GameObject::Draw() const
 {
+	// コンポーネントの描画処理を呼ぶ
 	for (const auto& component : mComponents) {
 		component->Draw();
 	}

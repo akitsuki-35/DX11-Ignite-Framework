@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/26
-*	@updated : 2026/09/21
+*	@updated : 2026/10/09
 *============================================================*/
 #pragma once
 
@@ -30,12 +30,14 @@ public:
 	virtual void Finalize() override;
 	virtual void Update(double deltaTime) override;
 
+	// ビュー行列取得
 	DirectX::XMMATRIX GetViewMatrix() const { return mViewMatrix; }
 
+	// カメラ前方・後方を取得
+	// ゲームオブジェクトのTransform取得とは別扱い
 	Vector3 GetForward() const;
-
 	Vector3 GetRight() const;
 
-	// カメラ行列のセット
+	// ビュー行列のセット
 	void SetMatrix() const;
 };

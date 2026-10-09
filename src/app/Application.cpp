@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/10/06
+*	@updated : 2026/10/09
 *============================================================*/
 #include "Application.h"
 #include "Scene.h"
@@ -12,7 +12,6 @@
 #include "Graphics.h"
 #include "Transition.h"
 #include "Input.h"
-#include "AudioPlayer.h"
 #include <cassert>
 
 /*------------------------------------------------------------
@@ -22,9 +21,8 @@ void Application::Initialize(std::unique_ptr<Scene> scene)
 {
 	assert(scene);
 
-	_mNextScene = std::move(scene);
-
-	_mCurrentScene = std::move(_mNextScene);
+	// 初期シーンをセットして初期化する
+	_mCurrentScene = std::move(scene);
 	_mCurrentScene->Initialize();
 }
 
@@ -33,6 +31,9 @@ void Application::Initialize(std::unique_ptr<Scene> scene)
 ------------------------------------------------------------*/
 void Application::Finalize()
 {
+	// 遷移先シーンが存在する（シーン遷移予約済み）場合は
+	// 現在シーン終了→遷移先シーン初期化
+	// アプリケーション終了時はそのまま現在シーンを終了
 	if (_mNextScene) {
 		if (_mCurrentScene) {
 			_mCurrentScene->Finalize();
@@ -56,12 +57,12 @@ void Application::Update(double deltaTime)
 	Transition::getInstance().Update(deltaTime);
 	Input::Update();
 
-	// 現在シーン更新
+	// 現在シーン更新処理
 	if (_mCurrentScene) {
 		_mCurrentScene->Update(deltaTime);
 	}
 
-	// シーン遷移
+	// _mNextSceneが存在（シーン遷移予約済み）ならシーン終了→次シーン初期化
 	if (_mNextScene) {
 		if (_mCurrentScene) {
 			_mCurrentScene->Finalize();
@@ -85,7 +86,7 @@ void Application::Draw()
 {
 	D3D11::Graphics::getInstance().Begin();
 
-	// 現在シーン描画
+	// 現在シーン描画処理
 	if (_mCurrentScene) {
 		_mCurrentScene->Draw();
 	}

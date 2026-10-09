@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/15
-*	@updated : 2026/09/16
+*	@updated : 2026/10/09
 *============================================================*/
 #include "Scene.h"
 #include "DeviceManager.h"
@@ -61,13 +61,12 @@ void Scene::Draw() const
 		}
 	}
 	
+	// Zソート処理
+	// 2Dオブジェクトには適用しない
 	if (camera) {
 		Vector3 forward = camera->GetForward();
 		Vector3 position = camera->GetTransform().GetPosition();
-
-		// Zソート
 		for (size_t layer = 0; layer < LAYER; layer++) {
-			// UIには適用しない
 			if (layer == static_cast<size_t>(Layer::UI)) {
 				continue;
 			}
@@ -89,8 +88,6 @@ void Scene::Draw() const
 
 	// レイヤー順に描画
 	for (size_t layer = 0; layer < LAYER; layer++) {
-
-		// 深度ステート切替
 		if (layer == static_cast<size_t>(Layer::World)) {
 			D3D11::DeviceManager::getInstance().SetDepthStencilState(D3D11::RenderState::Depth::Enable);
 		}
@@ -105,6 +102,7 @@ void Scene::Draw() const
 			obj->Draw();
 		}
 
+		// 深度ステートを有効に戻す
 		D3D11::DeviceManager::getInstance().SetDepthStencilState(D3D11::RenderState::Depth::Enable);
 	}
 }
