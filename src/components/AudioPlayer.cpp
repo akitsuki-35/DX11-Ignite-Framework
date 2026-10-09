@@ -12,9 +12,7 @@
 #include <cassert>
 #include <algorithm>
 #include <xaudio2.h>
-
-IXAudio2* AudioPlayer::mXaudio{ nullptr };
-IXAudio2MasteringVoice* AudioPlayer::mMasteringVoice{ nullptr };
+#pragma comment (lib, "winmm.lib")
 
 void AudioPlayer::InitializeMaster()
 {

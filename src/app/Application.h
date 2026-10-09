@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/09/20
+*	@updated : 2026/10/09
 *============================================================*/
 #pragma once
 
@@ -40,13 +40,12 @@ private:
 	メンバ変数・メンバ関数
 ----------------------------------------------------*/
 private:
-	// 現在シーン
+	// 現在シーン != 遷移先シーンでシーン遷移させる
 	std::unique_ptr<Scene> _mCurrentScene{};
-
-	// 遷移先シーン
 	std::unique_ptr<Scene> _mNextScene{};
 
 public:
+	// 初期化時に初期シーンを渡す
 	void Initialize(std::unique_ptr<Scene> scene);
 	void Finalize();
 	void Update(double deltaTime);

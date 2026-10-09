@@ -4,9 +4,10 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/01
-*	@updated : 2026/10/05
+*	@updated : 2026/10/09
 *============================================================*/
 #include "ModelRenderer.h"
+#include "Animator.h"
 #include "ModelManager.h"
 #include "Model.h"
 #include "TextureManager.h"
@@ -26,9 +27,22 @@ void ModelRenderer::Draw() const
     // ワールド行列セット
 	D3D11::BufferManager::getInstance().SetWorldMatrix(getWorldMatrix());
 
-    // ボーン行列セット
+    /*------------------------------------------------------------
+	    ボーン行列セット
+    ------------------------------------------------------------*/
     if (_mModel->GetSkeleton().GetBoneCount() > 0) {
-        D3D11::BufferManager::getInstance().SetBoneMatrices(_mModel->GetSkeleton());
+        // Animatorコンポーネントが存在する場合、
+        // AnimatorコンポーネントのSkeletonをボーン行列に送る
+        // （同一モデルの別オブジェクトが一律アニメーションになるのを防ぐ）
+        auto animator = _mOwner->GetComponent<Animator>();
+        if (animator) {
+            D3D11::BufferManager::getInstance().SetBoneMatrices(animator->GetSkeleton());
+        }
+        else {
+            // Animatorコンポーネントがない場合も、前回のボーン行列が参照されないよう
+            // モデル自身のSkeletonを送る
+            D3D11::BufferManager::getInstance().SetBoneMatrices(_mModel->GetSkeleton());
+        }
     }
 
     for (auto& mesh : _mModel->mMeshes)

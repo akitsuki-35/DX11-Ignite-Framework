@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/09/30
+*	@updated : 2026/10/09
 *============================================================*/
 #pragma once
 
@@ -59,7 +59,7 @@ private:
 	// パーティクル配列
 	std::vector<Particle> mParticles{};
 
-	// データ構造体
+	// 初期化用データ構造体
 	PARTICLE_DESC mDesc{};
 
 	// 発射インターバル

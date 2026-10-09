@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/06
+*	@updated : 2026/10/09
 *============================================================*/
 #pragma once
 
 #include "Component.h"
 #include "Animation.h"
+#include "Skeleton.h"
 #include "BoneTransform.h"
 #include <string>
 #include <unordered_map>
@@ -17,7 +18,6 @@
 /*------------------------------------------------------------
 	前方宣言
 ------------------------------------------------------------*/
-class Skeleton;
 class Animation;
 
 /*============================================================
@@ -41,7 +41,8 @@ private:
     ANIMATION mNext{};
 
     // スケルトン
-    Skeleton* _mSkeleton{};
+    // アニメーションはオブジェクトで独立して扱うため、モデルから実体をコピー
+    Skeleton mSkeleton{};
 
     // ブレンド関連
     float mBlendWeight{};
@@ -76,6 +77,10 @@ public:
 
     // ブレンド中？
     bool IsBlending(std::string keyName) const;
+
+    // Animatorコンポーネントが存在するオブジェクトの場合、
+    // 描画時にAnimatorコンポーネントのSkeletonをボーン行列に送る
+    Skeleton& GetSkeleton() { return mSkeleton; }
 
 private:
     // 単一アニメーションの更新

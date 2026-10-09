@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/01
+*	@updated : 2026/10/09
 *============================================================*/
 #pragma once
 
@@ -34,10 +34,10 @@ namespace Element {
 		ボーンバッファ
 	----------------------------------------------------*/
 	// 最大ボーン数
-	static constexpr int MAX_BONE{ 128 };
+	static constexpr int MAX_BONE{ 256 };
 	struct BONE
 	{
-		DirectX::XMFLOAT4X4 Matrices[128]{};
+		DirectX::XMFLOAT4X4 Matrices[MAX_BONE]{};
 	};
 
 	/*--------------------------------------------------

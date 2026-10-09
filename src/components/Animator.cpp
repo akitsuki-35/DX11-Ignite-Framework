@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/06
+*	@updated : 2026/10/09
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -25,7 +25,6 @@ Animator::Animator(GameObject* owner)
 
 void Animator::Finalize()
 {
-    _mSkeleton = nullptr;
     mNext._Animation = nullptr;
     mCurrent._Animation = nullptr;
 }
@@ -77,7 +76,7 @@ void Animator::Set(const std::string& keyName, const bool& isLoop, const double&
 
 void Animator::Update(double deltaTime)
 {
-    if (!mCurrent._Animation || !mNext._Animation || !_mSkeleton) {
+    if (!mCurrent._Animation || !mNext._Animation) {
         return;
     }
 
@@ -122,7 +121,7 @@ bool Animator::IsBlending(std::string keyName) const
 void Animator::updateCurrent(double deltaTime)
 {
     // 全ノードをバインドポーズに戻す
-    _mSkeleton->ToBindPose();
+    mSkeleton.ToBindPose();
 
     // ノードテーブル参照でアニメーション更新
     const auto& channels = mCurrent._Animation->GetChannels();
@@ -132,7 +131,7 @@ void Animator::updateCurrent(double deltaTime)
         updateBoneTransform(channels[i], table[i], mCurrent.ElapsedTime);
     }
 
-    _mSkeleton->Update();
+    mSkeleton.Update();
 
     // 経過時間更新
     mCurrent.ElapsedTime += deltaTime * mCurrent._Animation->GetTicksPerSecond();
@@ -143,7 +142,7 @@ void Animator::updateCurrent(double deltaTime)
 void Animator::updateBlend(double deltaTime)
 {
     // 全ノードをバインドポーズに戻す
-    _mSkeleton->ToBindPose();
+    mSkeleton.ToBindPose();
 
     // 現在アニメーションのチャンネルとテーブル取得
     const auto& currentChannels = mCurrent._Animation->GetChannels();
@@ -154,7 +153,7 @@ void Animator::updateBlend(double deltaTime)
     const auto& nextTable = mNodeTable.at(mNext.Name);
 
     // Next用の逆引きノードテーブル作成
-    std::vector<int> nextNodes(_mSkeleton->GetNodeCount(), -1);
+    std::vector<int> nextNodes(mSkeleton.GetNodeCount(), -1);
 
     for (size_t i = 0; i < nextTable.size(); ++i) {
         int nodeIndex = nextTable[i];
@@ -180,7 +179,7 @@ void Animator::updateBlend(double deltaTime)
     for (size_t i = 0; i < currentChannels.size(); ++i) {
         const int nodeIndex = currentTable[i];
 
-        if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= _mSkeleton->GetNodeCount()) {
+        if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= mSkeleton.GetNodeCount()) {
             continue;
         }
 
@@ -203,11 +202,11 @@ void Animator::updateBlend(double deltaTime)
         blend.mRotation = Quaternion::Slerp(current.mRotation, next.mRotation, weight);
         blend.mScale = Vector3::Lerp(current.mScale, next.mScale, weight);
 
-        auto& node = _mSkeleton->GetNode(nodeIndex);
+        auto& node = mSkeleton.GetNode(nodeIndex);
         XMStoreFloat4x4(&node.Local, blend.ToMatrix());
     }
 
-    _mSkeleton->Update();
+    mSkeleton.Update();
 
     // 現在アニメーションと次アニメーションの経過時間を更新
     mCurrent.ElapsedTime += deltaTime * mCurrent._Animation->GetTicksPerSecond();
@@ -263,7 +262,7 @@ bool Animator::setSkeleton()
     }
 
     // モデルからスケルトンを取得
-    _mSkeleton = &model->GetSkeleton();
+    mSkeleton = model->GetSkeleton();
 
     return true;
 }
@@ -272,24 +271,24 @@ void Animator::generateNodeTable(const std::string& keyName, const Animation* an
 {
     mNodeTable[keyName].clear();
 
-    if (!animation || !_mSkeleton) return;
+    if (!animation) return;
 
     const auto& channels = animation->GetChannels();
 
     // アニメーションチャンネルからノードテーブルを作成
     for (size_t i = 0; i < channels.size(); ++i) {
-        mNodeTable[keyName].push_back(_mSkeleton->FindNode(channels[i].NodeName));
+        mNodeTable[keyName].push_back(mSkeleton.FindNode(channels[i].NodeName));
     }
 }
 
 void Animator::updateBoneTransform(const Animation::CHANNEL& channel, int nodeIndex, double time)
 {
-    if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= _mSkeleton->GetNodeCount()) {
+    if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= mSkeleton.GetNodeCount()) {
         return;
     }
 
     // ノード取得
-    auto& node = _mSkeleton->GetNode(nodeIndex);
+    auto& node = mSkeleton.GetNode(nodeIndex);
 
     BoneTransform transform{};
 

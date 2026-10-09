@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/05/12
-*	@updated : 2026/09/16
+*	@updated : 2026/10/09
 *============================================================*/
 #pragma once
 
@@ -24,15 +24,18 @@ class GameObject
 {
 protected:
 	// トランスフォーム
+	// オブジェクト共通の座標コントロール
 	Transform mTransform{};
 
 	// コンポーネント
+	// オブジェクトからAddComponentでアタッチする
 	std::vector<std::unique_ptr<Component>> mComponents{};
 
 	// タグ
 	std::string mTag{};
 
 	// 削除フラグ
+	// 削除予約→更新処理完了後に安全にオブジェクト削除
 	bool mDestroy{ false };
 
 public:
@@ -56,6 +59,7 @@ public:
 	virtual const bool IsDestroy() const { return mDestroy; }
 
 	// セッター
+	// Position・Rotation・ScaleのセットをTransformセッターのラッパーとして扱う
 	GameObject& SetPosition(const Vector3& position);
 	GameObject& SetRotation(const Vector3& rotation);
 	GameObject& SetScale(const Vector3& scale);
