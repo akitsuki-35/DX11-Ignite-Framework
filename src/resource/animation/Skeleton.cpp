@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #include "Skeleton.h"
 #include "Elements.h"
@@ -69,10 +69,7 @@ int Skeleton::FindBone(const std::string& name) const
 
 void Skeleton::AddSpringChain(SPRING_CHAIN chain)
 {
-    if (!chain.Joints.empty()) {
-        mSpringChains.push_back(
-            std::move(chain));
-    }
+    mSpringChains.push_back(std::move(chain));
 }
 
 const std::vector<Skeleton::SPRING_CHAIN>& Skeleton::GetSpringChains() const

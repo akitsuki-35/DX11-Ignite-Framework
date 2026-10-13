@@ -4,11 +4,12 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2025/09/17
-*	@updated : 2026/09/16
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
 #include "GameObject.h"
+#include "Elements.h"
 #include <list>
 #include <vector>
 #include <memory>
@@ -28,6 +29,10 @@ protected:
 	static inline bool mPause{ false };
 	static inline bool mHitStop{ false };
 
+	// 風
+	static inline Element::WIND mWind{};
+	static inline bool mWindEnable{ true };
+
 public:
 	virtual ~Scene() = default;
 
@@ -43,6 +48,11 @@ public:
 	// ポーズ・ヒットストップフラグ取得
 	static bool IsPause() { return mPause; }
 	static bool IsHitStop() { return mHitStop; }
+
+	// 風パラメータ取得
+	static void SetWindEnable(const bool& isWind) { mWindEnable = isWind; }
+	static bool IsWindEnable() { return mWindEnable; }
+	static Element::WIND GetWind() { return mWind; }
 
 	/*------------------------------------------------------------
 		テンプレート関数

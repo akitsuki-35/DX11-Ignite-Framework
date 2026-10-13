@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
@@ -35,6 +35,16 @@ class Animator final : public Component
         bool IsLoop{ true };
     };
 
+    // 揺れもの（スプリングボーン）
+    struct SPRING
+    {
+        float CurrentPitch{};
+        float TargetPitch{};
+
+        float CurrentRoll{};
+        float TargetRoll{};
+    };
+
 private:
     // アニメーション
     ANIMATION mCurrent{};
@@ -51,6 +61,11 @@ private:
 
     // ノードテーブル
     std::unordered_map<std::string, std::vector<int>> mNodeTable{};
+
+    // スプリングボーン関連
+    std::vector<SPRING> mSprings{};
+    Vector3 mPrevPosition{};
+    bool mSpringInitialized{};
 
 public:
     Animator(GameObject* owner);
@@ -109,4 +124,8 @@ private:
 
     // アニメーションブレンド
     void animBlend(const double& duration);
+
+    // スプリングボーン関連
+    void initSpring();
+    void updateSpring(const float& dt);
 };

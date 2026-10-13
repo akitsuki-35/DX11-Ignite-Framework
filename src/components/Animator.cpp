@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
 #include "AnimationManager.h"
 #include "ModelRenderer.h"
+#include "Scene.h"
 #include "GameObject.h"
 #include <cmath>
 #include <algorithm>
@@ -21,6 +22,9 @@ Animator::Animator(GameObject* owner)
 {
     // モデルのスケルトン取得
     setSkeleton();
+
+    // スプリングボーン初期化
+    initSpring();
 }
 
 void Animator::Finalize()
@@ -131,6 +135,8 @@ void Animator::updateCurrent(double deltaTime)
         updateBoneTransform(channels[i], table[i], mCurrent.ElapsedTime);
     }
 
+    updateSpring(static_cast<float>(deltaTime));
+
     mSkeleton.Update();
 
     // 経過時間更新
@@ -205,6 +211,8 @@ void Animator::updateBlend(double deltaTime)
         auto& node = mSkeleton.GetNode(nodeIndex);
         XMStoreFloat4x4(&node.Local, blend.ToMatrix());
     }
+
+    updateSpring(static_cast<float>(deltaTime));
 
     mSkeleton.Update();
 
@@ -435,4 +443,119 @@ void Animator::animBlend(const double& duration)
 
     mBlendTime = 0.0;
     mBlendDuration = duration;
+}
+
+void Animator::initSpring()
+{
+    mSprings.clear();
+
+    mSprings.resize(mSkeleton.GetSpringChains().size());
+
+    mSpringInitialized = false;
+}
+
+void Animator::updateSpring(const float& dt)
+{
+    // スプリングチェーンが存在しない
+    if (!mSkeleton.SpringChainEnable()) {
+        return;
+    }
+
+    // 現在座標取得
+    const auto& chains = mSkeleton.GetSpringChains();
+
+    if (mSprings.size() != chains.size()) {
+        initSpring();
+    }
+
+    DirectX::XMFLOAT3 currentPos = _mOwner->GetPosition().ConvertToXMFLOAT3();
+
+    // 初回処理
+    if (!mSpringInitialized) {
+        mPrevPosition = _mOwner->GetPosition();
+        mSpringInitialized = true;
+        return;
+    }
+
+    if (dt <= 0.0f) {
+        return;
+    }
+
+    // フレーム移動量
+    const float moveX = (currentPos.x - mPrevPosition.x) / dt;
+    const float moveY = (currentPos.y - mPrevPosition.y) / dt;
+    const float moveZ = (currentPos.z - mPrevPosition.z) / dt;
+
+    const Element::WIND wind = Scene::GetWind();
+    const float windStrength = std::clamp(wind.Strength, 0.0f, 1.0f);
+    constexpr float windAngleRatio = 0.6f;
+
+    for (size_t i = 0; i < chains.size(); ++i) {
+        const auto& chain = chains[i];
+        auto& spring = mSprings[i];
+
+        const float windAngle = chain.MaxAngle * windAngleRatio * windStrength * chain.WindInfluence;
+
+        // 前後・上下移動
+        const float motionPitch = (-moveZ - moveY) * chain.MotionInfluence;
+
+        // Z方向の風
+        const float windPitch = wind.Direction.z * windAngle;
+
+        spring.TargetPitch = motionPitch + windPitch;
+
+        // 左右移動
+        const float motionRoll = -moveX * chain.MotionInfluence;
+
+        // X方向の風
+        const float windRoll = wind.Direction.x * windAngle;
+
+        spring.TargetRoll = motionRoll + windRoll;
+
+        // 最終目標角を制限
+        spring.TargetPitch = std::clamp(spring.TargetPitch, -chain.MaxAngle, chain.MaxAngle);
+        spring.TargetRoll = std::clamp(spring.TargetRoll, -chain.MaxAngle, chain.MaxAngle);
+
+        const float safeDt = std::min(dt, 1.0f / 30.0f);
+        const float follow = std::clamp(chain.FollowSpeed * safeDt, 0.0f, 1.0f);
+
+        spring.CurrentPitch += (spring.TargetPitch - spring.CurrentPitch) * follow;
+        spring.CurrentRoll += (spring.TargetRoll - spring.CurrentRoll) * follow;
+
+        // 現在値をクランプ
+        spring.CurrentPitch = std::clamp(spring.CurrentPitch, -chain.MaxAngle, chain.MaxAngle);
+        spring.CurrentRoll = std::clamp(spring.CurrentRoll, -chain.MaxAngle, chain.MaxAngle);
+
+        const size_t nodeCount = chain.NodeIndices.size();
+
+        if (nodeCount == 0) {
+            continue;
+        }
+
+        for (size_t j = 0; j < nodeCount; ++j) {
+            const int nodeIndex = chain.NodeIndices[j];
+
+            if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= mSkeleton.GetNodeCount()) {
+                continue;
+            }
+
+            auto& node = mSkeleton.GetNode(static_cast<size_t>(nodeIndex));
+
+            const float weight = static_cast<float>(j + 1) / static_cast<float>(nodeCount);
+
+            const float pitch = spring.CurrentPitch * weight;
+            const float roll = spring.CurrentRoll * weight;
+
+            const DirectX::XMMATRIX pitchMatrix = DirectX::XMMatrixRotationX(pitch);
+            const DirectX::XMMATRIX rollMatrix = DirectX::XMMatrixRotationZ(roll);
+            const DirectX::XMMATRIX localMatrix = DirectX::XMLoadFloat4x4(&node.Local);
+
+            const DirectX::XMMATRIX springMatrix = pitchMatrix * rollMatrix;
+            const DirectX::XMMATRIX result = springMatrix * localMatrix;
+
+            DirectX::XMStoreFloat4x4(&node.Local, result);
+        }
+    }
+
+    mPrevPosition = currentPos;
 }

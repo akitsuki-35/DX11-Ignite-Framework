@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
@@ -62,41 +62,26 @@ public:
         };
     };
 
-    struct SPRING_JOINT
-    {
-        // 対応ノードインデックス
-        // NODE::Localを操作するために使用
-        int NodeIndex{ -1 };
-
-        // 対応ボーンインデックス
-        // BoneMatricesとの対応確認に使用
-        // 終端ノードなど、スキニングボーンでない場合は-1を許容
-        int BoneIndex{ -1 };
-
-        // バインド姿勢でのローカル先端方向
-        DirectX::XMFLOAT3 LocalTailDir {
-            0.0f,
-            -1.0f,
-            0.0f
-        };
-
-        float BoneLength{ 0.0f };
-
-        float Stiffness{ 8.0f };
-        float Drag{ 0.85f };
-        float Gravity{ 0.0f };
-        float Radius{ 0.02f };
-
-        float WindResponse{ 1.0f };
-    };
-
+    // スプリングボーンのチェーン
     struct SPRING_CHAIN
     {
+        // スプリングボーンキー名
         std::string Name{};
 
-        std::vector<SPRING_JOINT> Joints{};
+        // 対応インデックス
+        std::vector<int> NodeIndices{};
 
+        // 風の影響
         float WindInfluence{ 1.0f };
+
+        // モーションの影響
+        float MotionInfluence{ 1.0f };
+
+        // 追従スピード
+        float FollowSpeed{ 5.0f };
+
+        // 最大角度
+        float MaxAngle{ 0.35f };
     };
 
 private:

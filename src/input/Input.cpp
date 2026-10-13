@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/10/07
-*	@updated : 2026/10/07
+*	@updated : 2026/10/09
 *============================================================*/
 #include "Input.h"
 
@@ -15,18 +15,18 @@ void Input::Initialize()
 
 	// キーマップ初期化
 	mKeyMap = {
-		{ InputKey::A, { KeyCode::Space || KeyCode::Enter, ButtonCode::A }},
-		{ InputKey::B, { KeyCode::C, ButtonCode::B }},
-		{ InputKey::X, { KeyCode::Z, ButtonCode::X }},
-		{ InputKey::Y, { KeyCode::X, ButtonCode::Y }},
-		{ InputKey::L, { KeyCode::Q, ButtonCode::L }},
-		{ InputKey::R, { KeyCode::E, ButtonCode::R }},
+		{ InputKey::A, { KeyCode::K || KeyCode::Space || KeyCode::Enter, ButtonCode::A }},
+		{ InputKey::B, { KeyCode::L, ButtonCode::B }},
+		{ InputKey::X, { KeyCode::J, ButtonCode::X }},
+		{ InputKey::Y, { KeyCode::I, ButtonCode::Y }},
+		{ InputKey::L, { KeyCode::U, ButtonCode::L }},
+		{ InputKey::R, { KeyCode::O, ButtonCode::R }},
 		{ InputKey::Left, { KeyCode::A, ButtonCode::Left }},
 		{ InputKey::Right, { KeyCode::D, ButtonCode::Right }},
 		{ InputKey::Up, { KeyCode::W, ButtonCode::Up }},
 		{ InputKey::Down, { KeyCode::S, ButtonCode::Down }},
-		{ InputKey::Start, { KeyCode::Enter, ButtonCode::Start }},
-		{ InputKey::Select, { KeyCode::Space, ButtonCode::Select }}
+		{ InputKey::Start, { KeyCode::Shift, ButtonCode::Start }},
+		{ InputKey::Select, { KeyCode::Ctrl, ButtonCode::Select }}
 	};
 }
 

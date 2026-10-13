@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -85,40 +85,29 @@ namespace {
 		return !isSpringNode(parentName);
 	}
 
-	// ジョイントパラメータの部位別プリセット
-	void setSpringPreset(const std::string& name, Skeleton::SPRING_JOINT& joint, Skeleton::SPRING_CHAIN& chain)
+	// スプリングボーンパラメータの部位別プリセット
+	void setSpringPreset(const std::string& name, Skeleton::SPRING_CHAIN& chain)
 	{
-		// デフォルト
-		joint.Stiffness = 8.0f;
-		joint.Drag = 0.85f;
-		joint.Gravity = 0.0f;
-		joint.Radius = 0.02f;
-
-		chain.WindInfluence = 1.0f;
-
 		// 髪
 		if (name.find("Hair") != std::string::npos) {
-			joint.Stiffness = 6.0f;
-			joint.Drag= 0.88f;
-			joint.Gravity = 0.2f;
-
 			chain.WindInfluence = 1.0f;
+			chain.MotionInfluence = 0.8f;
+			chain.FollowSpeed = 5.0f;
+			chain.MaxAngle = 0.35f;
 		}
 		// スカート
 		else if (name.find("Skirt") != std::string::npos) {
-			joint.Stiffness = 10.0f;
-			joint.Drag = 0.90f;
-			joint.Gravity = 0.4f;
-
-			chain.WindInfluence = 0.6f;
+			chain.WindInfluence = 2.0f;
+			chain.MotionInfluence = 1.2f;
+			chain.FollowSpeed = 3.5f;
+			chain.MaxAngle = 0.75f;
 		}
 		// 胸
 		else if (name.find("Bust") != std::string::npos) {
-			joint.Stiffness = 14.0f;
-			joint.Drag = 0.78f;
-			joint.Gravity = 0.0f;
-
 			chain.WindInfluence = 0.1f;
+			chain.MotionInfluence = 1.5f;
+			chain.FollowSpeed = 2.5f;
+			chain.MaxAngle = 0.15f;
 		}
 	}
 }
@@ -262,16 +251,22 @@ bool AssimpLoader::loadBones(const aiScene* scene, Skeleton& skeleton)
 	// ボーン登録
 	for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
 		const aiMesh* mesh = scene->mMeshes[i];
-		if (!mesh) continue;
+		if (!mesh) {
+			continue;
+		}
 
 		for (uint32_t j = 0; j < mesh->mNumBones; ++j) {
 			const aiBone* bone = mesh->mBones[j];
-			if (!bone) continue;
+			if (!bone) {
+				continue;
+			}
 
 			std::string boneName = bone->mName.C_Str();
 
 			int boneIndex = skeleton.FindBone(boneName);
-			if (boneIndex >= 0) continue;
+			if (boneIndex >= 0) {
+				continue;
+			}
 
 			if (skeleton.GetBoneCount() >= Element::MAX_BONE) {
 				return false;
@@ -307,90 +302,48 @@ void AssimpLoader::loadSpringBones(const aiNode* node, Skeleton& skeleton)
 
 		chain.Name = node->mName.C_Str();
 
-		// スプリングチェーン収集
-		collectSpringChain(node, skeleton, chain);
+		// パラメータプリセット適用
+		setSpringPreset(chain.Name, chain);
+
+		// チェーン収集
+		const aiNode* current = node;
+
+		while (current) {
+			const std::string nodeName = current->mName.C_Str();
+			int nodeIndex = skeleton.FindNode(nodeName);
+
+			if (nodeIndex >= 0) {
+				chain.NodeIndices.push_back(nodeIndex);
+			}
+
+			// 次のJ_Secノードを探す
+			const aiNode* next = nullptr;
+
+			for (UINT i = 0; i < current->mNumChildren; ++i) {
+				const aiNode* child = current->mChildren[i];
+
+				if (!child) {
+					continue;
+				}
+
+				if (isSpringNode(child->mName.C_Str())) {
+					next = child;
+					break;
+				}
+			}
+
+			current = next;
+		}
 
 		// スプリングチェーン登録
-		skeleton.AddSpringChain(std::move(chain));
+		if (!chain.NodeIndices.empty()) {
+			skeleton.AddSpringChain(std::move(chain));
+		}
 	}
 
 	// 子ノードがある場合は再帰呼出し
-	for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-		loadSpringBones(node->mChildren[i], skeleton);
-	}
-}
-
-void AssimpLoader::collectSpringChain(const aiNode * node, Skeleton & skeleton, Skeleton::SPRING_CHAIN & chain)
-{
-	if (!node) {
-		return;
-	}
-
-	const std::string nodeName = node->mName.C_Str();
-
-	// スプリングノード？
-	if (!isSpringNode(nodeName)) {
-		return;
-	}
-
-	Skeleton::SPRING_JOINT joint{};
-
-	// 各インデックス取得
-	joint.NodeIndex = skeleton.FindNode(nodeName);
-	joint.BoneIndex = skeleton.FindBone(nodeName);
-
-	if (joint.NodeIndex < 0) {
-		return;
-	}
-
-	// パラメータプリセット適用
-	setSpringPreset(nodeName, joint, chain);
-
-	// 次のJ_Secノードから長さと方向を計算
-	const aiNode* springChild = nullptr;
-
-	for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-		const aiNode* child = node->mChildren[i];
-
-		if (!child) {
-			continue;
-		}
-
-		if (isSpringNode(child->mName.C_Str())) {
-			springChild = child;
-			break;
-		}
-	}
-
-	if (springChild) {
-		const aiVector3D tail = { springChild->mTransformation.a4,
-			springChild->mTransformation.b4, springChild->mTransformation.c4 };
-
-		const float length = tail.Length();
-
-		joint.BoneLength = length;
-
-		if (length > 0.00001f) {
-			const aiVector3D direction = tail / length;
-
-			joint.LocalTailDir = { direction.x, direction.y, direction.z };
-		}
-	}
-
-	// ジョイントを登録
-	chain.Joints.push_back(joint);
-
-	// 子を処理
-	for (unsigned int i = 0; i < node->mNumChildren; ++i) {
-		const aiNode* child = node->mChildren[i];
-
-		if (!child) {
-			continue;
-		}
-
-		if (isSpringNode(child->mName.C_Str())) {
-			collectSpringChain(child, skeleton, chain);
-		}
+	for (UINT i = 0; i < node->mNumChildren; ++i) {
+		loadSpringBones(node->mChildren[i],skeleton);
 	}
 }
 

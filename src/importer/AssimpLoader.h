@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
@@ -74,7 +74,6 @@ private:
 
 	// スプリングボーン取得
 	void loadSpringBones(const aiNode* node, Skeleton& skeleton);
-	void collectSpringChain(const aiNode* node, Skeleton& skeleton, Skeleton::SPRING_CHAIN& chain);
 
 	// メッシュ生成
 	bool loadMeshes(const aiScene* scene, Model& model, const Skeleton& skeleton);

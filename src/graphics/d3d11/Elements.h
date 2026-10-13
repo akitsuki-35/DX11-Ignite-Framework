@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
@@ -65,5 +65,18 @@ namespace Element {
 		DirectX::XMFLOAT4 Direction{};
 		DirectX::XMFLOAT4 Diffuse{};
 		DirectX::XMFLOAT4 Ambient{};
+	};
+
+	/*--------------------------------------------------
+		風パラメータ構造体
+	----------------------------------------------------*/
+	struct WIND
+	{
+		float Strength{};
+		DirectX::XMFLOAT3 Direction{};
+		float BaseStrength{ 0.0f };
+		float GustStrength{ 0.0f };
+		float GustFrequency{ 1.0f };
+		float Time{ 0.0f };
 	};
 }
