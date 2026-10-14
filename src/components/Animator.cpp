@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/13
+*	@updated : 2026/10/14
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -461,13 +461,18 @@ void Animator::updateSpring(const float& dt)
         return;
     }
 
-    // 現在座標取得
-    const auto& chains = mSkeleton.GetSpringChains();
+    if (dt <= 0.0f) {
+        return;
+    }
 
+    const auto& chains = mSkeleton.GetSpringChains();
+    
+    // 初期化
     if (mSprings.size() != chains.size()) {
         initSpring();
     }
 
+    // 現在ワールド座標取得
     DirectX::XMFLOAT3 currentPos = _mOwner->GetPosition().ConvertToXMFLOAT3();
 
     // 初回処理
@@ -477,61 +482,80 @@ void Animator::updateSpring(const float& dt)
         return;
     }
 
-    if (dt <= 0.0f) {
-        return;
-    }
+    // ワールド座標系における移動速度を取得
+    const DirectX::XMVECTOR worldVel = DirectX::XMVectorSet((currentPos.x - mPrevPosition.x) / dt,
+        (currentPos.y - mPrevPosition.y) / dt, (currentPos.z - mPrevPosition.z) / dt, 0.0f);
 
-    // フレーム移動量
-    const float moveX = (currentPos.x - mPrevPosition.x) / dt;
-    const float moveY = (currentPos.y - mPrevPosition.y) / dt;
-    const float moveZ = (currentPos.z - mPrevPosition.z) / dt;
+    // オブジェクト回転行列を取得
+    const DirectX::XMFLOAT3 objRot=_mOwner->GetRotation().ConvertToXMFLOAT3();
+    const DirectX::XMMATRIX objRotMtx = DirectX::XMMatrixRotationRollPitchYaw(objRot.x, objRot.y, objRot.z);
 
+    // ワールド移動速度をオブジェクトのローカル空間へ変換
+    const DirectX::XMMATRIX invRot = DirectX::XMMatrixTranspose(objRotMtx);
+    const DirectX::XMVECTOR localVelVec = DirectX::XMVector3TransformNormal(worldVel, invRot);
+
+    DirectX::XMFLOAT3 localVel{};
+    DirectX::XMStoreFloat3(&localVel, localVelVec);
+
+    // 風パラメータ取得
     const Element::WIND wind = Scene::GetWind();
+
     const float windStrength = std::clamp(wind.Strength, 0.0f, 1.0f);
     constexpr float windAngleRatio = 0.6f;
 
+    // フレーム落ちで追従値が急増しないよう制限
+    const float safeDt = std::min(dt, 1.0f / 30.0f);
+
+    // 各チェーン更新
     for (size_t i = 0; i < chains.size(); ++i) {
         const auto& chain = chains[i];
+
         auto& spring = mSprings[i];
 
         const float windAngle = chain.MaxAngle * windAngleRatio * windStrength * chain.WindInfluence;
+        
+        // ローカル前後移動と上下移動をPitchへ反映
+        const float motionPitch = (localVel.z - localVel.y) * chain.MotionInfluence;
 
-        // 前後・上下移動
-        const float motionPitch = (-moveZ - moveY) * chain.MotionInfluence;
+        // 風パラメータをオブジェクトのローカル空間へ反映
+        const DirectX::XMVECTOR worldWindDir = DirectX::XMVectorSet(wind.Direction.x, wind.Direction.y, 
+            wind.Direction.z, 0.0f);
 
-        // Z方向の風
-        const float windPitch = wind.Direction.z * windAngle;
+        const DirectX::XMVECTOR localWindVec = DirectX::XMVector3TransformNormal(worldWindDir, invRot);
 
+        DirectX::XMFLOAT3 localWindDir{};
+        DirectX::XMStoreFloat3(&localWindDir, localWindVec);
+
+        const float windPitch = localWindDir.z * windAngle;
         spring.TargetPitch = motionPitch + windPitch;
 
-        // 左右移動
-        const float motionRoll = -moveX * chain.MotionInfluence;
-
-        // X方向の風
-        const float windRoll = wind.Direction.x * windAngle;
-
+        // ローカル左右移動をRollへ反映
+        const float motionRoll = localVel.x * chain.MotionInfluence;
+        const float windRoll = localWindDir.x * windAngle;
         spring.TargetRoll = motionRoll + windRoll;
 
-        // 最終目標角を制限
+        // 角度をクランプ
         spring.TargetPitch = std::clamp(spring.TargetPitch, -chain.MaxAngle, chain.MaxAngle);
         spring.TargetRoll = std::clamp(spring.TargetRoll, -chain.MaxAngle, chain.MaxAngle);
 
-        const float safeDt = std::min(dt, 1.0f / 30.0f);
+        // 追従率計算
         const float follow = std::clamp(chain.FollowSpeed * safeDt, 0.0f, 1.0f);
 
+        // Currentを更新
         spring.CurrentPitch += (spring.TargetPitch - spring.CurrentPitch) * follow;
         spring.CurrentRoll += (spring.TargetRoll - spring.CurrentRoll) * follow;
 
-        // 現在値をクランプ
+        // Currentもクランプ（Maxを超えないことを保証する）
         spring.CurrentPitch = std::clamp(spring.CurrentPitch, -chain.MaxAngle, chain.MaxAngle);
         spring.CurrentRoll = std::clamp(spring.CurrentRoll, -chain.MaxAngle, chain.MaxAngle);
 
+        // チェーン内ノード探索
         const size_t nodeCount = chain.NodeIndices.size();
-
         if (nodeCount == 0) {
             continue;
         }
 
+        // チェーン内ノード更新
         for (size_t j = 0; j < nodeCount; ++j) {
             const int nodeIndex = chain.NodeIndices[j];
 
@@ -541,21 +565,23 @@ void Animator::updateSpring(const float& dt)
 
             auto& node = mSkeleton.GetNode(static_cast<size_t>(nodeIndex));
 
+            // 根元を弱く、先端を強くする
             const float weight = static_cast<float>(j + 1) / static_cast<float>(nodeCount);
-
             const float pitch = spring.CurrentPitch * weight;
             const float roll = spring.CurrentRoll * weight;
 
-            const DirectX::XMMATRIX pitchMatrix = DirectX::XMMatrixRotationX(pitch);
-            const DirectX::XMMATRIX rollMatrix = DirectX::XMMatrixRotationZ(roll);
-            const DirectX::XMMATRIX localMatrix = DirectX::XMLoadFloat4x4(&node.Local);
+            // マトリクス更新
+            const DirectX::XMMATRIX pitchMtx = DirectX::XMMatrixRotationX(pitch);
+            const DirectX::XMMATRIX rollMtx = DirectX::XMMatrixRotationZ(roll);
+            const DirectX::XMMATRIX localMtx = DirectX::XMLoadFloat4x4(&node.Local);
+            const DirectX::XMMATRIX springMtx = pitchMtx * rollMtx;
 
-            const DirectX::XMMATRIX springMatrix = pitchMatrix * rollMatrix;
-            const DirectX::XMMATRIX result = springMatrix * localMatrix;
-
+            const DirectX::XMMATRIX result = springMtx * localMtx;
+            
             DirectX::XMStoreFloat4x4(&node.Local, result);
         }
     }
 
+    // 次回更新用の座標保存
     mPrevPosition = currentPos;
 }

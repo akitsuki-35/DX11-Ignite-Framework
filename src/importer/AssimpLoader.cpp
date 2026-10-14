@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/13
+*	@updated : 2026/10/14
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -90,10 +90,10 @@ namespace {
 	{
 		// 髪
 		if (name.find("Hair") != std::string::npos) {
-			chain.WindInfluence = 1.0f;
+			chain.WindInfluence = 1.5f;
 			chain.MotionInfluence = 0.8f;
 			chain.FollowSpeed = 5.0f;
-			chain.MaxAngle = 0.35f;
+			chain.MaxAngle = 1.0f;
 		}
 		// スカート
 		else if (name.find("Skirt") != std::string::npos) {
