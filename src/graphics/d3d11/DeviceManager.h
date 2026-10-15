@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/09/16
+*	@updated : 2026/10/15
 *============================================================*/
 #pragma once
 
@@ -70,6 +70,7 @@ namespace D3D11 {
 
 		// ラスタライザステート
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> _mRasterSolid{};
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> _mRasterNoCull{};
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> _mRasterWireframe{};
 
 		// サンプラーステート

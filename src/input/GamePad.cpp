@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/10/07
-*	@updated : 2026/10/07
+*	@updated : 2026/10/15
 *============================================================*/
 #include "GamePad.h"
 

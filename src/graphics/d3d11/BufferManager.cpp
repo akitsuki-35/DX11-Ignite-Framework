@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/01
+*	@updated : 2026/10/15
 *============================================================*/
 #include "BufferManager.h"
 #include "DeviceManager.h"
 #include "Config.h"
 #include "Skeleton.h"
+#include <memory>
 
 using namespace DirectX;
 
@@ -27,9 +28,9 @@ void D3D11::BufferManager::Initialize()
 
 	// ライト初期化
 	Element::LIGHT light{};
-	light.Position = { 1.0f, -1.0f, 1.0f, 0.0f };
+	light.Position = { -10.0f, 10.0f, 10.0f, 0.0f };
 	light.Enable = true;
-	light.Direction = XMFLOAT4(1.0f, -1.0f, 1.0f, 0.0f);
+	light.Direction = XMFLOAT4(1.0f, -1.0f, 0.0f, 0.0f);
 	light.Ambient = XMFLOAT4(0.9f, 0.8f, 1.0f, 1.0f);
 	light.Diffuse = XMFLOAT4(0.7f, 0.7f, 1.0f, 1.0f);
 	SetLight(light);
@@ -69,7 +70,7 @@ void D3D11::BufferManager::Set2DMatrix()
 	SetWorldMatrix(XMMatrixIdentity());
 	SetViewMatrix(XMMatrixIdentity());
 
-	XMMATRIX projection;
+	XMMATRIX projection{};
 	projection = XMMatrixOrthographicOffCenterLH(0.0f, Screen::WIDTH, Screen::HEIGHT, 0.0f, 0.0f, 1.0f);
 	SetProjectionMatrix(projection);
 }
@@ -77,7 +78,7 @@ void D3D11::BufferManager::Set2DMatrix()
 void D3D11::BufferManager::SetWorldMatrix(const DirectX::XMMATRIX& worldMatrix)
 {
 	// ワールド行列設定
-	XMFLOAT4X4 worldf;
+	XMFLOAT4X4 worldf{};
 	XMStoreFloat4x4(&worldf, XMMatrixTranspose(worldMatrix));
 	DeviceManager::getInstance().
 		GetContext()->UpdateSubresource(_mWorld.Get(), 0, nullptr, &worldf, 0, 0);
@@ -90,7 +91,7 @@ void D3D11::BufferManager::SetWorldMatrix(const DirectX::XMMATRIX& worldMatrix)
 void D3D11::BufferManager::SetViewMatrix(const DirectX::XMMATRIX& viewMatrix)
 {
 	// ビュー行列設定
-	XMFLOAT4X4 viewf;
+	XMFLOAT4X4 viewf{};
 	XMStoreFloat4x4(&viewf, XMMatrixTranspose(viewMatrix));
 	DeviceManager::getInstance().
 		GetContext()->UpdateSubresource(_mView.Get(), 0, nullptr, &viewf, 0, 0);
@@ -103,7 +104,7 @@ void D3D11::BufferManager::SetViewMatrix(const DirectX::XMMATRIX& viewMatrix)
 void D3D11::BufferManager::SetProjectionMatrix(const DirectX::XMMATRIX& projectionMatrix)
 {
 	// プロジェクション行列設定
-	XMFLOAT4X4 projectionf;
+	XMFLOAT4X4 projectionf{};
 	XMStoreFloat4x4(&projectionf, XMMatrixTranspose(projectionMatrix));
 	DeviceManager::getInstance().
 		GetContext()->UpdateSubresource(_mProjection.Get(), 0, nullptr, &projectionf, 0, 0);
@@ -155,12 +156,12 @@ void D3D11::BufferManager::SetCamera(const DirectX::XMFLOAT4& camera)
 void D3D11::BufferManager::SetBoneMatrices(const Skeleton& skeleton)
 {
 	// ボーン行列設定
-	Element::BONE buffer{};
+	auto buffer = std::make_unique<Element::BONE>();
 
 	const DirectX::XMMATRIX identity = DirectX::XMMatrixIdentity();
 
 	// 単位行列で初期化
-	for (auto& matrix : buffer.Matrices) {
+	for (auto& matrix : buffer->Matrices) {
 		DirectX::XMStoreFloat4x4(&matrix, identity);
 	}
 
@@ -169,11 +170,11 @@ void D3D11::BufferManager::SetBoneMatrices(const Skeleton& skeleton)
 	assert(matrices.size() <= Element::MAX_BONE);
 
 	for (size_t i = 0; i < matrices.size(); i++) {
-		buffer.Matrices[i] = matrices[i];
+		buffer->Matrices[i] = matrices[i];
 	}
 
 	DeviceManager::getInstance().GetContext()->UpdateSubresource(_mBones.Get(),
-		0, nullptr, &buffer, 0, 0);
+		0, nullptr, buffer.get(), 0, 0);
 
 	ID3D11Buffer* buf = _mBones.Get();
 
