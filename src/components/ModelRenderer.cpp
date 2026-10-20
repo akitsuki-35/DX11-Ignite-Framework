@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/01
-*	@updated : 2026/10/09
+*	@updated : 2026/10/20
 *============================================================*/
 #include "ModelRenderer.h"
 #include "Animator.h"
@@ -12,6 +12,8 @@
 #include "Model.h"
 #include "TextureManager.h"
 #include "Texture.h"
+#include "DeviceManager.h"
+#include "D3D11Config.h"
 #include "BufferManager.h"
 #include "GameObject.h"
 #include "FileUtility.h"
@@ -21,6 +23,10 @@ void ModelRenderer::Draw() const
 	if (!_mModel) return;
 
     Renderer::Begin();
+
+    if (!mCulling) {
+        D3D11::DeviceManager::getInstance().SetRasterizerState(D3D11::RenderState::Raster::NoCull);
+    }
 
     Bind();
 
@@ -87,6 +93,10 @@ void ModelRenderer::Draw() const
         }
     }
 
+    if (!mCulling) {
+        D3D11::DeviceManager::getInstance().SetRasterizerState(D3D11::RenderState::Raster::Solid);
+    }
+
     Renderer::End();
 }
 
@@ -140,6 +150,12 @@ ModelRenderer* ModelRenderer::LoadTexture(std::string textureName, TextureType t
         break;
     }
 
+    return this;
+}
+
+ModelRenderer* ModelRenderer::SetCulling(const bool& isCulling)
+{
+    mCulling = isCulling;
     return this;
 }
 
