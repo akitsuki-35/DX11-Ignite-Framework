@@ -4,10 +4,11 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/15
-*	@updated : 2026/10/09
+*	@updated : 2026/10/22
 *============================================================*/
 #include "Scene.h"
 #include "DeviceManager.h"
+#include "BufferManager.h"
 #include "D3D11Config.h"
 #include "Renderer.h"
 #include "GameObject.h"
@@ -85,6 +86,9 @@ void Scene::Draw() const
 		// カメラ行列セット
 		camera->SetMatrix();
 	}
+
+	// ライトをセット
+	D3D11::BufferManager::getInstance().SetLight(mLight);
 
 	// レイヤー順に描画
 	for (size_t layer = 0; layer < LAYER; layer++) {

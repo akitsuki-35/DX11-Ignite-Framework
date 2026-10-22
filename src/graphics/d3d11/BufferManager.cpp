@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/15
+*	@updated : 2026/10/22
 *============================================================*/
 #include "BufferManager.h"
 #include "DeviceManager.h"
@@ -30,9 +30,10 @@ void D3D11::BufferManager::Initialize()
 	Element::LIGHT light{};
 	light.Position = { -10.0f, 10.0f, 10.0f, 0.0f };
 	light.Enable = true;
-	light.Direction = XMFLOAT4(1.0f, -1.0f, 0.0f, 0.0f);
-	light.Ambient = XMFLOAT4(0.9f, 0.8f, 1.0f, 1.0f);
-	light.Diffuse = XMFLOAT4(0.7f, 0.7f, 1.0f, 1.0f);
+	light.Strength = 100.0f;
+	light.Direction = { 1.0f, -1.0f, 0.0f, 0.0f };
+	light.Ambient = { 0.9f, 0.8f, 1.0f, 1.0f };
+	light.Diffuse = { 0.7f, 0.7f, 1.0f, 1.0f };
 	SetLight(light);
 
 	// マテリアル初期化

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/14
+*	@updated : 2026/10/22
 *============================================================*/
 #pragma once
 
@@ -61,7 +61,8 @@ namespace Element {
 	{
 		DirectX::XMFLOAT4 Position{};
 		int Enable{};
-		float Dummy[3]{};
+		float Strength{ 100.0f };
+		float Dummy[2]{};
 		DirectX::XMFLOAT4 Direction{};
 		DirectX::XMFLOAT4 Diffuse{};
 		DirectX::XMFLOAT4 Ambient{};

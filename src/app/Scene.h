@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2025/09/17
-*	@updated : 2026/10/13
+*	@updated : 2026/10/22
 *============================================================*/
 #pragma once
 
@@ -28,6 +28,9 @@ protected:
 	// シーンによってマネージャーオブジェクトのクラスが異なるので、マネージャー側からフラグを切り替える
 	static inline bool mPause{ false };
 	static inline bool mHitStop{ false };
+
+	// ライト
+	static inline Element::LIGHT mLight{};
 
 	// 風
 	static inline Element::WIND mWind{};
