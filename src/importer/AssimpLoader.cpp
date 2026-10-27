@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/14
+*	@updated : 2026/10/28
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -542,13 +542,17 @@ bool AssimpLoader::loadTextures(const aiScene* scene, Model& model)
 	for (unsigned int i = 0; i < scene->mNumTextures; ++i) {
 		const aiTexture* tex = scene->mTextures[i];
 
+		if (!tex) continue;
+
+		const std::string name = tex->mFilename.C_Str();
+
 		// キャッシュが存在すれば返す
-		auto it = mTextureMap.find(tex->mFilename.C_Str());
+		auto it = mTextureMap.find(name);
 
 		if (it != mTextureMap.end()) {
-			model.mTextures.emplace_back(it->second);
+			continue;
 		}
-
+		
 		// テクスチャ生成;
 		auto texture = std::make_unique<Texture>();
 
@@ -562,8 +566,7 @@ bool AssimpLoader::loadTextures(const aiScene* scene, Model& model)
 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
 
-		hr = CreateShaderResourceView(
-			D3D11::DeviceManager::getInstance().GetDevice(),
+		hr = CreateShaderResourceView(D3D11::DeviceManager::getInstance().GetDevice(),
 			image.GetImages(), image.GetImageCount(), metadata, srv.GetAddressOf());
 		if (FAILED(hr)) return false;
 
@@ -603,22 +606,22 @@ void AssimpLoader::loadMaterials(const aiScene* scene, Model& model, const std::
 					material._Texture = it->second;
 					material.Material.TextureEnable = true;
 				}
-			}
-			else {
-				// mtlファイルからテクスチャ取得
-				std::filesystem::path dir = Utility::File::getDirectoryPath(modelPath.c_str());
-
-				// mtlファイル登録テクスチャ探索用パス
-				std::filesystem::path mtlTexPath = dir / path.C_Str();
-
-				// mtlファイル登録テクスチャをロード
-				material._Texture = TextureManager::getInstance().Load(mtlTexPath.string().c_str(), false);
-
-				if (!material._Texture) {
-					return;
-				}
 				else {
-					material.Material.TextureEnable = true;
+					// mtlファイルからテクスチャ取得
+					std::filesystem::path dir = Utility::File::getDirectoryPath(modelPath.c_str());
+
+					// mtlファイル登録テクスチャ探索用パス
+					std::filesystem::path mtlTexPath = dir / path.C_Str();
+
+					// mtlファイル登録テクスチャをロード
+					material._Texture = TextureManager::getInstance().Load(mtlTexPath.string().c_str(), false);
+
+					if (!material._Texture) {
+						return;
+					}
+					else {
+						material.Material.TextureEnable = true;
+					}
 				}
 			}
 		}
