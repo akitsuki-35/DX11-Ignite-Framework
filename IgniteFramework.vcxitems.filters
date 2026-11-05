@@ -312,6 +312,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\input\Input.h">
       <Filter>input</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.h">
+      <Filter>debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp">
@@ -511,6 +514,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\input\Input.cpp">
       <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.cpp">
+      <Filter>debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

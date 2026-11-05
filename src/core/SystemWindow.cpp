@@ -4,9 +4,16 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/05
-*	@updated : 2026/07/07
+*	@updated : 2026/11/05
 *============================================================*/
 #include "SystemWindow.h"
+
+// ImGui関連
+#ifndef NDEBUG
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 void System::Window::Initialize(HINSTANCE hInstance, const char* windowName, int width, int height)
 {
@@ -102,6 +109,14 @@ void System::Window::GameQuit() const
 
 LRESULT System::Window::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+#ifndef NDEBUG
+	if (ImGui::GetCurrentContext()) {
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
+			return true;
+		}
+	}
+#endif
+
 	// ウィンドウプロシージャ
 	switch (uMsg)
 	{
