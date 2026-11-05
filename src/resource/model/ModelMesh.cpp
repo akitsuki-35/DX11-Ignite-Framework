@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/09/16
+*	@updated : 2026/11/05
 *============================================================*/
 #include "ModelMesh.h"
 #include "DeviceManager.h"
@@ -45,6 +45,18 @@ void ModelMesh::Draw(const SUBSET& subset) const
 {
 	// 描画
 	D3D11::DeviceManager::getInstance().GetContext()->DrawIndexed(subset.IndexNum, subset.StartIndex, 0);
+}
+
+void ModelMesh::DrawInstanced(const SUBSET& subset, uint32_t instance) const
+{
+	// 描画対象が存在しない場合は描画しない
+	if (instance == 0) {
+		return;
+	}
+
+	ID3D11DeviceContext* context = D3D11::DeviceManager::getInstance().GetContext();
+
+	context->DrawIndexedInstanced(subset.IndexNum, instance, subset.StartIndex, 0, 0);
 }
 
 bool ModelMesh::generateVertexBuffer()

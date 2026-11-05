@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/01
-*	@updated : 2026/10/20
+*	@updated : 2026/11/05
 *============================================================*/
 #include "ModelRenderer.h"
 #include "Animator.h"
@@ -17,6 +17,7 @@
 #include "BufferManager.h"
 #include "GameObject.h"
 #include "FileUtility.h"
+#include "Instancing.h"
 
 void ModelRenderer::Draw() const
 {
@@ -51,12 +52,26 @@ void ModelRenderer::Draw() const
         }
     }
 
+    // インスタンス描画使用設定
+    const bool isInstanced = IsDrawInstanced();
+
+    if (isInstanced) {
+        // インスタンスを必要に応じてGPUに転送
+        if (!_mInstancing->Upload()) {
+            Renderer::End();
+            return;
+        }
+
+        // インスタンスデータを設定
+        _mInstancing->Bind();
+    }
+
     for (auto& mesh : _mModel->mMeshes)
     {
         mesh.Bind();
 
         // マテリアル設定
-        for (auto& subset : mesh.subsets)
+        for (auto& subset : mesh.mSubsets)
         {
             Element::MATERIAL material{};
             material.Diffuse = _mModel->mMaterials[subset.MaterialIndex].Material.Diffuse;
@@ -88,8 +103,14 @@ void ModelRenderer::Draw() const
             // マップテクスチャをセット
             setMapTextures();
 
-            // メッシュ描画
-            mesh.Draw(subset);
+            if (isInstanced) {
+                // 同一Meshをインスタンス数分描画
+                mesh.DrawInstanced(subset, _mInstancing->GetCount());
+            }
+            else {
+                // 通常メッシュ描画
+                mesh.Draw(subset);
+            }
         }
     }
 

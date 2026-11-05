@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/28
+*	@updated : 2026/11/05
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -441,7 +441,7 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 		uint32_t indexNum = static_cast<uint32_t>(indices.size()) - startIndex;
 
 		// サブセット生成
-		modelMesh.subsets.push_back(createSubset(mesh, startIndex, indexNum));
+		modelMesh.mSubsets.push_back(createSubset(mesh, startIndex, indexNum));
 
 		// モデル用メッシュ作成
 		if (!modelMesh.Create(vertices, indices))

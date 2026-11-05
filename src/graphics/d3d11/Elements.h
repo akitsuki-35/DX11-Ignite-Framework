@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/22
+*	@updated : 2026/11/05
 *============================================================*/
 #pragma once
 
@@ -79,5 +79,24 @@ namespace Element {
 		float GustStrength{ 0.0f };
 		float GustFrequency{ 1.0f };
 		float Time{ 0.0f };
+	};
+
+	/*--------------------------------------------------
+		インスタンス1個分の情報
+		インスタンス描画で使用する
+	----------------------------------------------------*/
+	struct InstanceData
+	{
+		// インスタンスのローカル位置
+		DirectX::XMFLOAT3 Position{};
+
+		// Y軸回転角（草などY軸回転のみ行わせる場合）
+		float RotationY{};
+
+		// インスタンスごとの拡大率
+		DirectX::XMFLOAT3 Scale{ 1.0f, 1.0f, 1.0f };
+
+		// GPU側とのデータサイズ調整用
+		float Dummy{};
 	};
 }

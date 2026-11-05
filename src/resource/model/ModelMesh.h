@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/01
-*	@updated : 2026/09/16
+*	@updated : 2026/11/05
 *============================================================*/
 #pragma once
 
@@ -46,7 +46,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> _mIndexBuffer{};
 
 	// サブセット
-	std::vector<SUBSET> subsets{};
+	std::vector<SUBSET> mSubsets{};
 
 public:
 	ModelMesh() = default;
@@ -58,6 +58,9 @@ public:
 
 	void Bind() const;
 	void Draw(const SUBSET& subset) const;
+
+	// インスタンス描画
+	void DrawInstanced(const SUBSET& subset, uint32_t instance) const;
 
 private:
 	// 頂点バッファ生成

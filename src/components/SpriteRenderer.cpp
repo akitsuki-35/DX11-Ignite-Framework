@@ -4,16 +4,21 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/09/16
+*	@updated : 2026/11/05
 *============================================================*/
 #include "SpriteRenderer.h"
 #include "Texture.h"
 #include "TextureManager.h"
 #include "BufferManager.h"
 #include "GameObject.h"
+#include "Instancing.h"
 
 void SpriteRenderer::Draw() const
 {
+	if (!_mTexture) {
+        return;
+    }
+
 	Renderer::Begin();
 
 	Bind();
@@ -35,8 +40,26 @@ void SpriteRenderer::Draw() const
 		_mTexture->Bind();
 	}
 
-	// メッシュ描画
-	mMesh.Draw();
+	if (IsDrawInstanced()) {
+		// インスタンスを必要に応じてGPUに転送
+		if (!_mInstancing->Upload()) {
+			Renderer::End();
+			return;
+		}
+
+		// インスタンスデータを設定
+		_mInstancing->Bind();
+
+		// 同一スプライトをインスタンス数分描画
+		mMesh.DrawInstanced(_mInstancing->GetCount());
+
+		// SRVをクリア
+		_mInstancing->Unbind();
+	}
+	else {
+		// 通常のメッシュ描画
+		mMesh.Draw();
+	}
 
 	Renderer::End();
 }
