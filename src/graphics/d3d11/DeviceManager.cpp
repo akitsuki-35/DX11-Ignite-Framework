@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/10/05
+*	@updated : 2026/10/15
 *============================================================*/
 #include "DeviceManager.h"
 #include "SystemWindow.h"
@@ -230,7 +230,13 @@ bool D3D11::DeviceManager::generateRasterizerState()
 	hr = _mDevice->CreateRasterizerState(&rasterizerDesc, &_mRasterSolid);
 	if (FAILED(hr)) { return false; }
 
+	// ソリッド（裏面カリングなし）
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	hr = _mDevice->CreateRasterizerState(&rasterizerDesc, &_mRasterNoCull);
+	if (FAILED(hr)) { return false; }
+
 	// ワイヤーフレーム
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 	hr = _mDevice->CreateRasterizerState(&rasterizerDesc, &_mRasterWireframe);
 	if (FAILED(hr)) { return false; }
@@ -288,6 +294,7 @@ void D3D11::DeviceManager::renderStateRegister()
 
 	// ラスタライザステート登録
 	RenderState::Raster::Solid = _mRasterSolid.Get();
+	RenderState::Raster::NoCull = _mRasterNoCull.Get();
 	RenderState::Raster::Wireframe = _mRasterWireframe.Get();
 
 	// サンプラーステート登録

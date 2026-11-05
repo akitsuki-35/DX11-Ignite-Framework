@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/09
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
@@ -35,6 +35,16 @@ class Animator final : public Component
         bool IsLoop{ true };
     };
 
+    // 揺れもの（スプリングボーン）
+    struct SPRING
+    {
+        float CurrentPitch{};
+        float TargetPitch{};
+
+        float CurrentRoll{};
+        float TargetRoll{};
+    };
+
 private:
     // アニメーション
     ANIMATION mCurrent{};
@@ -52,19 +62,24 @@ private:
     // ノードテーブル
     std::unordered_map<std::string, std::vector<int>> mNodeTable{};
 
+    // スプリングボーン関連
+    std::vector<SPRING> mSprings{};
+    Vector3 mPrevPosition{};
+    bool mSpringInitialized{};
+
 public:
     Animator(GameObject* owner);
 
     void Finalize() override;
+
+    // 更新
+    void Update(double deltaTime) override;
 
     // アニメーション読み込み
     Animator* Load(std::string keyName, const char* fileName, const bool& isSet = false);
 
     // アニメーションをセット
     void Set(const std::string& keyName, const bool& isLoop = true, const double& duration = 0.25);
-
-    // 更新
-    void Update(double deltaTime) override;
 
     // 経過時間取得
     double GetTime() const { return mCurrent.ElapsedTime; }
@@ -109,4 +124,8 @@ private:
 
     // アニメーションブレンド
     void animBlend(const double& duration);
+
+    // スプリングボーン関連
+    void initSpring();
+    void updateSpring(const float& dt);
 };

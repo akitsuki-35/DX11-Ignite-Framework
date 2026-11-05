@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/24
-*	@updated : 2026/09/16
+*	@updated : 2026/11/04
 *============================================================*/
 #pragma once
 
@@ -33,13 +33,13 @@ private:
 	Type mType{};
 
 	// 頂点数
-	uint8_t mVertexCount{};
+	uint32_t mVertexCount{};
 
 	// 頂点バッファ
 	Microsoft::WRL::ComPtr<ID3D11Buffer> _mVertexBuffer{};
 
 	// インデックス数
-	uint8_t mIndexCount{};
+	uint32_t mIndexCount{};
 
 	// インデックスバッファ
 	Microsoft::WRL::ComPtr<ID3D11Buffer> _mIndexBuffer{};
@@ -53,6 +53,9 @@ public:
 
 	// 板ポリゴン作成
 	bool CreatePlane(MeshType::Plane::Pivot pivot, MeshType::Plane::Axis axis);
+
+	// 凹凸地形作成
+	bool CreateUnevenness(const MeshType::Unevenness::DESC& desc);
 
 	void Bind() const;
 	void Draw() const;

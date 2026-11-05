@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/05
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
 #include "ModelMesh.h"
 #include "Elements.h"
+#include "Skeleton.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -70,6 +71,9 @@ private:
 
 	// ボーン取得
 	bool loadBones(const aiScene* scene, Skeleton& skeleton);
+
+	// スプリングボーン取得
+	void loadSpringBones(const aiNode* node, Skeleton& skeleton);
 
 	// メッシュ生成
 	bool loadMeshes(const aiScene* scene, Model& model, const Skeleton& skeleton);

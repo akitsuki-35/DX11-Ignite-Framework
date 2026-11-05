@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/01
+*	@updated : 2026/10/13
 *============================================================*/
 #pragma once
 
@@ -62,6 +62,28 @@ public:
         };
     };
 
+    // スプリングボーンのチェーン
+    struct SPRING_CHAIN
+    {
+        // スプリングボーンキー名
+        std::string Name{};
+
+        // 対応インデックス
+        std::vector<int> NodeIndices{};
+
+        // 風の影響
+        float WindInfluence{ 1.0f };
+
+        // モーションの影響
+        float MotionInfluence{ 1.0f };
+
+        // 追従スピード
+        float FollowSpeed{ 5.0f };
+
+        // 最大角度
+        float MaxAngle{ 0.35f };
+    };
+
 private:
     // ノードマップ・配列
     std::unordered_map<std::string, int> mNodeMap{};
@@ -70,6 +92,9 @@ private:
     // ボーンマップ・配列
     std::unordered_map<std::string, int> mBoneMap{};
     std::vector<BONE> mBones{};
+
+    // スプリングボーンチェーン配列
+    std::vector<SPRING_CHAIN> mSpringChains{};
 
     // スキニング行列
     std::vector<DirectX::XMFLOAT4X4>mSkinningMatrices{};
@@ -90,6 +115,11 @@ public:
     // ボーン登録・取得
     int AddBone(const BONE& bone);
     int FindBone(const std::string& name) const;
+
+    // スプリングチェーン登録・取得
+    void AddSpringChain(SPRING_CHAIN chain);
+    const std::vector<SPRING_CHAIN>& GetSpringChains() const;
+    bool SpringChainEnable() const;
 
     // 更新
     void Update();

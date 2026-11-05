@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/31
-*	@updated : 2026/10/05
+*	@updated : 2026/10/20
 *============================================================*/
 #pragma once
 
@@ -60,6 +60,9 @@ private:
 	// ディレクトリ(テクスチャ検索用)
 	std::filesystem::path mDirectory{};
 
+	// カリング有効？
+	bool mCulling{ true };
+
 public:
 	ModelRenderer(GameObject* owner)
 		: Renderer(owner) {
@@ -90,6 +93,10 @@ public:
 
 	// テクスチャ読み込み
 	ModelRenderer* LoadTexture(std::string textureName, TextureType type = TextureType::Albedo, bool isMip = false);
+
+	// カリング有効・無効化
+	// VRoidモデル等カリング有で正常に描画されないモデルは無効化
+	ModelRenderer* SetCulling(const bool& isCulling);
 
 	// ゲッター
 	Model* GetModel() const{ return _mModel; }

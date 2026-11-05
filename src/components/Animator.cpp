@@ -4,12 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/09
+*	@updated : 2026/10/14
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
 #include "AnimationManager.h"
 #include "ModelRenderer.h"
+#include "Scene.h"
 #include "GameObject.h"
 #include <cmath>
 #include <algorithm>
@@ -21,12 +22,30 @@ Animator::Animator(GameObject* owner)
 {
     // モデルのスケルトン取得
     setSkeleton();
+
+    // スプリングボーン初期化
+    initSpring();
 }
 
 void Animator::Finalize()
 {
     mNext._Animation = nullptr;
     mCurrent._Animation = nullptr;
+}
+
+void Animator::Update(double deltaTime)
+{
+    if (!mCurrent._Animation || !mNext._Animation) {
+        return;
+    }
+
+    // Current != Nextの場合はブレンド処理
+    if (mCurrent.Name != mNext.Name) {
+        updateBlend(deltaTime);
+    }
+    else {
+        updateCurrent(deltaTime);
+    }
 }
 
 Animator* Animator::Load(std::string keyName, const char* fileName, const bool& isSet)
@@ -74,21 +93,6 @@ void Animator::Set(const std::string& keyName, const bool& isLoop, const double&
     }
 }
 
-void Animator::Update(double deltaTime)
-{
-    if (!mCurrent._Animation || !mNext._Animation) {
-        return;
-    }
-
-    // Current != Nextの場合はブレンド処理
-    if(mCurrent.Name != mNext.Name){
-        updateBlend(deltaTime);
-    }
-    else {
-        updateCurrent(deltaTime);
-    }
-}
-
 bool Animator::IsPlaying(std::string keyName) const
 {
     if (mCurrent.Name == keyName || mNext.Name == keyName) {
@@ -130,6 +134,8 @@ void Animator::updateCurrent(double deltaTime)
     for (size_t i = 0; i < channels.size(); ++i) {
         updateBoneTransform(channels[i], table[i], mCurrent.ElapsedTime);
     }
+
+    updateSpring(static_cast<float>(deltaTime));
 
     mSkeleton.Update();
 
@@ -205,6 +211,8 @@ void Animator::updateBlend(double deltaTime)
         auto& node = mSkeleton.GetNode(nodeIndex);
         XMStoreFloat4x4(&node.Local, blend.ToMatrix());
     }
+
+    updateSpring(static_cast<float>(deltaTime));
 
     mSkeleton.Update();
 
@@ -435,4 +443,145 @@ void Animator::animBlend(const double& duration)
 
     mBlendTime = 0.0;
     mBlendDuration = duration;
+}
+
+void Animator::initSpring()
+{
+    mSprings.clear();
+
+    mSprings.resize(mSkeleton.GetSpringChains().size());
+
+    mSpringInitialized = false;
+}
+
+void Animator::updateSpring(const float& dt)
+{
+    // スプリングチェーンが存在しない
+    if (!mSkeleton.SpringChainEnable()) {
+        return;
+    }
+
+    if (dt <= 0.0f) {
+        return;
+    }
+
+    const auto& chains = mSkeleton.GetSpringChains();
+    
+    // 初期化
+    if (mSprings.size() != chains.size()) {
+        initSpring();
+    }
+
+    // 現在ワールド座標取得
+    DirectX::XMFLOAT3 currentPos = _mOwner->GetPosition().ConvertToXMFLOAT3();
+
+    // 初回処理
+    if (!mSpringInitialized) {
+        mPrevPosition = _mOwner->GetPosition();
+        mSpringInitialized = true;
+        return;
+    }
+
+    // ワールド座標系における移動速度を取得
+    const DirectX::XMVECTOR worldVel = DirectX::XMVectorSet((currentPos.x - mPrevPosition.x) / dt,
+        (currentPos.y - mPrevPosition.y) / dt, (currentPos.z - mPrevPosition.z) / dt, 0.0f);
+
+    // オブジェクト回転行列を取得
+    const DirectX::XMFLOAT3 objRot=_mOwner->GetRotation().ConvertToXMFLOAT3();
+    const DirectX::XMMATRIX objRotMtx = DirectX::XMMatrixRotationRollPitchYaw(objRot.x, objRot.y, objRot.z);
+
+    // ワールド移動速度をオブジェクトのローカル空間へ変換
+    const DirectX::XMMATRIX invRot = DirectX::XMMatrixTranspose(objRotMtx);
+    const DirectX::XMVECTOR localVelVec = DirectX::XMVector3TransformNormal(worldVel, invRot);
+
+    DirectX::XMFLOAT3 localVel{};
+    DirectX::XMStoreFloat3(&localVel, localVelVec);
+
+    // 風パラメータ取得
+    const Element::WIND wind = Scene::GetWind();
+
+    const float windStrength = std::clamp(wind.Strength, 0.0f, 1.0f);
+    constexpr float windAngleRatio = 0.6f;
+
+    // フレーム落ちで追従値が急増しないよう制限
+    const float safeDt = std::min(dt, 1.0f / 30.0f);
+
+    // 各チェーン更新
+    for (size_t i = 0; i < chains.size(); ++i) {
+        const auto& chain = chains[i];
+
+        auto& spring = mSprings[i];
+
+        const float windAngle = chain.MaxAngle * windAngleRatio * windStrength * chain.WindInfluence;
+        
+        // ローカル前後移動と上下移動をPitchへ反映
+        const float motionPitch = (localVel.z - localVel.y) * chain.MotionInfluence;
+
+        // 風パラメータをオブジェクトのローカル空間へ反映
+        const DirectX::XMVECTOR worldWindDir = DirectX::XMVectorSet(wind.Direction.x, wind.Direction.y, 
+            wind.Direction.z, 0.0f);
+
+        const DirectX::XMVECTOR localWindVec = DirectX::XMVector3TransformNormal(worldWindDir, invRot);
+
+        DirectX::XMFLOAT3 localWindDir{};
+        DirectX::XMStoreFloat3(&localWindDir, localWindVec);
+
+        const float windPitch = localWindDir.z * windAngle;
+        spring.TargetPitch = motionPitch + windPitch;
+
+        // ローカル左右移動をRollへ反映
+        const float motionRoll = localVel.x * chain.MotionInfluence;
+        const float windRoll = localWindDir.x * windAngle;
+        spring.TargetRoll = motionRoll + windRoll;
+
+        // 角度をクランプ
+        spring.TargetPitch = std::clamp(spring.TargetPitch, -chain.MaxAngle, chain.MaxAngle);
+        spring.TargetRoll = std::clamp(spring.TargetRoll, -chain.MaxAngle, chain.MaxAngle);
+
+        // 追従率計算
+        const float follow = std::clamp(chain.FollowSpeed * safeDt, 0.0f, 1.0f);
+
+        // Currentを更新
+        spring.CurrentPitch += (spring.TargetPitch - spring.CurrentPitch) * follow;
+        spring.CurrentRoll += (spring.TargetRoll - spring.CurrentRoll) * follow;
+
+        // Currentもクランプ（Maxを超えないことを保証する）
+        spring.CurrentPitch = std::clamp(spring.CurrentPitch, -chain.MaxAngle, chain.MaxAngle);
+        spring.CurrentRoll = std::clamp(spring.CurrentRoll, -chain.MaxAngle, chain.MaxAngle);
+
+        // チェーン内ノード探索
+        const size_t nodeCount = chain.NodeIndices.size();
+        if (nodeCount == 0) {
+            continue;
+        }
+
+        // チェーン内ノード更新
+        for (size_t j = 0; j < nodeCount; ++j) {
+            const int nodeIndex = chain.NodeIndices[j];
+
+            if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= mSkeleton.GetNodeCount()) {
+                continue;
+            }
+
+            auto& node = mSkeleton.GetNode(static_cast<size_t>(nodeIndex));
+
+            // 根元を弱く、先端を強くする
+            const float weight = static_cast<float>(j + 1) / static_cast<float>(nodeCount);
+            const float pitch = spring.CurrentPitch * weight;
+            const float roll = spring.CurrentRoll * weight;
+
+            // マトリクス更新
+            const DirectX::XMMATRIX pitchMtx = DirectX::XMMatrixRotationX(pitch);
+            const DirectX::XMMATRIX rollMtx = DirectX::XMMatrixRotationZ(roll);
+            const DirectX::XMMATRIX localMtx = DirectX::XMLoadFloat4x4(&node.Local);
+            const DirectX::XMMATRIX springMtx = pitchMtx * rollMtx;
+
+            const DirectX::XMMATRIX result = springMtx * localMtx;
+            
+            DirectX::XMStoreFloat4x4(&node.Local, result);
+        }
+    }
+
+    // 次回更新用の座標保存
+    mPrevPosition = currentPos;
 }

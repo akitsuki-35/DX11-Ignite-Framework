@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/10/05
+*	@updated : 2026/10/28
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -28,6 +28,7 @@ using namespace DirectX;
 
 // 補助関数宣言
 namespace {
+	// assimp行列をDirectX用の行列に転置
 	XMFLOAT4X4 convertMatrix(const aiMatrix4x4& m) {
 		XMFLOAT4X4 out {
 			m.a1, m.b1, m.c1, m.d1,
@@ -38,6 +39,7 @@ namespace {
 		return out;
 	}
 
+	// aiScene生成
 	const aiScene* generateScene(Assimp::Importer& importer, const std::string& path) {
 		// FBXのPivotノードをAssimp補助ノードとして展開しない
 		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
@@ -53,6 +55,60 @@ namespace {
 		);
 
 		return scene;
+	}
+
+	// 引数ノードがスプリングボーンか判定
+	// 現時点ではVRoidのJ_Sec_ノードをスプリングボーンとして解釈
+	bool isSpringNode(const std::string& name) {
+		return name.starts_with("J_Sec_");
+	}
+
+	// スプリングボーンのRootか？
+	bool isSpringRootNode(const aiNode* node) {
+		if (!node) {
+			return false;
+		}
+
+		const std::string name = node->mName.C_Str();
+
+		if (!isSpringNode(name)) {
+			return false;
+		}
+
+		if (!node->mParent) {
+			return true;
+		}
+
+		const std::string parentName = node->mParent->mName.C_Str();
+
+		// 親がJ_Sec＝チェーン途中
+		return !isSpringNode(parentName);
+	}
+
+	// スプリングボーンパラメータの部位別プリセット
+	void setSpringPreset(const std::string& name, Skeleton::SPRING_CHAIN& chain)
+	{
+		// 髪
+		if (name.find("Hair") != std::string::npos) {
+			chain.WindInfluence = 1.5f;
+			chain.MotionInfluence = 0.8f;
+			chain.FollowSpeed = 5.0f;
+			chain.MaxAngle = 1.0f;
+		}
+		// スカート
+		else if (name.find("Skirt") != std::string::npos) {
+			chain.WindInfluence = 2.0f;
+			chain.MotionInfluence = 1.2f;
+			chain.FollowSpeed = 3.5f;
+			chain.MaxAngle = 0.75f;
+		}
+		// 胸
+		else if (name.find("Bust") != std::string::npos) {
+			chain.WindInfluence = 0.1f;
+			chain.MotionInfluence = 1.5f;
+			chain.FollowSpeed = 2.5f;
+			chain.MaxAngle = 0.15f;
+		}
 	}
 }
 
@@ -95,6 +151,9 @@ bool AssimpLoader::GenerateModel(Model& model, const std::string& path, const bo
 	if (!loadBones(scene, model.mSkeleton)) {
 		return false;
 	}
+
+	// スキニングボーン読み込み
+	loadSpringBones(scene->mRootNode, model.mSkeleton);
 
 	// グローバル逆行列作成
 	aiMatrix4x4 inverseRoot = scene->mRootNode->mTransformation.Inverse();
@@ -192,16 +251,22 @@ bool AssimpLoader::loadBones(const aiScene* scene, Skeleton& skeleton)
 	// ボーン登録
 	for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
 		const aiMesh* mesh = scene->mMeshes[i];
-		if (!mesh) continue;
+		if (!mesh) {
+			continue;
+		}
 
 		for (uint32_t j = 0; j < mesh->mNumBones; ++j) {
 			const aiBone* bone = mesh->mBones[j];
-			if (!bone) continue;
+			if (!bone) {
+				continue;
+			}
 
 			std::string boneName = bone->mName.C_Str();
 
 			int boneIndex = skeleton.FindBone(boneName);
-			if (boneIndex >= 0) continue;
+			if (boneIndex >= 0) {
+				continue;
+			}
 
 			if (skeleton.GetBoneCount() >= Element::MAX_BONE) {
 				return false;
@@ -223,6 +288,63 @@ bool AssimpLoader::loadBones(const aiScene* scene, Skeleton& skeleton)
 	}
 
 	return true;
+}
+
+void AssimpLoader::loadSpringBones(const aiNode* node, Skeleton& skeleton)
+{
+	if (!node) {
+		return;
+	}
+
+	// スプリングボーンのRootだった
+	if (isSpringRootNode(node)) {
+		Skeleton::SPRING_CHAIN chain{};
+
+		chain.Name = node->mName.C_Str();
+
+		// パラメータプリセット適用
+		setSpringPreset(chain.Name, chain);
+
+		// チェーン収集
+		const aiNode* current = node;
+
+		while (current) {
+			const std::string nodeName = current->mName.C_Str();
+			int nodeIndex = skeleton.FindNode(nodeName);
+
+			if (nodeIndex >= 0) {
+				chain.NodeIndices.push_back(nodeIndex);
+			}
+
+			// 次のJ_Secノードを探す
+			const aiNode* next = nullptr;
+
+			for (UINT i = 0; i < current->mNumChildren; ++i) {
+				const aiNode* child = current->mChildren[i];
+
+				if (!child) {
+					continue;
+				}
+
+				if (isSpringNode(child->mName.C_Str())) {
+					next = child;
+					break;
+				}
+			}
+
+			current = next;
+		}
+
+		// スプリングチェーン登録
+		if (!chain.NodeIndices.empty()) {
+			skeleton.AddSpringChain(std::move(chain));
+		}
+	}
+
+	// 子ノードがある場合は再帰呼出し
+	for (UINT i = 0; i < node->mNumChildren; ++i) {
+		loadSpringBones(node->mChildren[i],skeleton);
+	}
 }
 
 bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton& skeleton)
@@ -420,13 +542,17 @@ bool AssimpLoader::loadTextures(const aiScene* scene, Model& model)
 	for (unsigned int i = 0; i < scene->mNumTextures; ++i) {
 		const aiTexture* tex = scene->mTextures[i];
 
+		if (!tex) continue;
+
+		const std::string name = tex->mFilename.C_Str();
+
 		// キャッシュが存在すれば返す
-		auto it = mTextureMap.find(tex->mFilename.C_Str());
+		auto it = mTextureMap.find(name);
 
 		if (it != mTextureMap.end()) {
-			model.mTextures.emplace_back(it->second);
+			continue;
 		}
-
+		
 		// テクスチャ生成;
 		auto texture = std::make_unique<Texture>();
 
@@ -440,8 +566,7 @@ bool AssimpLoader::loadTextures(const aiScene* scene, Model& model)
 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
 
-		hr = CreateShaderResourceView(
-			D3D11::DeviceManager::getInstance().GetDevice(),
+		hr = CreateShaderResourceView(D3D11::DeviceManager::getInstance().GetDevice(),
 			image.GetImages(), image.GetImageCount(), metadata, srv.GetAddressOf());
 		if (FAILED(hr)) return false;
 

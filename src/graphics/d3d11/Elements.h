@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/14
-*	@updated : 2026/10/09
+*	@updated : 2026/10/22
 *============================================================*/
 #pragma once
 
@@ -34,7 +34,7 @@ namespace Element {
 		ボーンバッファ
 	----------------------------------------------------*/
 	// 最大ボーン数
-	static constexpr int MAX_BONE{ 256 };
+	static constexpr int MAX_BONE{ 512 };
 	struct BONE
 	{
 		DirectX::XMFLOAT4X4 Matrices[MAX_BONE]{};
@@ -61,9 +61,23 @@ namespace Element {
 	{
 		DirectX::XMFLOAT4 Position{};
 		int Enable{};
-		float Dummy[3]{};
+		float Strength{ 100.0f };
+		float Dummy[2]{};
 		DirectX::XMFLOAT4 Direction{};
 		DirectX::XMFLOAT4 Diffuse{};
 		DirectX::XMFLOAT4 Ambient{};
+	};
+
+	/*--------------------------------------------------
+		風パラメータ構造体
+	----------------------------------------------------*/
+	struct WIND
+	{
+		float Strength{};
+		DirectX::XMFLOAT3 Direction{};
+		float BaseStrength{ 0.0f };
+		float GustStrength{ 0.0f };
+		float GustFrequency{ 1.0f };
+		float Time{ 0.0f };
 	};
 }

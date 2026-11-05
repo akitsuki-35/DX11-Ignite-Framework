@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/09/16
+*	@updated : 2026/10/15
 *============================================================*/
 #pragma once
 
@@ -61,6 +61,7 @@ namespace D3D11 {
 		// ラスタライザステート
 		namespace Raster {
 			inline ID3D11RasterizerState* Solid;
+			inline ID3D11RasterizerState* NoCull;
 			inline ID3D11RasterizerState* Wireframe;
 		}
 
