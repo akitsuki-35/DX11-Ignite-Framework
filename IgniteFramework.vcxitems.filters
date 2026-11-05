@@ -312,6 +312,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\input\Input.h">
       <Filter>input</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.h">
+      <Filter>debug</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\StructuredBuffer.h">
+      <Filter>graphics\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Instancing.h">
+      <Filter>components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp">
@@ -512,6 +521,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\input\Input.cpp">
       <Filter>input</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.cpp">
+      <Filter>debug</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Instancing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)external\include\ImGui\imgui.ini">

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/24
-*	@updated : 2026/11/04
+*	@updated : 2026/11/05
 *============================================================*/
 #include "Mesh.h"
 #include "DeviceManager.h"
@@ -122,5 +122,24 @@ void Mesh::Draw() const
 	}
 	else {
 		D3D11::DeviceManager::getInstance().GetContext()->Draw(mVertexCount, 0);
+	}
+}
+
+void Mesh::DrawInstanced(uint32_t instance) const
+{
+	// 描画対象が存在しない場合は描画しない
+	if (instance == 0) {
+		return;
+	}
+
+	ID3D11DeviceContext* context = D3D11::DeviceManager::getInstance().GetContext();
+
+	if (mIndexed) {
+		// インデックスを使用する
+		context->DrawIndexedInstanced(mIndexCount,instance, 0, 0, 0);
+	}
+	else {
+		// インデックスを使用しない
+		context->DrawInstanced(mVertexCount, instance, 0, 0);
 	}
 }

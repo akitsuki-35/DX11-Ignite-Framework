@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/10/09
+*	@updated : 2026/11/05
 *============================================================*/
 #include "Application.h"
 #include "Scene.h"
@@ -13,6 +13,10 @@
 #include "Transition.h"
 #include "Input.h"
 #include <cassert>
+
+#ifndef NDEBUG
+#include "ImGuiDebug.h"
+#endif
 
 /*------------------------------------------------------------
 	初期化
@@ -86,6 +90,10 @@ void Application::Draw()
 {
 	D3D11::Graphics::getInstance().Begin();
 
+#ifndef NDEBUG
+	ImGuiDebug::Begin();
+#endif
+
 	// 現在シーン描画処理
 	if (_mCurrentScene) {
 		_mCurrentScene->Draw();
@@ -93,6 +101,11 @@ void Application::Draw()
 
 	// トランジションテクスチャを最後に描画
 	Transition::getInstance().Draw();
+
+
+#ifndef NDEBUG
+	ImGuiDebug::End();
+#endif
 
 	D3D11::Graphics::getInstance().End();
 }

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/27
-*	@updated : 2026/09/16
+*	@updated : 2026/11/05
 *============================================================*/
 #pragma once
 
@@ -17,6 +17,7 @@
 ------------------------------------------------------------*/
 class Vector3;
 class Shader;
+class Instancing;
 
 /*------------------------------------------------------------
 	ブレンドステート
@@ -72,6 +73,9 @@ protected:
 	// シェーダー
 	Shader* _mShader{ nullptr };
 
+	// インスタンス情報の参照
+	Instancing* _mInstancing{ nullptr };
+
 	// カラー
 	DirectX::XMFLOAT4 mColor{ 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -97,15 +101,22 @@ public:
 		mBlendState = Blend::Default;
 	}
 
-	void Finalize() override {
-		_mShader = nullptr;
-	}
+	void Finalize() override;
 
 	// 描画
 	virtual void Draw() const = 0;
 
 	// シェーダー読み込み
 	Renderer* LoadShader(const std::string& keyName);
+
+	// インスタンス描画設定
+	Renderer* SetInstancing(Instancing* instancing);
+
+	// インスタンス描画するか
+	bool IsDrawInstanced() const;
+
+	// インスタンス情報取得
+	Instancing* GetInstancing() const { return _mInstancing; }
 
 	// ブレンドステート指定
 	Renderer* SetBlendState(const Blend& state);

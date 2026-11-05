@@ -4,11 +4,12 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/09/16
+*	@updated : 2026/11/05
 *============================================================*/
 #include "Renderer.h"
 #include "Vector3.h"
 #include "GameObject.h"
+#include "Instancing.h"
 #include "DeviceManager.h"
 #include "ShaderManager.h"
 #include "D3D11Config.h"
@@ -25,11 +26,43 @@ void Renderer::Bind() const
 	context->PSSetShader(_mShader->GetPixelShader(), nullptr, 0);
 }
 
+void Renderer::Finalize()
+{
+	_mInstancing = nullptr;
+	_mShader = nullptr;
+}
+
 Renderer* Renderer::LoadShader(const std::string& keyName)
 {
 	// シェーダー読み込み
 	_mShader = ShaderManager::getInstance().Get(keyName);
 	return this;
+}
+
+Renderer* Renderer::SetInstancing(Instancing* instancing)
+{
+	_mInstancing = instancing;
+	return this;
+}
+
+bool Renderer::IsDrawInstanced() const
+{
+	// Instancingが設定されていないRendererは通常描画
+	if (!_mInstancing) {
+		return false;
+	}
+
+	// StructuredBufferが未生成の場合は使用不可
+	if (!_mInstancing->IsValid()) {
+		return false;
+	}
+
+	// Instanceが0件の場合はインスタンス描画しない
+	if (_mInstancing->IsEmpty()) {
+		return false;
+	}
+
+	return true;
 }
 
 Renderer* Renderer::SetBlendState(const Blend& state)

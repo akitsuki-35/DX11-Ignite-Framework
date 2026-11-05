@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/09/30
+*	@updated : 2026/11/05
 *============================================================*/
 #include "ParticleEmitter.h"
 #include "ParticleRenderer.h"
@@ -22,7 +22,7 @@ void ParticleEmitter::Initialize()
 	ParticleRenderer* renderer = AddComponent<ParticleRenderer>(this)->SetEmitter(this);
 
 	// パーティクル用テクスチャ読み込み
-	renderer->LoadTexture("assets\\textures\\particle.png")->LoadShader("Unlit")
+	renderer->LoadTexture("assets\\textures\\particle.png")->LoadShader("InstanceParticle")
 		->SetBlendState(Blend::Add)->SetLayer(Layer::Alpha);
 
 	// 構造体初期化

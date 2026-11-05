@@ -35,6 +35,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\GridRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Instancing.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\ModelRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\ParticleRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Renderer.cpp" />
@@ -46,6 +47,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\core\AppLoop.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\core\SystemTimer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\core\SystemWindow.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\geometry\Mesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\geometry\MeshTypes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\common\Transition.cpp" />
@@ -106,6 +108,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Component.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\GridRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Instancing.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\ModelRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\ParticleRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Renderer.h" />
@@ -119,6 +122,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\core\SystemTimer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\core\SystemWindow.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\debug\DebugMemoryleak.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\geometry\Mesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\geometry\MeshTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\common\Transition.h" />
@@ -127,6 +131,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\DeviceManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Elements.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\StructuredBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBezier.h" />
