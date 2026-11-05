@@ -46,6 +46,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\core\AppLoop.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\core\SystemTimer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\core\SystemWindow.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\geometry\Mesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\geometry\MeshTypes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\common\Transition.cpp" />
@@ -119,6 +120,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\core\SystemTimer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\core\SystemWindow.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\debug\DebugMemoryleak.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\debug\ImGuiDebug.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\geometry\Mesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\geometry\MeshTypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\common\Transition.h" />

@@ -1,10 +1,10 @@
 ﻿/*============================================================
-*	@file	 : debug_memoryleak.h
+*	@file	 : DebugMemoryleak.h
 *	@brief	 : メモリリークの検出
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/11
-*	@updated : 2026/06/02
+*	@updated : 2026/11/05
 *============================================================*/
 #pragma once
 

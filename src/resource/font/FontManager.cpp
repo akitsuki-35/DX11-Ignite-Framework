@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/11
-*	@updated : 2026/09/30
+*	@updated : 2026/11/05
 *============================================================*/
 #include "FontManager.h"
 #include "FontLoader.h"
@@ -146,7 +146,7 @@ bool FontManager::generateGlyph(GLYPH& glyph, const GLYPHKEY& key)
 
     // DirectX11テクスチャ作成
     D3D11_TEXTURE2D_DESC desc{};
-    desc.Width = width ;
+    desc.Width = width;
     desc.Height = height;
     desc.MipLevels = 1;
     desc.ArraySize = 1;
