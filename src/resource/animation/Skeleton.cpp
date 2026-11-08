@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/13
+*	@updated : 2026/11/08
 *============================================================*/
 #include "Skeleton.h"
 #include "Elements.h"
@@ -102,6 +102,18 @@ void Skeleton::ToBindPose()
     for (NODE& node : mNodes) {
         node.Local = node.BindLocal;
     }
+}
+
+const DirectX::XMFLOAT4X4* Skeleton::GetGlobalMatrix(const std::string& name) const
+{
+    // 指定ノードのグローバル行列を取得
+    int index = FindNode(name);
+
+    if (index < 0) {
+        return nullptr;
+    }
+
+    return &mNodes[index].Global;
 }
 
 void Skeleton::updateGlobal(int index)

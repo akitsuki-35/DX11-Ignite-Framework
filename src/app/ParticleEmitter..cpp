@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/11/05
+*	@updated : 2026/11/08
 *============================================================*/
 #include "ParticleEmitter.h"
 #include "ParticleRenderer.h"
@@ -19,10 +19,10 @@ using namespace DirectX;
 void ParticleEmitter::Initialize()
 {
 	// レンダラーにエミッタ本体をセット
-	ParticleRenderer* renderer = AddComponent<ParticleRenderer>(this)->SetEmitter(this);
+	_mRenderer = AddComponent<ParticleRenderer>(this)->SetEmitter(this);
 
 	// パーティクル用テクスチャ読み込み
-	renderer->LoadTexture("assets\\textures\\particle.png")->LoadShader("InstanceParticle")
+	_mRenderer->LoadShader("InstanceParticle")
 		->SetBlendState(Blend::Add)->SetLayer(Layer::Alpha);
 
 	// 構造体初期化
@@ -80,6 +80,12 @@ ParticleEmitter* ParticleEmitter::LoadCSV(const char* filePath)
 	if (newType) {
 		this->SetType(std::move(newType));
 	}
+	return this;
+}
+
+ParticleEmitter* ParticleEmitter::LoadTexture(const char* filePath)
+{
+	_mRenderer->LoadTexture(filePath);
 	return this;
 }
 

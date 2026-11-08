@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/13
+*	@updated : 2026/11/08
 *============================================================*/
 #pragma once
 
@@ -142,6 +142,9 @@ public:
 
     // スキニング行列取得
     const std::vector<DirectX::XMFLOAT4X4>& GetSkinningMatrices() const { return mSkinningMatrices; }
+
+    // グローバル行列取得
+    const DirectX::XMFLOAT4X4* GetGlobalMatrix(const std::string& name) const;
 
 private:
     // グローバル行列更新
