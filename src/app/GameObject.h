@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/05/12
-*	@updated : 2026/10/09
+*	@updated : 2026/11/08
 *============================================================*/
 #pragma once
 
@@ -63,6 +63,7 @@ public:
 	GameObject& SetPosition(const Vector3& position);
 	GameObject& SetRotation(const Vector3& rotation);
 	GameObject& SetScale(const Vector3& scale);
+	GameObject& SetWorldMatrix(const DirectX::XMMATRIX& world);
 	GameObject& SetTag(const std::string& tag);
 	void SetDestroy() { mDestroy = true; }
 	

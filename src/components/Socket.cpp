@@ -43,6 +43,9 @@ void Socket::Update(double deltaTime)
     // スケルトン取得
     Skeleton& skeleton = _mAnimator->GetSkeleton();
 
+    // 親のワールド行列
+    DirectX::XMMATRIX ownerWorld = _mOwner->GetTransform().GetWorldMatrix();
+
     // ソケット更新
     for (auto& [name, socket] : mSockets)
     {
@@ -50,15 +53,33 @@ void Socket::Update(double deltaTime)
             continue;
         }
 
-        int nodeIndex = skeleton.GetNodeIndex(socket.Desc.ParentJoint);
+        // アニメーション適用済みジョイント行列
+        const DirectX::XMFLOAT4X4* global = skeleton.GetGlobalMatrix(socket.Desc.ParentJoint);
 
-        if (nodeIndex < 0) {
+        if (!global) {
             continue;
         }
 
-        Skeleton::NODE& node = skeleton.GetNode(nodeIndex);
-
         // ソケット位置を計算
+        DirectX::XMMATRIX jointGlobal = DirectX::XMLoadFloat4x4(global);
+        const auto& pos = socket.Desc.Position;
+        const auto& rot = socket.Desc.Rotation;
+
+        // Mayaの回転は度数方式なのでラジアンに変換する
+        DirectX::XMMATRIX socketRotation = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(rot.x),
+                DirectX::XMConvertToRadians(rot.y), DirectX::XMConvertToRadians(rot.z));
+
+        DirectX::XMMATRIX socketTranslation = DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+        DirectX::XMMATRIX socketMatrix = DirectX::XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z) *
+            DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
+
+        // 親から見たソケットのローカル行列
+        DirectX::XMMATRIX socketLocal = socketRotation * socketTranslation;
+
+        // 子オブジェクトのワールド行列をセット
+        DirectX::XMMATRIX childWorld = socketLocal * jointGlobal * ownerWorld;
+        socket.Child->SetWorldMatrix(childWorld);
     }
 }
 
@@ -114,8 +135,6 @@ Socket* Socket::Attach(const std::string& name, GameObject* child)
     }
 
     socket->Child = child;
-
-    socket->Child->SetPosition(_mOwner->GetPosition());
 
     return this;
 }

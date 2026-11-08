@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/05/19
-*	@updated : 2026/09/16
+*	@updated : 2026/11/08
 *============================================================*/
 #pragma once
 
@@ -29,9 +29,6 @@ private:
 
 	// ワールド行列
 	mutable DirectX::XMMATRIX mWorldMatrix{};
-
-	// 子オブジェクト
-	Transform* mParent{ nullptr };
 
 public:
 	Transform() = default;
@@ -68,6 +65,13 @@ public:
 	void SetScale(const Vector3& scale) {
 		mScale = scale;
 		markDirty();
+	}
+
+	// ワールド行列をセット
+	void SetWorldMatrix(const DirectX::XMMATRIX& world)
+	{
+		mWorldMatrix = world;
+		mDirty = false;
 	}
 
 	// ゲッター

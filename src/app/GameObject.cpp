@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/09/09
-*	@updated : 2026/10/09
+*	@updated : 2026/11/08
 *============================================================*/
 #include "GameObject.h"
 
@@ -60,6 +60,12 @@ GameObject& GameObject::SetRotation(const Vector3& rotation)
 GameObject& GameObject::SetScale(const Vector3& scale)
 {
 	mTransform.SetScale(scale);
+	return *this;
+}
+
+GameObject& GameObject::SetWorldMatrix(const DirectX::XMMATRIX& world)
+{
+	mTransform.SetWorldMatrix(world);
 	return *this;
 }
 
