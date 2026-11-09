@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/11/08
+*	@updated : 2026/11/09
 *============================================================*/
 #include "ParticleEmitter.h"
 #include "ParticleRenderer.h"
@@ -33,6 +33,8 @@ void ParticleEmitter::Initialize()
 
 	// 基本的に外部からCSVファイルで指定するため、仮にボックスで初期化
 	_mType = std::make_unique<ParticleType::Box>(this);
+
+	GameObject::Initialize();
 }
 
 void ParticleEmitter::Finalize()

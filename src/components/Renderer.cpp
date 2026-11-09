@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/11/05
+*	@updated : 2026/11/09
 *============================================================*/
 #include "Renderer.h"
 #include "Vector3.h"

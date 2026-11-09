@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/26
-*	@updated : 2026/10/09
+*	@updated : 2026/11/09
 *============================================================*/
 #include "Camera.h"
 #include "BufferManager.h"
@@ -17,6 +17,8 @@ void Camera::Initialize()
 	// 初期設定
 	mTransform.SetPosition({ 0.0f, 5.0f, -10.0f });
 	mTarget = Vector3(0.0f, 0.0f, 0.0f);
+
+	GameObject::Initialize();
 }
 
 void Camera::Finalize()

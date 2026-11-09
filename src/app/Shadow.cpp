@@ -1,10 +1,10 @@
 ﻿/*============================================================
-*	@file	 : Shadow.h
+*	@file	 : Shadow.cpp
 *	@brief	 : シャドウ
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/15
-*	@updated : 2026/08/15
+*	@updated : 2026/11/09
 *============================================================*/
 #include "Shadow.h"
 #include "SpriteRenderer.h"
@@ -20,6 +20,8 @@ void Shadow::Initialize()
 	mTransform.SetScale({ 3.0f, 3.0f, 3.0f });
 
 	renderer->LoadTexture("assets\\textures\\shadow.png")->LoadShader("Unlit")->SetLayer(Layer::Alpha)->SetBlendState(Blend::Multiply);
+	
+	GameObject::Initialize();
 }
 
 void Shadow::Finalize()
