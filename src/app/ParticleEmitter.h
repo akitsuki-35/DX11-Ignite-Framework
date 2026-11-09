@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/06/18
-*	@updated : 2026/10/09
+*	@updated : 2026/11/08
 *============================================================*/
 #pragma once
 
@@ -53,6 +53,8 @@ class ParticleEmitter : public GameObject
 	friend class ParticleRenderer;
 
 private:
+	ParticleRenderer* _mRenderer{ nullptr };
+
 	// パーティクル最大数
 	static constexpr int PARTICLE_MAX{ 10000 };
 
@@ -108,6 +110,9 @@ public:
 
 	// CSVファイル読み込み
 	ParticleEmitter* LoadCSV(const char* filePath);
+
+	// テクスチャ読み込み
+	ParticleEmitter* LoadTexture(const char* filePath);
 
 	// エミッタ寿命のセット
 	ParticleEmitter* SetEmitterLife(double lifeTime);

@@ -40,6 +40,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\ParticleRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Renderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Shaker.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Socket.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\SpriteRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\TextRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Timer.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\ParticleRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Renderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Shaker.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Socket.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\SpriteRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\TextRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Timer.h" />
