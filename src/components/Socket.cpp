@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/08
-*	@updated : 2026/11/08
+*	@updated : 2026/11/09
 *============================================================*/
 #include "Socket.h"
 #include "CSVHandler.h"
@@ -13,9 +13,10 @@
 #include "Transform.h"
 
 Socket::Socket(GameObject* owner)
+    :Component(owner)
 {
-    _mOwner = owner;
-    _mAnimator = _mOwner->GetComponent<Animator>();
+    // アニメーション後の行列を使うため、Animatorより後に処理する
+    mPriority = Priority::Medium;
 }
 
 void Socket::Finalize()
@@ -31,13 +32,19 @@ void Socket::Finalize()
     }
 
     mSockets.clear();
-    _mAnimator = nullptr;
 }
 
-void Socket::Update(double deltaTime)
+void Socket::Update(double /*deltaTime*/)
 {
+    // Animatorコンポーネントがnullの場合は取得する
     if (!_mAnimator) {
-        return;
+        Animator* animator = _mOwner->GetComponent<Animator>();
+
+        if (!animator) {
+            return;
+        }
+
+        _mAnimator = animator;
     }
 
     // スケルトン取得

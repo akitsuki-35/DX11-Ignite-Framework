@@ -42,7 +42,7 @@ public:
 	GameObject() = default;
 	virtual ~GameObject() = default;
 
-	virtual void Initialize() = 0;
+	virtual void Initialize();
 	virtual void Finalize();
 	virtual void Update(double deltaTime);
 	virtual void Draw() const;

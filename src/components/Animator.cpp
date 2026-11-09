@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/14
+*	@updated : 2026/11/09
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -20,6 +20,9 @@ using namespace DirectX;
 Animator::Animator(GameObject* owner)
     : Component(owner)
 {
+    // ソケットがアニメーション後の行列を使うため先に処理する
+    mPriority = Priority::High;
+
     // モデルのスケルトン取得
     setSkeleton();
 
