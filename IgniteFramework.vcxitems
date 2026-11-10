@@ -86,6 +86,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\TimeUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)external\include\ImGui\imconfig.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\TimeUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)external\include\ImGui\imgui.ini" />

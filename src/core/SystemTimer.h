@@ -4,11 +4,12 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/13
-*	@updated : 2026/09/16
+*	@updated : 2026/11/09
 *============================================================*/
 #pragma once
 
 #include <Windows.h>
+#include <cmath>
 
 namespace System {
 /*============================================================
@@ -63,6 +64,9 @@ namespace System {
 
 		// dt取得
 		double GetDeltaTime() const { return mFps; }
+
+		// フレームレート取得
+		int GetFps() const { return static_cast<int>(std::round(1.0 / mFps)); }
 
 		// FPS値変更
 		void SetFps(double fps) { mFps = 1.0 / fps; }
