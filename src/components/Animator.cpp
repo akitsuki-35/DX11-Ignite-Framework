@@ -134,7 +134,7 @@ void Animator::updateCurrent(double deltaTime)
     const auto& channels = mCurrent._Animation->GetChannels();
     const auto& table = mNodeTable.at(mCurrent.Name);
 
-    for (size_t i = 0; i < channels.size(); ++i) {
+    for (size_t i = 0; i < channels.size(); i++) {
         updateBoneTransform(channels[i], table[i], mCurrent.ElapsedTime);
     }
 
@@ -164,7 +164,7 @@ void Animator::updateBlend(double deltaTime)
     // Next用の逆引きノードテーブル作成
     std::vector<int> nextNodes(mSkeleton.GetNodeCount(), -1);
 
-    for (size_t i = 0; i < nextTable.size(); ++i) {
+    for (size_t i = 0; i < nextTable.size(); i++) {
         int nodeIndex = nextTable[i];
 
         if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= nextNodes.size()) {
@@ -185,7 +185,7 @@ void Animator::updateBlend(double deltaTime)
 
     // チャンネル更新
     // 逆引きテーブルを元にNextを更新する
-    for (size_t i = 0; i < currentChannels.size(); ++i) {
+    for (size_t i = 0; i < currentChannels.size(); i++) {
         const int nodeIndex = currentTable[i];
 
         if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= mSkeleton.GetNodeCount()) {
@@ -287,7 +287,7 @@ void Animator::generateNodeTable(const std::string& keyName, const Animation* an
     const auto& channels = animation->GetChannels();
 
     // アニメーションチャンネルからノードテーブルを作成
-    for (size_t i = 0; i < channels.size(); ++i) {
+    for (size_t i = 0; i < channels.size(); i++) {
         mNodeTable[keyName].push_back(mSkeleton.FindNode(channels[i].NodeName));
     }
 }
@@ -350,7 +350,7 @@ Vector3 Animator::calculatePosition(const std::vector<Animation::KEY_POSITION>& 
         }
     }
 
-    for (size_t i = 0; i + 1 < keys.size(); ++i) {
+    for (size_t i = 0; i + 1 < keys.size(); i++) {
         const auto& current = keys[i];
         const auto& next = keys[i + 1];
 
@@ -385,7 +385,7 @@ Quaternion Animator::calculateRotation(const std::vector<Animation::KEY_ROTATION
         return keys.back().Rotation;
     }
 
-    for (size_t i = 0; i + 1 < keys.size(); ++i) {
+    for (size_t i = 0; i + 1 < keys.size(); i++) {
         const auto& current = keys[i];
         const auto& next = keys[i + 1];
 
@@ -420,7 +420,7 @@ Vector3 Animator::calculateScale(const std::vector<Animation::KEY_SCALE>& keys, 
         return keys.back().Scale;
     }
 
-    for (size_t i = 0; i + 1 < keys.size(); ++i) {
+    for (size_t i = 0; i + 1 < keys.size(); i++) {
         const auto& current = keys[i];
         const auto& next = keys[i + 1];
 
@@ -476,8 +476,36 @@ void Animator::updateSpring(const float& dt)
     // ゼロ除算防止のための下限
     const float motionDt = std::max(dt, 0.0001f);
 
-    // フレーム落ちで追従値が急増しないよう制限
-    const float followDt = std::min(dt, 1.0f / 30.0f);
+    // バネシミュレーションへ渡す時間
+    // フレーム落ちで角速度が急増しないよう制限
+    const float springDt = std::min(dt, 1.0f / 15.0f);
+
+    // 1回のバネ積分で処理する最大時間
+    constexpr float maxSpringStep = 1.0f / 120.0f;
+
+    // 1サブステップあたりの更新時間を算出
+    // springDtをmaxSpringStep以下へ分割する
+    const int springStepCount = std::max(1, static_cast<int>(std::ceil(springDt / maxSpringStep)));
+    const float springStepDt = springDt / static_cast<float>(springStepCount);
+
+    // 現在座標取得
+    const Vector3 currentPosition = _mOwner->GetPosition();
+
+    // 初回フレームでは移動速度を0として扱う
+    DirectX::XMVECTOR worldVelocityVec = DirectX::XMVectorZero();
+    
+    if (mPositionInitialized) {
+        // 現在座標と前フレーム座標をXMFLOAT3に変換
+        const DirectX::XMFLOAT3 currentPositionValue = currentPosition.ConvertToXMFLOAT3();
+        const DirectX::XMFLOAT3 previousPositionValue = mPrevPosition.ConvertToXMFLOAT3();
+
+        // ワールド空間におけるオブジェクトの移動速度を計算
+        worldVelocityVec = DirectX::XMVectorSet(
+                (currentPositionValue.x - previousPositionValue.x) / motionDt,
+                (currentPositionValue.y - previousPositionValue.y) / motionDt,
+                (currentPositionValue.z - previousPositionValue.z) / motionDt,
+                0.0f);
+    }
 
     // オブジェクト回転行列を取得
     const DirectX::XMFLOAT3 objRot =_mOwner->GetRotation().ConvertToXMFLOAT3();
@@ -485,6 +513,13 @@ void Animator::updateSpring(const float& dt)
 
     // オブジェクト回転行列の逆回転行列を作成
     const DirectX::XMMATRIX invRot = DirectX::XMMatrixTranspose(objRotMtx);
+
+    // ワールド空間の移動速度をオブジェクトのローカル空間に変換
+    const DirectX::XMVECTOR localVelocityVec = DirectX::XMVector3TransformNormal(worldVelocityVec, invRot);
+
+    // ローカル移動速度を保存
+    DirectX::XMFLOAT3 localVelocity{};
+    DirectX::XMStoreFloat3(&localVelocity, localVelocityVec);
 
     // 風パラメータ取得
     const Element::WIND wind = Scene::GetWind();
@@ -592,8 +627,7 @@ void Animator::updateSpring(const float& dt)
             const float deltaZ = DirectX::XMVectorGetZ(deltaRotationVec);
 
             // Quaternionのw成分を-1.0から1.0に制限
-            const float deltaW = std::clamp(DirectX::XMVectorGetW(deltaRotationVec),
-                    -1.0f, 1.0f);
+            const float deltaW = std::clamp(DirectX::XMVectorGetW(deltaRotationVec), -1.0f, 1.0f);
 
             // 差分Quaternionから回転角度を取得
             const float rotationAngle = 2.0f * std::acos(deltaW);
@@ -640,7 +674,7 @@ void Animator::updateSpring(const float& dt)
         const float windPitch = localWindDir.z * windAngle;
         const float windRoll = localWindDir.x * windAngle;
 
-        // 親ノードの回転による慣性と風による揺れを合成して目標角度を設定
+        // 親ボーン回転・風による角度を合成
         spring.TargetPitch = motionPitch + windPitch;
         spring.TargetRoll = motionRoll + windRoll;
 
@@ -648,16 +682,83 @@ void Animator::updateSpring(const float& dt)
         spring.TargetPitch = std::clamp(spring.TargetPitch, -chain.MaxAngle, chain.MaxAngle);
         spring.TargetRoll = std::clamp(spring.TargetRoll, -chain.MaxAngle, chain.MaxAngle);
 
-        // 追従率計算
-        const float follow = std::clamp(chain.FollowSpeed * followDt, 0.0f, 1.0f);
+        // 外力を作成
+        const float translationPitchForce = localVelocity.z * chain.TranslationInfluence;
+        const float translationRollForce = localVelocity.x * chain.TranslationInfluence;
 
-        // 現在のPitchとRollを目標に近づける
-        spring.CurrentPitch += (spring.TargetPitch - spring.CurrentPitch) * follow;
-        spring.CurrentRoll += (spring.TargetRoll - spring.CurrentRoll) * follow;
+        // バネ計算
+        for (int step = 0; step < springStepCount; step++) {
+            // Pitch方向の復元力を計算
+            const float pitchSpringForce = (spring.TargetPitch - spring.CurrentPitch) * chain.Stiffness;
 
-        // 追従後のPitchとRollが最大角度を超えないようクランプ
-        spring.CurrentPitch = std::clamp(spring.CurrentPitch, -chain.MaxAngle, chain.MaxAngle);
-        spring.CurrentRoll = std::clamp(spring.CurrentRoll, -chain.MaxAngle, chain.MaxAngle);
+            // 現在のPitch角速度に対する減衰力を計算
+            const float pitchDampingForce = -spring.PitchVelocity * chain.Damping;
+
+            // 復元力・減衰力・オブジェクト移動による外力からPitch方向の角加速度を計算
+            const float pitchAcceleration = pitchSpringForce + pitchDampingForce + translationPitchForce;
+
+            // Pitch角速度を更新
+            spring.PitchVelocity += pitchAcceleration * springStepDt;
+
+            // 更新後の角速度を使ってPitch角度を更新
+            spring.CurrentPitch += spring.PitchVelocity * springStepDt;
+
+            // Roll方向の復元力を計算する
+            const float rollSpringForce = (spring.TargetRoll - spring.CurrentRoll) * chain.Stiffness;
+
+            // 現在のRoll角速度に対する減衰力を計算
+            const float rollDampingForce = -spring.RollVelocity * chain.Damping;
+
+            // Roll方向の角加速度を計算
+            const float rollAcceleration = rollSpringForce + rollDampingForce + translationRollForce;
+
+            // Roll角速度を更新
+            spring.RollVelocity += rollAcceleration * springStepDt;
+
+            // 更新後の角速度を使ってRoll角度を更新
+            spring.CurrentRoll += spring.RollVelocity * springStepDt;
+
+            // 最大角度を超えた場合のクランプ処理
+            // Pitch
+            if (spring.CurrentPitch > chain.MaxAngle) {
+                // 正方向の最大角度まで戻す
+                spring.CurrentPitch = chain.MaxAngle;
+
+                // さらに正方向へ進もうとしている角速度だけ停止
+                if (spring.PitchVelocity > 0.0f) {
+                    spring.PitchVelocity = 0.0f;
+                }
+            }
+            else if (spring.CurrentPitch < -chain.MaxAngle) {
+                // 負方向の最大角度まで戻す
+                spring.CurrentPitch = -chain.MaxAngle;
+
+                // さらに負方向へ進もうとしている角速度だけ停止する
+                if (spring.PitchVelocity < 0.0f) {
+                    spring.PitchVelocity = 0.0f;
+                }
+            }
+
+            // Roll
+            if (spring.CurrentRoll > chain.MaxAngle) {
+                // 正方向の最大角度まで戻す
+                spring.CurrentRoll = chain.MaxAngle;
+
+                // さらに正方向へ進もうとしている角速度だけ停止する
+                if (spring.RollVelocity > 0.0f) {
+                    spring.RollVelocity = 0.0f;
+                }
+            }
+            else if (spring.CurrentRoll < -chain.MaxAngle) {
+                // 負方向の最大角度まで戻す
+                spring.CurrentRoll = -chain.MaxAngle;
+
+                // さらに負方向へ進もうとしている角速度だけ停止する
+                if (spring.RollVelocity < 0.0f) {
+                    spring.RollVelocity = 0.0f;
+                }
+            }
+        }
 
         // チェーン内の各ノードにスプリング回転を適用
         for (size_t j = 0; j < nodeCount; j++) {
@@ -671,7 +772,8 @@ void Animator::updateSpring(const float& dt)
             auto& node = mSkeleton.GetNode(static_cast<size_t>(nodeIndex));
 
             // 根元を弱く、先端を強くする
-            const float weight = static_cast<float>(j + 1) / static_cast<float>(nodeCount);
+            const float weight = chain.UniformWeight ? 1.0f : 
+                static_cast<float>(j + 1) / static_cast<float>(nodeCount);
             const float pitch = spring.CurrentPitch * weight;
             const float roll = spring.CurrentRoll * weight;
 
@@ -687,4 +789,8 @@ void Animator::updateSpring(const float& dt)
             DirectX::XMStoreFloat4x4(&node.Local, result);
         }
     }
+
+    // 現在座標を次フレームの移動速度計算用に保存
+    mPrevPosition = currentPosition;
+    mPositionInitialized = true;
 }

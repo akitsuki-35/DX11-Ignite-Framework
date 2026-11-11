@@ -74,14 +74,23 @@ public:
         // 風の影響
         float WindInfluence{ 1.0f };
 
-        // モーションの影響
+        // 移動による影響
+        float TranslationInfluence{ 1.0f };
+
+        // 親ボーン回転による影響
         float MotionInfluence{ 1.0f };
 
-        // 追従スピード
-        float FollowSpeed{ 5.0f };
+        // 目標角度へ戻ろうとするバネの強さ
+        float Stiffness{ 80.0f };
+
+        // 角速度を減衰させる強さ
+        float Damping{ 12.0f };
 
         // 最大角度
         float MaxAngle{ 0.35f };
+
+        // 根元から先端まで同じ強さで回転を適用するフラグ
+        bool UniformWeight{};
     };
 
 private:

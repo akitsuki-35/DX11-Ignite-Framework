@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/21
-*	@updated : 2026/11/08
+*	@updated : 2026/11/11
 *============================================================*/
 #include "CSVHandler.h"
 #include "FileUtility.h"
@@ -62,7 +62,7 @@ bool CSVHandler::Export(const char* filePath, const Data& data)
 
     // 2次元配列のデータをファイルに書き込み
     for (const auto& row : data) {
-        for (size_t i = 0; i < row.size(); ++i) {
+        for (size_t i = 0; i < row.size(); i++) {
             file << row[i];
 
             // 行末セル以外に区切り文字としてカンマを挿入

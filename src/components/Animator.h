@@ -40,11 +40,16 @@ class Animator final : public Component
     {
         float CurrentPitch{};
         float TargetPitch{};
+        float PitchVelocity{};
 
         float CurrentRoll{};
         float TargetRoll{};
+        float RollVelocity{};
 
+        // 前フレームの親ノード回転
         Quaternion PrevRotation{ 0.0f, 0.0f, 0.0f, 1.0f };
+
+        // 前フレ―ムの親回転を保存済みか
         bool RotationInitialized{};
     };
 
@@ -67,6 +72,8 @@ private:
 
     // スプリングボーン関連
     std::vector<SPRING> mSprings{};
+    Vector3 mPrevPosition{};
+    bool mPositionInitialized{};
 
 public:
     Animator(GameObject* owner);

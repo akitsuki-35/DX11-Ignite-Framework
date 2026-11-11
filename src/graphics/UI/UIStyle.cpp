@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/12
-*	@updated : 2026/09/16
+*	@updated : 2026/11/11
 *============================================================*/
 #include "UIStyle.h"
 #include "Vector2.h"
@@ -79,7 +79,7 @@ std::array<Element::VERTEX3D, 4> UIStyle::Create(const Pivot& pivot)
 {
     std::array<Element::VERTEX3D, 4> vertices{};
 
-    for (size_t i = 0; i < vertices.size(); ++i) {
+    for (size_t i = 0; i < vertices.size(); i++) {
         vertices[i] = CreateVertex(i, pivot);
     }
 

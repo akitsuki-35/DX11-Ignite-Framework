@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/12
-*	@updated : 2026/09/30
+*	@updated : 2026/11/11
 *============================================================*/
 #include "TextRenderer.h"
 #include "Texture.h"
@@ -70,7 +70,7 @@ void TextRenderer::Draw() const
 	XMFLOAT4 textColor = mColor;
 
 	// 1文字ずつレンダリング処理する
-	for (size_t i = 0; i < mText.length(); ++i) {
+	for (size_t i = 0; i < mText.length(); i++) {
 		// 1文字分の文字コード
 		uint32_t codepoint = mText[i];
 
