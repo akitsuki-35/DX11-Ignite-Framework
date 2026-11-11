@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/13
+*	@updated : 2026/11/11
 *============================================================*/
 #pragma once
 
@@ -43,6 +43,9 @@ class Animator final : public Component
 
         float CurrentRoll{};
         float TargetRoll{};
+
+        Quaternion PrevRotation{ 0.0f, 0.0f, 0.0f, 1.0f };
+        bool RotationInitialized{};
     };
 
 private:

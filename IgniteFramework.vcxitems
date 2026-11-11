@@ -34,6 +34,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Animator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Collider.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\GridRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Instancing.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\ModelRenderer.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Animator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Collider.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Component.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\GridRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Instancing.h" />

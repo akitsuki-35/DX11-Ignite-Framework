@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/26
-*	@updated : 2026/10/09
+*	@updated : 2026/11/11
 *============================================================*/
 #pragma once
 
@@ -24,6 +24,9 @@ protected:
 	// ビュー行列
 	DirectX::XMMATRIX mViewMatrix{};
 
+	// プロジェクション行列
+	DirectX::XMMATRIX mProjectionMatrix{};
+
 public:
 	virtual ~Camera() = default;
 	virtual void Initialize() override;
@@ -38,6 +41,12 @@ public:
 	Vector3 GetForward() const;
 	Vector3 GetRight() const;
 
+	// プロジェクション行列作成
+	void CalcProjection();
+
 	// ビュー行列のセット
 	void SetMatrix() const;
+
+	// 対象が視界内か
+	bool IsView(const Vector3& position, float size) const;
 };

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/10/01
+*	@updated : 2026/11/11
 *============================================================*/
 #pragma once
 
@@ -30,6 +30,12 @@ public:
         : x(x), y(y), z(z), w(w) {}
     constexpr Quaternion(const DirectX::XMFLOAT4& float4)
         : x(float4.x), y(float4.y), z(float4.z), w(float4.w) {}
+
+    // XMVECTORへ変換
+    DirectX::XMVECTOR ToXMVECTOR() const {
+        DirectX::XMVECTOR q = DirectX::XMVectorSet(x, y, z, w);
+        return q;
+    }
 
     // XMMATRIXへ変換
     DirectX::XMMATRIX ToMatrix() const {
