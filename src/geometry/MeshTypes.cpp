@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/26
-*	@updated : 2026/11/04
+*	@updated : 2026/11/11
 *============================================================*/
 #include "MeshTypes.h"
 #include "Vector2.h"
@@ -130,7 +130,7 @@ std::array<Element::VERTEX3D, 4> MeshType::Plane::Create(const DESC& desc)
 {
     std::array<Element::VERTEX3D, 4> vertices{};
 
-    for (size_t i = 0; i < vertices.size(); ++i) {
+    for (size_t i = 0; i < vertices.size(); i++) {
         vertices[i] = CreateVertex(i, desc);
     }
 

@@ -84,6 +84,7 @@ void Scene::Draw() const
 		}
 
 		// カメラ行列セット
+		camera->CalcProjection();
 		camera->SetMatrix();
 	}
 

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/11/08
+*	@updated : 2026/11/11
 *============================================================*/
 #include "Skeleton.h"
 #include "Elements.h"
@@ -84,7 +84,7 @@ bool Skeleton::SpringChainEnable() const
 
 void Skeleton::Update()
 {
-    for (size_t i = 0; i < mNodes.size(); ++i) {
+    for (size_t i = 0; i < mNodes.size(); i++) {
 
         if (mNodes[i].ParentIndex == -1) {
             // グローバル行列更新
@@ -135,7 +135,7 @@ void Skeleton::updateGlobal(int index)
     }
 
     // 子を更新
-    for (int i = 0; i < static_cast<int>(mNodes.size()); ++i) {
+    for (int i = 0; i < static_cast<int>(mNodes.size()); i++) {
         if (mNodes[i].ParentIndex == index) {
             updateGlobal(i);
         }
@@ -171,7 +171,7 @@ void Skeleton::updateSkinningMatrices()
     // モデル全体の逆行列を取得
     DirectX::XMMATRIX globalInverse = XMLoadFloat4x4(&mGlobalInverse);
 
-    for (size_t i = 0; i < mBones.size(); ++i) {
+    for (size_t i = 0; i < mBones.size(); i++) {
         const BONE& bone = mBones[i];
 
         assert(bone.NodeIndex < mNodes.size());

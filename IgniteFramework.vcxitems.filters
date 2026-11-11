@@ -324,6 +324,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Socket.h">
       <Filter>components</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\TimeUtility.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Collider.h">
+      <Filter>components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp">
@@ -531,6 +537,12 @@
       <Filter>components</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Socket.cpp">
+      <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\TimeUtility.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Collider.cpp">
       <Filter>components</Filter>
     </ClCompile>
   </ItemGroup>

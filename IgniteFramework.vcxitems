@@ -34,6 +34,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Animator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Collider.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\GridRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Instancing.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\ModelRenderer.cpp" />
@@ -86,6 +87,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\TimeUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)external\include\ImGui\imconfig.h" />
@@ -107,6 +109,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Animator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Collider.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Component.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\GridRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Instancing.h" />
@@ -170,6 +173,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\EasingUtility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\StringUtility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\utility\TimeUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)external\include\ImGui\imgui.ini" />

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/11/05
+*	@updated : 2026/11/11
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -90,24 +90,33 @@ namespace {
 	{
 		// 髪
 		if (name.find("Hair") != std::string::npos) {
-			chain.WindInfluence = 1.5f;
-			chain.MotionInfluence = 0.8f;
-			chain.FollowSpeed = 5.0f;
-			chain.MaxAngle = 1.0f;
+			chain.WindInfluence = 1.2f;
+			chain.TranslationInfluence = 1.5f;
+			chain.MotionInfluence = 1.2f;
+			chain.Stiffness = 80.0f;
+			chain.Damping = 12.0f;
+			chain.MaxAngle = 0.3f;
+			chain.UniformWeight = true;
 		}
 		// スカート
 		else if (name.find("Skirt") != std::string::npos) {
-			chain.WindInfluence = 2.0f;
+			chain.WindInfluence = 0.0f;
+			chain.TranslationInfluence = 1.0f;
 			chain.MotionInfluence = 1.2f;
-			chain.FollowSpeed = 3.5f;
+			chain.Stiffness = 80.0f;
+			chain.Damping = 12.0f;
 			chain.MaxAngle = 0.75f;
+			chain.UniformWeight = false;
 		}
 		// 胸
 		else if (name.find("Bust") != std::string::npos) {
-			chain.WindInfluence = 0.1f;
+			chain.WindInfluence = 0.0f;
+			chain.TranslationInfluence = 1.0f;
 			chain.MotionInfluence = 1.5f;
-			chain.FollowSpeed = 2.5f;
+			chain.Stiffness = 80.0f;
+			chain.Damping = 12.0f;
 			chain.MaxAngle = 0.15f;
+			chain.UniformWeight = false;
 		}
 	}
 }
@@ -233,7 +242,7 @@ bool AssimpLoader::loadNodes(const aiNode* node, Skeleton& skeleton, int parentI
 	int nodeIndex = skeleton.AddNode(newNode);
 
 	// 親子関係を登録
-	for (uint32_t i = 0; i < node->mNumChildren; ++i) {
+	for (uint32_t i = 0; i < node->mNumChildren; i++) {
 		if (!loadNodes(node->mChildren[i], skeleton, nodeIndex)) {
 			return false;
 		}
@@ -249,13 +258,13 @@ bool AssimpLoader::loadBones(const aiScene* scene, Skeleton& skeleton)
 	}
 
 	// ボーン登録
-	for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
+	for (uint32_t i = 0; i < scene->mNumMeshes; i++) {
 		const aiMesh* mesh = scene->mMeshes[i];
 		if (!mesh) {
 			continue;
 		}
 
-		for (uint32_t j = 0; j < mesh->mNumBones; ++j) {
+		for (uint32_t j = 0; j < mesh->mNumBones; j++) {
 			const aiBone* bone = mesh->mBones[j];
 			if (!bone) {
 				continue;
@@ -319,7 +328,7 @@ void AssimpLoader::loadSpringBones(const aiNode* node, Skeleton& skeleton)
 			// 次のJ_Secノードを探す
 			const aiNode* next = nullptr;
 
-			for (UINT i = 0; i < current->mNumChildren; ++i) {
+			for (UINT i = 0; i < current->mNumChildren; i++) {
 				const aiNode* child = current->mChildren[i];
 
 				if (!child) {
@@ -342,7 +351,7 @@ void AssimpLoader::loadSpringBones(const aiNode* node, Skeleton& skeleton)
 	}
 
 	// 子ノードがある場合は再帰呼出し
-	for (UINT i = 0; i < node->mNumChildren; ++i) {
+	for (UINT i = 0; i < node->mNumChildren; i++) {
 		loadSpringBones(node->mChildren[i],skeleton);
 	}
 }
@@ -350,7 +359,7 @@ void AssimpLoader::loadSpringBones(const aiNode* node, Skeleton& skeleton)
 bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton& skeleton)
 {
 	// 全メッシュを処理
-	for (unsigned int m = 0; m < scene->mNumMeshes; ++m) {
+	for (unsigned int m = 0; m < scene->mNumMeshes; m++) {
 
 		std::vector<VERTEX3D> vertices{};
 		std::vector<uint32_t> indices{};
@@ -365,7 +374,7 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 		/*--------------------------------------------------
 			頂点データ作成
 		----------------------------------------------------*/
-		for (unsigned int v = 0; v < mesh->mNumVertices; ++v) {
+		for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
 			// aiMeshをVERTEX3Dへ変換
 			vertices.push_back(convertVertex(mesh, v));
 		}
@@ -386,7 +395,7 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 			assert(skeletonIndex < Element::MAX_BONE);
 
 			// ウェイト情報取得
-			for (UINT weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
+			for (UINT weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++) {
 				UINT vertexId = bone->mWeights[weightIndex].mVertexId;
 
 				float weight = bone->mWeights[weightIndex].mWeight;
@@ -396,7 +405,7 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 				Element::VERTEX3D& vertex = vertices[vertexId];
 
 				// BoneWeightsとBoneIndicesを登録
-				for (int slot = 0; slot < 4; ++slot) {
+				for (int slot = 0; slot < 4; slot++) {
 					if (vertex.BoneWeights[slot] == 0.0f) {
 						vertex.BoneIndices[slot] = static_cast<uint32_t>(skeletonIndex);
 
@@ -419,7 +428,7 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 
 			if (total > 0.0f)
 			{
-				for (int i = 0; i < 4; ++i)
+				for (int i = 0; i < 4; i++)
 				{
 					vertex.BoneWeights[i] /= total;
 				}
@@ -429,10 +438,10 @@ bool AssimpLoader::loadMeshes(const aiScene* scene, Model& model, const Skeleton
 		/*--------------------------------------------------
 			インデックス取得
 		----------------------------------------------------*/
-		for (unsigned int f = 0; f < mesh->mNumFaces; ++f) {
+		for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
 			const aiFace& face = mesh->mFaces[f];
 
-			for (unsigned int i = 0; i < face.mNumIndices; ++i) {
+			for (unsigned int i = 0; i < face.mNumIndices; i++) {
 				indices.push_back(face.mIndices[i]);
 			}
 		}
@@ -539,7 +548,7 @@ bool AssimpLoader::loadTextures(const aiScene* scene, Model& model)
 	// テクスチャ取得
 	model.mTextures.reserve(scene->mNumTextures);
 
-	for (unsigned int i = 0; i < scene->mNumTextures; ++i) {
+	for (unsigned int i = 0; i < scene->mNumTextures; i++) {
 		const aiTexture* tex = scene->mTextures[i];
 
 		if (!tex) continue;
@@ -588,7 +597,7 @@ bool AssimpLoader::loadTextures(const aiScene* scene, Model& model)
 void AssimpLoader::loadMaterials(const aiScene* scene, Model& model, const std::string& modelPath)
 {
 	// マテリアル取得
-	for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 		Model::MATERIAL material{};
 
 		aiMaterial* aiMat = scene->mMaterials[i];
