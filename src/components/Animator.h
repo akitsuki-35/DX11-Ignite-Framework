@@ -67,8 +67,6 @@ private:
 
     // スプリングボーン関連
     std::vector<SPRING> mSprings{};
-    Vector3 mPrevPosition{};
-    bool mSpringInitialized{};
 
 public:
     Animator(GameObject* owner);

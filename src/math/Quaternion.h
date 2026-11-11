@@ -31,6 +31,12 @@ public:
     constexpr Quaternion(const DirectX::XMFLOAT4& float4)
         : x(float4.x), y(float4.y), z(float4.z), w(float4.w) {}
 
+    // XMFLOAT4へ変換
+    DirectX::XMFLOAT4 ToXMFLOAT4() const {
+        DirectX::XMFLOAT4 q = { x, y, z, w };
+        return q;
+    }
+
     // XMVECTORへ変換
     DirectX::XMVECTOR ToXMVECTOR() const {
         DirectX::XMVECTOR q = DirectX::XMVectorSet(x, y, z, w);

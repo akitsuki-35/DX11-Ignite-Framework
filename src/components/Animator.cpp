@@ -450,11 +450,8 @@ void Animator::animBlend(const double& duration)
 
 void Animator::initSpring()
 {
-    mSprings.clear();
-
-    mSprings.resize(mSkeleton.GetSpringChains().size());
-
-    mSpringInitialized = false;
+    // 各チェーンの実行時状態初期化
+    mSprings.assign(mSkeleton.GetSpringChains().size(), SPRING{});
 }
 
 void Animator::updateSpring(const float& dt)
@@ -468,37 +465,26 @@ void Animator::updateSpring(const float& dt)
         return;
     }
 
+    // スプリングチェーン取得
     const auto& chains = mSkeleton.GetSpringChains();
     
-    // 初期化
+    // チェーン数が変更されていた場合は、各チェーンの実行時状態を初期化
     if (mSprings.size() != chains.size()) {
         initSpring();
     }
 
-    // 現在ワールド座標取得
-    DirectX::XMFLOAT3 currentPos = _mOwner->GetPosition().ConvertToXMFLOAT3();
+    // ゼロ除算防止のための下限
+    const float motionDt = std::max(dt, 0.0001f);
 
-    // 初回処理
-    if (!mSpringInitialized) {
-        mPrevPosition = _mOwner->GetPosition();
-        mSpringInitialized = true;
-        return;
-    }
-
-    // ワールド座標系における移動速度を取得
-    const DirectX::XMVECTOR worldVel = DirectX::XMVectorSet((currentPos.x - mPrevPosition.x) / dt,
-        (currentPos.y - mPrevPosition.y) / dt, (currentPos.z - mPrevPosition.z) / dt, 0.0f);
+    // フレーム落ちで追従値が急増しないよう制限
+    const float followDt = std::min(dt, 1.0f / 30.0f);
 
     // オブジェクト回転行列を取得
-    const DirectX::XMFLOAT3 objRot=_mOwner->GetRotation().ConvertToXMFLOAT3();
+    const DirectX::XMFLOAT3 objRot =_mOwner->GetRotation().ConvertToXMFLOAT3();
     const DirectX::XMMATRIX objRotMtx = DirectX::XMMatrixRotationRollPitchYaw(objRot.x, objRot.y, objRot.z);
 
-    // ワールド移動速度をオブジェクトのローカル空間へ変換
+    // オブジェクト回転行列の逆回転行列を作成
     const DirectX::XMMATRIX invRot = DirectX::XMMatrixTranspose(objRotMtx);
-    const DirectX::XMVECTOR localVelVec = DirectX::XMVector3TransformNormal(worldVel, invRot);
-
-    DirectX::XMFLOAT3 localVel{};
-    DirectX::XMStoreFloat3(&localVel, localVelVec);
 
     // 風パラメータ取得
     const Element::WIND wind = Scene::GetWind();
@@ -506,66 +492,182 @@ void Animator::updateSpring(const float& dt)
     const float windStrength = std::clamp(wind.Strength, 0.0f, 1.0f);
     constexpr float windAngleRatio = 0.6f;
 
-    // フレーム落ちで追従値が急増しないよう制限
-    const float safeDt = std::min(dt, 1.0f / 30.0f);
-
     // 各チェーン更新
-    for (size_t i = 0; i < chains.size(); ++i) {
+    for (size_t i = 0; i < chains.size(); i++) {
         const auto& chain = chains[i];
-
         auto& spring = mSprings[i];
 
-        const float windAngle = chain.MaxAngle * windAngleRatio * windStrength * chain.WindInfluence;
-        
-        // ローカル前後移動と上下移動をPitchへ反映
-        const float motionPitch = (localVel.z - localVel.y) * chain.MotionInfluence;
-
-        // 風パラメータをオブジェクトのローカル空間へ反映
-        const DirectX::XMVECTOR worldWindDir = DirectX::XMVectorSet(wind.Direction.x, wind.Direction.y, 
-            wind.Direction.z, 0.0f);
-
-        const DirectX::XMVECTOR localWindVec = DirectX::XMVector3TransformNormal(worldWindDir, invRot);
-
-        DirectX::XMFLOAT3 localWindDir{};
-        DirectX::XMStoreFloat3(&localWindDir, localWindVec);
-
-        const float windPitch = localWindDir.z * windAngle;
-        spring.TargetPitch = motionPitch + windPitch;
-
-        // ローカル左右移動をRollへ反映
-        const float motionRoll = localVel.x * chain.MotionInfluence;
-        const float windRoll = localWindDir.x * windAngle;
-        spring.TargetRoll = motionRoll + windRoll;
-
-        // 角度をクランプ
-        spring.TargetPitch = std::clamp(spring.TargetPitch, -chain.MaxAngle, chain.MaxAngle);
-        spring.TargetRoll = std::clamp(spring.TargetRoll, -chain.MaxAngle, chain.MaxAngle);
-
-        // 追従率計算
-        const float follow = std::clamp(chain.FollowSpeed * safeDt, 0.0f, 1.0f);
-
-        // Currentを更新
-        spring.CurrentPitch += (spring.TargetPitch - spring.CurrentPitch) * follow;
-        spring.CurrentRoll += (spring.TargetRoll - spring.CurrentRoll) * follow;
-
-        // Currentもクランプ（Maxを超えないことを保証する）
-        spring.CurrentPitch = std::clamp(spring.CurrentPitch, -chain.MaxAngle, chain.MaxAngle);
-        spring.CurrentRoll = std::clamp(spring.CurrentRoll, -chain.MaxAngle, chain.MaxAngle);
-
-        // チェーン内ノード探索
+        // チェーン内のスプリング対象ノード数取得
         const size_t nodeCount = chain.NodeIndices.size();
         if (nodeCount == 0) {
             continue;
         }
 
-        // チェーン内ノード更新
-        for (size_t j = 0; j < nodeCount; ++j) {
-            const int nodeIndex = chain.NodeIndices[j];
+        // NodeIndicesの先頭をスプリングチェーンの根元とする
+        const int rootNodeIndex = chain.NodeIndices.front();
 
+        // チェーン根元のノードインデックスが有効か確認
+        if (rootNodeIndex < 0 || static_cast<size_t>(rootNodeIndex) >= mSkeleton.GetNodeCount()) {
+            continue;
+        }
+
+        // スプリングチェーンの根元ノードを取得
+        const auto& rootNode = mSkeleton.GetNode(static_cast<size_t>(rootNodeIndex));
+
+        // チェーン根元の親ノードを駆動ノードとする
+        // 親ノードの回転変化に応じてチェーンを揺らす
+        const int parentNodeIndex = rootNode.ParentIndex;
+
+        // 親ノードが存在しない場合は回転変化を取得できないため処理しない
+        if (parentNodeIndex < 0 || static_cast<size_t>(parentNodeIndex) >= mSkeleton.GetNodeCount()) {
+            continue;
+        }
+
+        // スプリングチェーンを駆動する親ノードを取得
+        const auto& parentNode = mSkeleton.GetNode(static_cast<size_t>(parentNodeIndex));
+
+        // 親ノードのローカル行列を取得
+        const DirectX::XMMATRIX parentLocalMtx = DirectX::XMLoadFloat4x4(&parentNode.Local);
+
+        DirectX::XMVECTOR parentScale{}, parentRotationVec{}, parentTranslation{};
+
+        // 親ノードのローカル行列を分解
+        // 行列を正常に分解できない場合は以降の処理を行わない
+        if (!DirectX::XMMatrixDecompose(&parentScale, &parentRotationVec, &parentTranslation, parentLocalMtx)) {
+            continue;
+        }
+
+        // 回転を正規化
+        parentRotationVec = DirectX::XMQuaternionNormalize(parentRotationVec);
+
+        // 前フレームの親回転が保存済みか
+        const bool hasPreviousRotation = spring.RotationInitialized;
+
+        // 前フレームから現在フレームまでの差分回転
+        // 初回更新時は回転差がないため単位Quaternionで初期化
+        DirectX::XMVECTOR deltaRotationVec = DirectX::XMQuaternionIdentity();
+
+        if (hasPreviousRotation) {
+            // 前フレームの親回転をXMFLOAT4に変換
+            const DirectX::XMFLOAT4 prevRotationValue = spring.PrevRotation.ToXMFLOAT4();
+
+            DirectX::XMVECTOR prevRotationVec = DirectX::XMLoadFloat4(&prevRotationValue);
+
+            // 前回回転を正規化
+            prevRotationVec = DirectX::XMQuaternionNormalize(prevRotationVec);
+
+            // 前回回転と現在回転の内積が負の場合、現在回転の符号を反転
+            const float rotationDot = DirectX::XMVectorGetX(DirectX::XMVector4Dot(
+                prevRotationVec, parentRotationVec));
+            if (rotationDot < 0.0f) {
+                parentRotationVec = DirectX::XMVectorNegate(parentRotationVec);
+            }
+
+            // 前フレームから現在フレームまでの差分回転を計算
+            deltaRotationVec = DirectX::XMQuaternionMultiply(DirectX::XMQuaternionInverse(
+                prevRotationVec), parentRotationVec);
+
+            // 後続の軸角変換で数値誤差が影響しないように正規化
+            deltaRotationVec = DirectX::XMQuaternionNormalize(deltaRotationVec);
+        }
+
+        // 符号補正後の現在回転をXMFLOAT4に保持
+        DirectX::XMFLOAT4 storedRotationValue{};
+        DirectX::XMStoreFloat4(&storedRotationValue, parentRotationVec);
+
+        // 現在フレームの親回転を次フレームの比較用として保存
+        spring.PrevRotation = Quaternion{ storedRotationValue.x, storedRotationValue.y,
+            storedRotationValue.z, storedRotationValue.w };
+
+        // 初期化フラグをオン
+        spring.RotationInitialized = true;
+
+        // 親ノードの回転変化によるPitchとRoll
+        // 初回フレームではどちらも0.0f
+        float motionPitch{}, motionRoll{};
+
+        if (hasPreviousRotation) {
+            // 差分QuaternionのXZ成分を取得
+            const float deltaX = DirectX::XMVectorGetX(deltaRotationVec);
+            const float deltaZ = DirectX::XMVectorGetZ(deltaRotationVec);
+
+            // Quaternionのw成分を-1.0から1.0に制限
+            const float deltaW = std::clamp(DirectX::XMVectorGetW(deltaRotationVec),
+                    -1.0f, 1.0f);
+
+            // 差分Quaternionから回転角度を取得
+            const float rotationAngle = 2.0f * std::acos(deltaW);
+
+            // 回転角度の半分に対するsin値を取得する
+            const float sinHalfAngle = std::sqrt(std::max(1.0f - deltaW * deltaW, 0.0f));
+
+            // 回転量が十分に存在する場合だけ回転軸と角速度を計算する
+            // 回転量がほぼ0の場合にsinHalfAngleで除算すると非常に大きな値やNaNが発生するため処理しない
+            constexpr float minRotation = 0.00001f;
+
+            if (sinHalfAngle > minRotation && rotationAngle > minRotation) {
+                // 差分Quaternionから回転軸を取得
+                const float axisX = deltaX / sinHalfAngle;
+                const float axisZ = deltaZ / sinHalfAngle;
+
+                // フレーム間の回転角度から角速度を計算
+                const float angularSpeed = rotationAngle / motionDt;
+
+                // 親ノードのX軸回転をPitchに反映
+                motionPitch = -axisX * angularSpeed * chain.MotionInfluence;
+
+                // 親ノードのZ軸回転をRollに反映
+                motionRoll = -axisZ * angularSpeed * chain.MotionInfluence;
+            }
+        }
+
+        // 風によって発生させる最大角度を計算
+        // MaxAngleを基準に、シーン全体の風の強さとチェーン固有の風影響度を反映
+        const float windAngle = chain.MaxAngle * windAngleRatio * windStrength * chain.WindInfluence;
+
+        // ワールド空間の風向きをベクトルとして取得
+        const DirectX::XMVECTOR worldWindDir = DirectX::XMVectorSet(wind.Direction.x,
+                wind.Direction.y, wind.Direction.z, 0.0f);
+
+        // ワールド空間の風向きをオブジェクトのローカル空間に変換
+        const DirectX::XMVECTOR localWindVec = DirectX::XMVector3TransformNormal(worldWindDir, invRot);
+
+        // 風向きを保存
+        DirectX::XMFLOAT3 localWindDir{};
+        DirectX::XMStoreFloat3(&localWindDir, localWindVec);
+
+        // ローカルの風をPitchとRollに反映
+        const float windPitch = localWindDir.z * windAngle;
+        const float windRoll = localWindDir.x * windAngle;
+
+        // 親ノードの回転による慣性と風による揺れを合成して目標角度を設定
+        spring.TargetPitch = motionPitch + windPitch;
+        spring.TargetRoll = motionRoll + windRoll;
+
+        // 目標PitchとRollがチェーンの最大角度を超えないようクランプ
+        spring.TargetPitch = std::clamp(spring.TargetPitch, -chain.MaxAngle, chain.MaxAngle);
+        spring.TargetRoll = std::clamp(spring.TargetRoll, -chain.MaxAngle, chain.MaxAngle);
+
+        // 追従率計算
+        const float follow = std::clamp(chain.FollowSpeed * followDt, 0.0f, 1.0f);
+
+        // 現在のPitchとRollを目標に近づける
+        spring.CurrentPitch += (spring.TargetPitch - spring.CurrentPitch) * follow;
+        spring.CurrentRoll += (spring.TargetRoll - spring.CurrentRoll) * follow;
+
+        // 追従後のPitchとRollが最大角度を超えないようクランプ
+        spring.CurrentPitch = std::clamp(spring.CurrentPitch, -chain.MaxAngle, chain.MaxAngle);
+        spring.CurrentRoll = std::clamp(spring.CurrentRoll, -chain.MaxAngle, chain.MaxAngle);
+
+        // チェーン内の各ノードにスプリング回転を適用
+        for (size_t j = 0; j < nodeCount; j++) {
+            // ノードインデックスが無効の場合は処理しない
+            const int nodeIndex = chain.NodeIndices[j];
             if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= mSkeleton.GetNodeCount()) {
                 continue;
             }
 
+            // ノード取得
             auto& node = mSkeleton.GetNode(static_cast<size_t>(nodeIndex));
 
             // 根元を弱く、先端を強くする
@@ -573,7 +675,7 @@ void Animator::updateSpring(const float& dt)
             const float pitch = spring.CurrentPitch * weight;
             const float roll = spring.CurrentRoll * weight;
 
-            // マトリクス更新
+            // マトリクス作成
             const DirectX::XMMATRIX pitchMtx = DirectX::XMMatrixRotationX(pitch);
             const DirectX::XMMATRIX rollMtx = DirectX::XMMatrixRotationZ(roll);
             const DirectX::XMMATRIX localMtx = DirectX::XMLoadFloat4x4(&node.Local);
@@ -581,10 +683,8 @@ void Animator::updateSpring(const float& dt)
 
             const DirectX::XMMATRIX result = springMtx * localMtx;
             
+            // スプリング補正後のローカル行列をノードに保存
             DirectX::XMStoreFloat4x4(&node.Local, result);
         }
     }
-
-    // 次回更新用の座標保存
-    mPrevPosition = currentPos;
 }
