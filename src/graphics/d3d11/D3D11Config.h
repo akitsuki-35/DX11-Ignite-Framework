@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/10/15
+*	@updated : 2026/11/12
 *============================================================*/
 #pragma once
 
@@ -27,7 +27,7 @@ namespace D3D11 {
 	static const DXGI_FORMAT BACKBUFFER_FORMAT{ DXGI_FORMAT_R8G8B8A8_UNORM };
 
 	// 深度バッファ設定
-	static const DXGI_FORMAT DEPTHBUFFER_FORMAT{ DXGI_FORMAT_D16_UNORM };
+	static const DXGI_FORMAT DEPTHBUFFER_FORMAT{ DXGI_FORMAT_D24_UNORM_S8_UINT };
 
 	// クリア色
 	static const DirectX::XMFLOAT4 CLEAR_COLOR { 0.0f, 1.0f, 1.0f, 1.0f };
