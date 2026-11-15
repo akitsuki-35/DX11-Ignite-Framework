@@ -14,7 +14,7 @@
 	前方宣言
 ------------------------------------------------------------*/
 namespace D3D11 {
-	class RenderTexture;
+	class ColorTexture;
 	class DepthTexture;
 }
 
@@ -55,7 +55,7 @@ namespace D3D11 {
 		void SetViewport(float width = Screen::WIDTH, float height = Screen::HEIGHT);
 
 		// レンダリングテクスチャ関連
-		void SetRenderTarget(const RenderTexture& renderTex, const DepthTexture& depthTex);
+		void SetRenderTarget(const ColorTexture& colorTex, const DepthTexture& depthTex);
 		void SetBackBuffer();
 	};
 }

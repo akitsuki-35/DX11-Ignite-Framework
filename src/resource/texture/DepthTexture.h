@@ -36,10 +36,10 @@ namespace D3D11 {
 
 	public:
 		// 深度テクスチャ初期化
-		bool Initialize(UINT width, UINT height, UINT mip = 1);
+		bool Initialize(UINT width, UINT height, UINT mip);
 
 		// 深度・ステンシルのクリア
-		void Clear(float depth = 1.0f, UINT8 stencil = 0) const;
+		void Clear(float depth, UINT8 stencil) const;
 
 		// ゲッター
 		ID3D11DepthStencilView* GetDSV() const { return _mDSV.Get(); }

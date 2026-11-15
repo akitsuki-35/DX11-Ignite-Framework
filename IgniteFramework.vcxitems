@@ -56,6 +56,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\BufferManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\DeviceManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBezier.cpp" />
@@ -82,7 +83,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\model\ModelMesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\shader\ShaderManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\DeviceManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Elements.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\StructuredBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.h" />
@@ -170,7 +172,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\shader\Shader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\shader\ShaderManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.h" />

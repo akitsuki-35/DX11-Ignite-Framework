@@ -1,23 +1,23 @@
 ﻿/*============================================================
-*	@file	 : RenderTexture.cpp
-*	@brief	 : レンダリングテクスチャ
+*	@file	 : ColorTexture.cpp
+*	@brief	 : レンダリングカラーテクスチャ
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/12
 *	@updated : 2026/11/15
 *============================================================*/
-#include "RenderTexture.h"
+#include "ColorTexture.h"
 #include "DeviceManager.h"
 #include <d3d11.h>
 
-bool D3D11::RenderTexture::Initialize(UINT width, UINT height, UINT mip, DXGI_FORMAT format)
+bool D3D11::ColorTexture::Initialize(UINT width, UINT height, UINT mip, DXGI_FORMAT format)
 {
     // 引数が不正な場合は処理しない
     if (width <= 0 || height <= 0) {
         return false;
     }
 
-    if (format != DXGI_FORMAT_UNKNOWN) {
+    if (format == DXGI_FORMAT_UNKNOWN) {
         return false;
     }
 
@@ -46,7 +46,7 @@ bool D3D11::RenderTexture::Initialize(UINT width, UINT height, UINT mip, DXGI_FO
     t2d.Usage = D3D11_USAGE_DEFAULT;
     t2d.CPUAccessFlags = 0;
     t2d.MipLevels = mip;
-    t2d.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    t2d.MiscFlags = (mip == 0) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
     HRESULT hr = device->CreateTexture2D(&t2d, nullptr, _mTexture.GetAddressOf());
     if (FAILED(hr)) {
@@ -73,7 +73,7 @@ bool D3D11::RenderTexture::Initialize(UINT width, UINT height, UINT mip, DXGI_FO
     D3D11_SHADER_RESOURCE_VIEW_DESC srvd{};
     srvd.Format = format;
     srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    srvd.Texture2D.MipLevels = mip;
+    srvd.Texture2D.MipLevels = (mip == 0) ? static_cast<UINT>(-1) : mip;
 
     hr = device->CreateShaderResourceView(_mTexture.Get(), &srvd, _mSRV.GetAddressOf());
     if (FAILED(hr)) {
@@ -87,14 +87,14 @@ bool D3D11::RenderTexture::Initialize(UINT width, UINT height, UINT mip, DXGI_FO
     return true;
 }
 
-void D3D11::RenderTexture::Clear(const DirectX::XMFLOAT4& color)
+void D3D11::ColorTexture::Clear(const DirectX::XMFLOAT4& color)
 {
     // レンダーターゲットのクリア
     const float clearColor[4] = { color.x, color.y, color.z, color.w };
     D3D11::DeviceManager::getInstance().GetContext()->ClearRenderTargetView(_mRTV.Get(), clearColor);
 }
 
-void D3D11::RenderTexture::reset()
+void D3D11::ColorTexture::reset()
 {
     // リセット処理
     _mSRV = nullptr;

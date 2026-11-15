@@ -90,7 +90,7 @@ void D3D11::DepthTexture::Clear(float depth, UINT8 stencil) const
     }
 
     D3D11::DeviceManager::getInstance().GetContext()->ClearDepthStencilView(_mDSV.Get(),
-        D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, depth, stencil);
+        D3D11_CLEAR_DEPTH, depth, stencil);
 }
 
 void D3D11::DepthTexture::reset()

@@ -1,6 +1,6 @@
 ﻿/*============================================================
-*	@file	 : RenderTexture.h
-*	@brief	 : レンダリングテクスチャ
+*	@file	 : ColorTexture.h
+*	@brief	 : レンダリングカラーテクスチャ
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/12
@@ -18,11 +18,11 @@ struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
 
 /*============================================================
-*	@class	: D3D11::RenderTexture
+*	@class	: D3D11::ColorTexture
 *	@brief	: レンダリングテクスチャ
 *============================================================*/
 namespace D3D11 {
-	class RenderTexture final : public Texture
+	class ColorTexture final : public Texture
 	{
 		template <typename T>
 		using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -36,7 +36,7 @@ namespace D3D11 {
 
 	public:
 		// 初期化
-		bool Initialize(UINT width, UINT height, UINT mip = 1, DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT);
+		bool Initialize(UINT width, UINT height, UINT mip, DXGI_FORMAT format);
 
 		// クリア
 		void Clear(const DirectX::XMFLOAT4& color);

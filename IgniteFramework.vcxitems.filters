@@ -330,11 +330,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Collider.h">
       <Filter>components</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.h">
       <Filter>resource\texture</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.h">
       <Filter>resource\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.h">
+      <Filter>graphics\d3d11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -551,11 +554,14 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Collider.cpp">
       <Filter>components</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.cpp">
       <Filter>resource\texture</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.cpp">
       <Filter>resource\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.cpp">
+      <Filter>graphics\d3d11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

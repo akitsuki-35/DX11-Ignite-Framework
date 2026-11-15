@@ -13,7 +13,7 @@
 #include "FontLoader.h"
 #include "FontManager.h"
 #include "SystemWindow.h"
-#include "RenderTexture.h"
+#include "ColorTexture.h"
 #include "DepthTexture.h"
 
 void D3D11::Graphics::Initialize()
@@ -72,10 +72,10 @@ void D3D11::Graphics::SetViewport(float width, float height)
 	D3D11::DeviceManager::getInstance().GetContext()->RSSetViewports(1, &viewport);
 }
 
-void D3D11::Graphics::SetRenderTarget(const D3D11::RenderTexture& renderTex, const D3D11::DepthTexture& depthTex)
+void D3D11::Graphics::SetRenderTarget(const D3D11::ColorTexture& colorTex, const D3D11::DepthTexture& depthTex)
 {
 	// カラーテクスチャのレンダーターゲット取得
-	ID3D11RenderTargetView* rtv = renderTex.GetRTV();
+	ID3D11RenderTargetView* rtv = colorTex.GetRTV();
 
 	// 深度テクスチャの深度情報取得
 	ID3D11DepthStencilView* dsv = depthTex.GetDSV();
@@ -85,7 +85,7 @@ void D3D11::Graphics::SetRenderTarget(const D3D11::RenderTexture& renderTex, con
 	}
 
 	// カラーと深度のサイズが一致していない場合は設定しない
-	if (renderTex.GetWidth() != depthTex.GetWidth() || renderTex.GetHeight() != depthTex.GetHeight()) {
+	if (colorTex.GetWidth() != depthTex.GetWidth() || colorTex.GetHeight() != depthTex.GetHeight()) {
 		return;
 	}
 
@@ -112,5 +112,5 @@ void D3D11::Graphics::SetBackBuffer()
 	dm.GetContext()->OMSetRenderTargets(1, &rtv, dsv);
 
 	// ビューポートを画面サイズに戻す
-	SetViewport();
+	//SetViewport();
 }
