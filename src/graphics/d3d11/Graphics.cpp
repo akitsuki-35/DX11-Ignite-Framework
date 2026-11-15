@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/11/12
+*	@updated : 2026/11/15
 *============================================================*/
 #include "Graphics.h"
 #include "DeviceManager.h"
@@ -13,6 +13,8 @@
 #include "FontLoader.h"
 #include "FontManager.h"
 #include "SystemWindow.h"
+#include "RenderTexture.h"
+#include "DepthTexture.h"
 
 void D3D11::Graphics::Initialize()
 {
@@ -51,6 +53,12 @@ void D3D11::Graphics::Begin()
 	device.GetContext()->ClearDepthStencilView( device.GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
+void D3D11::Graphics::End()
+{
+	// ループ末尾で呼出
+	D3D11::DeviceManager::getInstance().GetSwapChain()->Present(1, 0);
+}
+
 void D3D11::Graphics::SetViewport(float width, float height)
 {
 	// ビューポート設定
@@ -64,8 +72,45 @@ void D3D11::Graphics::SetViewport(float width, float height)
 	D3D11::DeviceManager::getInstance().GetContext()->RSSetViewports(1, &viewport);
 }
 
-void D3D11::Graphics::End()
+void D3D11::Graphics::SetRenderTarget(const D3D11::RenderTexture& renderTex, const D3D11::DepthTexture& depthTex)
 {
-	// ループ末尾で呼出
-	D3D11::DeviceManager::getInstance().GetSwapChain()->Present(1, 0);
+	// カラーテクスチャのレンダーターゲット取得
+	ID3D11RenderTargetView* rtv = renderTex.GetRTV();
+
+	// 深度テクスチャの深度情報取得
+	ID3D11DepthStencilView* dsv = depthTex.GetDSV();
+
+	if (rtv == nullptr || dsv == nullptr) {
+		return;
+	}
+
+	// カラーと深度のサイズが一致していない場合は設定しない
+	if (renderTex.GetWidth() != depthTex.GetWidth() || renderTex.GetHeight() != depthTex.GetHeight()) {
+		return;
+	}
+
+	// カラーテクスチャ+深度テクスチャを描画先にする
+	D3D11::DeviceManager::getInstance().GetContext()->OMSetRenderTargets(1, &rtv, dsv);
+
+
+	// ビューポートを描画先のサイズに合わせる
+	//SetViewport(renderTex.GetWidth(),renderTex.GetHeight());
+}
+
+void D3D11::Graphics::SetBackBuffer()
+{
+	auto& dm = D3D11::DeviceManager::getInstance();
+
+	ID3D11RenderTargetView* rtv = dm.GetRenderTargetView();
+	ID3D11DepthStencilView* dsv = dm.GetDepthStencilView();
+
+	if (rtv == nullptr) {
+		return;
+	}
+
+	// バックバッファを現在の描画先へ設定
+	dm.GetContext()->OMSetRenderTargets(1, &rtv, dsv);
+
+	// ビューポートを画面サイズに戻す
+	SetViewport();
 }

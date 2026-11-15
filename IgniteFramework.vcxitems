@@ -81,6 +81,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\model\ModelManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\model\ModelMesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\shader\ShaderManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.cpp" />
@@ -167,6 +169,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\model\ModelMesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\shader\Shader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\shader\ShaderManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.h" />

@@ -330,6 +330,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Collider.h">
       <Filter>components</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.h">
+      <Filter>resource\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.h">
+      <Filter>resource\texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp">
@@ -544,6 +550,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Collider.cpp">
       <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\RenderTexture.cpp">
+      <Filter>resource\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.cpp">
+      <Filter>resource\texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
