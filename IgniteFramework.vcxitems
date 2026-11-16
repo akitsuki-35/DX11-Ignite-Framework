@@ -31,6 +31,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\app\ParticleEmitter..cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Shadow.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Sprite2D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Animator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.cpp" />
@@ -57,6 +58,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\DeviceManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTargetManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBezier.cpp" />
@@ -109,6 +111,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\app\ParticleEmitter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Scene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Shadow.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Sprite2D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Animator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.h" />
@@ -140,6 +143,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Elements.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTargetManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\StructuredBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.h" />

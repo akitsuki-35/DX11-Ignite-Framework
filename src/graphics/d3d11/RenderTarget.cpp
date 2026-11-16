@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/15
-*	@updated : 2026/11/15
+*	@updated : 2026/11/16
 *============================================================*/
 #include "RenderTarget.h"
 
@@ -120,7 +120,7 @@ void D3D11::RenderTarget::ClearDepth(float depth, UINT8 stencil) const
 	_mDepth->Clear(depth, stencil);
 }
 
-const D3D11::ColorTexture* D3D11::RenderTarget::GetColorTexture(int index) const
+D3D11::ColorTexture* D3D11::RenderTarget::GetColorTexture(int index) const
 {
 	// 指定インデックスのカラーテクスチャ取得
 	if (index >= _mColors.size()) {
@@ -130,7 +130,7 @@ const D3D11::ColorTexture* D3D11::RenderTarget::GetColorTexture(int index) const
 	return _mColors[index].get();
 }
 
-const D3D11::DepthTexture* D3D11::RenderTarget::GetDepthTexture() const
+D3D11::DepthTexture* D3D11::RenderTarget::GetDepthTexture() const
 {
 	// 深度テクスチャ取得
 	if (!_mDepth) {
@@ -162,8 +162,8 @@ ID3D11DepthStencilView* D3D11::RenderTarget::GetDSV() const
 	return _mDepth->GetDSV();
 }
 
-size_t D3D11::RenderTarget::GetColorCount() const
+UINT D3D11::RenderTarget::GetColorCount() const
 {
 	// カラーテクスチャ枚数取得
-	return _mColors.size();
+	return static_cast<UINT>(_mColors.size());
 }

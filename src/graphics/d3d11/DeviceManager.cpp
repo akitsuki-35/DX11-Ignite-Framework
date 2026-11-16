@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/11/12
+*	@updated : 2026/11/16
 *============================================================*/
 #include "DeviceManager.h"
 #include "SystemWindow.h"
@@ -191,6 +191,9 @@ bool D3D11::DeviceManager::generateBlendState()
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
+	// 無効
+
+
 	// 通常（アルファブレンド）
 	hr = _mDevice->CreateBlendState(&blendDesc, &_mBlendDefault);
 	if (FAILED(hr)) { return false; }
@@ -205,6 +208,10 @@ bool D3D11::DeviceManager::generateBlendState()
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
 	hr = _mDevice->CreateBlendState(&blendDesc, &_mBlendMultiply);
+	if (FAILED(hr)) { return false; }
+
+	blendDesc.RenderTarget[0].BlendEnable = FALSE;
+	hr = _mDevice->CreateBlendState(&blendDesc, &_mBlendDisable);
 	if (FAILED(hr)) { return false; }
 
 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };

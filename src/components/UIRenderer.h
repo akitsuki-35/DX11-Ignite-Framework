@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/12
-*	@updated : 2026/09/16
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
@@ -63,6 +63,7 @@ private:
 public:
 	// テクスチャ読み込み
 	UIRenderer* LoadTexture(const char* fileName, bool isMip = false);
+	UIRenderer* SetTexture(Texture* texture);
 
 	// ゲッター
 	UICanvas& GetCanvas() { return mCanvas; }

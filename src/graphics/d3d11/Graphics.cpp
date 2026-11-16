@@ -4,17 +4,15 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/11/15
+*	@updated : 2026/11/16
 *============================================================*/
 #include "Graphics.h"
 #include "DeviceManager.h"
 #include "BufferManager.h"
-#include "ShaderManager.h"
 #include "FontLoader.h"
 #include "FontManager.h"
 #include "SystemWindow.h"
-#include "ColorTexture.h"
-#include "DepthTexture.h"
+#include "RenderTarget.h"
 
 void D3D11::Graphics::Initialize()
 {
@@ -36,9 +34,6 @@ void D3D11::Graphics::Initialize()
 
 void D3D11::Graphics::Finalize()
 {
-	FontManager::getInstance().Clear();
-	ShaderManager::getInstance().Clear();
-
 	D3D11::DeviceManager::getInstance().Fainlize();
 }
 
@@ -72,29 +67,29 @@ void D3D11::Graphics::SetViewport(float width, float height)
 	D3D11::DeviceManager::getInstance().GetContext()->RSSetViewports(1, &viewport);
 }
 
-void D3D11::Graphics::SetRenderTarget(const D3D11::ColorTexture& colorTex, const D3D11::DepthTexture& depthTex)
+void D3D11::Graphics::SetRenderTarget(const RenderTarget* rt)
 {
-	// カラーテクスチャのレンダーターゲット取得
-	ID3D11RenderTargetView* rtv = colorTex.GetRTV();
-
-	// 深度テクスチャの深度情報取得
-	ID3D11DepthStencilView* dsv = depthTex.GetDSV();
-
-	if (rtv == nullptr || dsv == nullptr) {
+	// 描画先をレンダリングテクスチャに切り替え
+	if (!rt) {
 		return;
 	}
 
-	// カラーと深度のサイズが一致していない場合は設定しない
-	if (colorTex.GetWidth() != depthTex.GetWidth() || colorTex.GetHeight() != depthTex.GetHeight()) {
-		return;
+	// RTV配列
+	ID3D11RenderTargetView* rtvs[D3D11::RenderTarget::MAX_COLOR_TARGETS]{};
+
+	const UINT colorCount = rt->GetColorCount();
+
+	// レンダーターゲットのRTVを取得
+	for (UINT i = 0; i < colorCount; ++i) {
+		rtvs[i] = rt->GetRTV(i);
 	}
 
-	// カラーテクスチャ+深度テクスチャを描画先にする
-	D3D11::DeviceManager::getInstance().GetContext()->OMSetRenderTargets(1, &rtv, dsv);
+	// DSV取得
+	ID3D11DepthStencilView* dsv = rt->GetDSV();
 
-
-	// ビューポートを描画先のサイズに合わせる
-	//SetViewport(renderTex.GetWidth(),renderTex.GetHeight());
+	// 描画先を設定
+	DeviceManager::getInstance().GetContext()->OMSetRenderTargets(colorCount, 
+		colorCount > 0 ? rtvs : nullptr, dsv);
 }
 
 void D3D11::Graphics::SetBackBuffer()
@@ -104,13 +99,10 @@ void D3D11::Graphics::SetBackBuffer()
 	ID3D11RenderTargetView* rtv = dm.GetRenderTargetView();
 	ID3D11DepthStencilView* dsv = dm.GetDepthStencilView();
 
-	if (rtv == nullptr) {
+	if (!rtv) {
 		return;
 	}
 
 	// バックバッファを現在の描画先へ設定
 	dm.GetContext()->OMSetRenderTargets(1, &rtv, dsv);
-
-	// ビューポートを画面サイズに戻す
-	//SetViewport();
 }

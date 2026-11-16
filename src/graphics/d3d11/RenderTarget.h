@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/15
-*	@updated : 2026/11/15
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
@@ -33,7 +33,7 @@ namespace D3D11 {
 		// 生成カラーテクスチャ枚数
 		// この枚数をMRTで一度に書き込む
 		// 必ず1～8になるようにする
-		size_t ColorCount{ 1 };
+		UINT ColorCount{ 1 };
 
 		// 深度テクスチャの生成有無
 		bool UseDepth{ true };
@@ -44,7 +44,7 @@ namespace D3D11 {
 
 		// フォーマット
 		// 現状は全カラーテクスチャで共通
-		DXGI_FORMAT Format{ DXGI_FORMAT_R32G32B32A32_FLOAT };
+		DXGI_FORMAT Format{ DXGI_FORMAT_R8G8B8A8_UNORM };
 	};
 
 	/*============================================================
@@ -85,10 +85,10 @@ namespace D3D11 {
 		void ClearDepth(float depth = 1.0f, UINT8 stencil = 0) const;
 
 		// カラーテクスチャ取得
-		const ColorTexture* GetColorTexture(int index = 0) const;
+		ColorTexture* GetColorTexture(int index = 0) const;
 
 		// 深度テクスチャ取得
-		const DepthTexture* GetDepthTexture() const;
+		DepthTexture* GetDepthTexture() const;
 
 		// RTV取得
 		ID3D11RenderTargetView* GetRTV(int index = 0) const;
@@ -97,7 +97,7 @@ namespace D3D11 {
 		ID3D11DepthStencilView* GetDSV() const;
 
 		// カラーテクスチャ枚数取得
-		size_t GetColorCount() const;
+		UINT GetColorCount() const;
 
 		// サイズ取得
 		const DirectX::XMUINT2& GetSize() const { return mSize; }

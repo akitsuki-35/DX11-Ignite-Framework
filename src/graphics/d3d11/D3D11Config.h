@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/11/12
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
@@ -56,6 +56,7 @@ namespace D3D11 {
 			inline ID3D11BlendState* Default;
 			inline ID3D11BlendState* Add;
 			inline ID3D11BlendState* Multiply;
+			inline ID3D11BlendState* Disable;
 		}
 
 		// ラスタライザステート
