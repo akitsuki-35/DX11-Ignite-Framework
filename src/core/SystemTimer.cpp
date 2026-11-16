@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/13
-*	@updated : 2026/09/16
+*	@updated : 2026/11/16
 *============================================================*/
 #include "SystemTimer.h"
 
@@ -29,8 +29,19 @@ bool System::Timer::Tick()
     // 累積時間更新
     mAccumulator += dt;
 
-    if (mAccumulator >= mFps) {
-        mAccumulator -= mFps;
+#ifndef NDEBUG
+    // FPS計測時間を加算
+    mFpsTimer += dt;
+#endif
+
+    if (mAccumulator >= mFrameRate) {
+
+#ifndef NDEBUG
+        // FPS計測
+        measureFps();
+#endif
+
+        mAccumulator -= mFrameRate;
         return true;
     }
 
@@ -46,3 +57,17 @@ void System::Timer::Refresh()
 
     mAccumulator = 0.0;
 }
+
+#ifndef NDEBUG
+void System::Timer::measureFps()
+{
+    // FPS計測
+    mFrameCount++;
+
+    if (mFpsTimer >= 1.0) {
+        mFps = static_cast<double>(mFrameCount) / mFpsTimer;
+        mFpsTimer = 0.0;
+        mFrameCount = 0;
+    }
+}
+#endif

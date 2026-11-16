@@ -4,34 +4,34 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/09
-*	@updated : 2026/11/10
+*	@updated : 2026/11/16
 *============================================================*/
 #include "TimeUtility.h"
 #include "SystemTimer.h"
 
 // システムタイマーからフレームレート取得
 namespace {
-    int getFps() {
-        return System::Timer::getInstance().GetFps();
+    int getFrameRate() {
+        return System::Timer::getInstance().GetFrameRate();
     }
 }
 
 double Utility::Time::toSeconds(int frame)
 {
-    int fps = getFps();
+    int frameRate = getFrameRate();
 
     // フレーム→秒に変換
-    double seconds = static_cast<double>(frame / fps);
+    double seconds = static_cast<double>(frame / frameRate);
 
     return seconds;
 }
 
 int Utility::Time::toFrame(double seconds)
 {
-    int fps = getFps();
+    int frameRate = getFrameRate();
 
     // 秒→フレームに変換
-    int frame = static_cast<int>(seconds * fps);
+    int frame = static_cast<int>(seconds * frameRate);
 
     return frame;
 }
