@@ -44,7 +44,7 @@ namespace D3D11 {
 
 		// フォーマット
 		// 現状は全カラーテクスチャで共通
-		DXGI_FORMAT Format{ DXGI_FORMAT_R8G8B8A8_UNORM };
+		DXGI_FORMAT Format{ DXGI_FORMAT_R32G32B32A32_FLOAT };
 	};
 
 	/*============================================================
