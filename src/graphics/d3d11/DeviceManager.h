@@ -4,18 +4,18 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/13
-*	@updated : 2026/10/15
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
 #include <d3d11.h>
 #include <wrl/client.h>
 
-namespace D3D11 {
 /*============================================================
 *	@class	: D3D11::DeviceManager
 *	@brief	: DirectX11デバイス管理
 *============================================================*/
+namespace D3D11 {
 	class DeviceManager final
 	{
 		template <typename T>
@@ -59,14 +59,15 @@ namespace D3D11 {
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> _mDepthStencilView{};
 
 		// 深度ステート
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState>  _mDepthEnable{};
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState>  _mDepthTestOnly{};
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState>  _mDepthDisable{};
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> _mDepthEnable{};
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> _mDepthTestOnly{};
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> _mDepthDisable{};
 
 		// ブレンドステート
-		Microsoft::WRL::ComPtr<ID3D11BlendState>  _mBlendDefault{};
-		Microsoft::WRL::ComPtr<ID3D11BlendState>  _mBlendAdd{};
-		Microsoft::WRL::ComPtr<ID3D11BlendState>  _mBlendMultiply{};
+		Microsoft::WRL::ComPtr<ID3D11BlendState> _mBlendDefault{};
+		Microsoft::WRL::ComPtr<ID3D11BlendState> _mBlendAdd{};
+		Microsoft::WRL::ComPtr<ID3D11BlendState> _mBlendMultiply{};
+		Microsoft::WRL::ComPtr<ID3D11BlendState> _mBlendDisable{};
 
 		// ラスタライザステート
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> _mRasterSolid{};

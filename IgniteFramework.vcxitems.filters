@@ -330,6 +330,21 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Collider.h">
       <Filter>components</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.h">
+      <Filter>resource\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.h">
+      <Filter>resource\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.h">
+      <Filter>graphics\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTargetManager.h">
+      <Filter>graphics\d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Sprite2D.h">
+      <Filter>app</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\utility\FileUtility.cpp">
@@ -544,6 +559,21 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Collider.cpp">
       <Filter>components</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.cpp">
+      <Filter>resource\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.cpp">
+      <Filter>resource\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.cpp">
+      <Filter>graphics\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTargetManager.cpp">
+      <Filter>graphics\d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Sprite2D.cpp">
+      <Filter>app</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
