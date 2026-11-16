@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/24
-*	@updated : 2026/09/16
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
@@ -53,6 +53,7 @@ private:
 public:
 	// テクスチャ読み込み
 	SpriteRenderer* LoadTexture(const char* fileName, bool isMip = false);
+	SpriteRenderer* SetTexture(Texture* texture);
 
 	// ゲッター
 	Mesh& GetMesh() { return mMesh; }

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/11/09
+*	@updated : 2026/11/16
 *============================================================*/
 #include "Renderer.h"
 #include "Vector3.h"
@@ -117,6 +117,10 @@ void Renderer::Begin() const
 
 	case Blend::Multiply:
 		D3D11::DeviceManager::getInstance().SetBlendState(D3D11::RenderState::Blend::Multiply);
+		break;
+
+	case Blend::Disable:
+		D3D11::DeviceManager::getInstance().SetBlendState(D3D11::RenderState::Blend::Disable);
 		break;
 
 	default:

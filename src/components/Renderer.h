@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/27
-*	@updated : 2026/11/05
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
@@ -26,7 +26,8 @@ enum class Blend : uint8_t
 {
 	Default,
 	Add,
-	Multiply
+	Multiply,
+	Disable
 };
 
 /*------------------------------------------------------------

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/11/05
+*	@updated : 2026/11/16
 *============================================================*/
 #include "SpriteRenderer.h"
 #include "Texture.h"
@@ -74,5 +74,11 @@ SpriteRenderer* SpriteRenderer::LoadTexture(const char* fileName, bool isMip)
 {
 	// テクスチャ読み込み
 	_mTexture = TextureManager::getInstance().Load(fileName, isMip);
+	return this;
+}
+
+SpriteRenderer* SpriteRenderer::SetTexture(Texture* texture)
+{
+	_mTexture = texture;
 	return this;
 }

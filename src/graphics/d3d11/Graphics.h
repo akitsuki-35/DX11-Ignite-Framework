@@ -4,17 +4,24 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/09/16
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
 #include "Config.h"
 
+/*------------------------------------------------------------
+	前方宣言
+------------------------------------------------------------*/
 namespace D3D11 {
+	class RenderTarget;
+}
+
 /*============================================================
 *	@class	: D3D11::Graphics
 *	@brief	: 描画システム制御
 *============================================================*/
+namespace D3D11 {
 	class Graphics final
 	{
 	/*--------------------------------------------------
@@ -45,5 +52,9 @@ namespace D3D11 {
 		void Begin();
 		void End();
 		void SetViewport(float width = Screen::WIDTH, float height = Screen::HEIGHT);
+
+		// 描画先をレンダリングテクスチャとバックバッファで切り替え
+		void SetRenderTarget(const RenderTarget* rt);
+		void SetBackBuffer();
 	};
 }

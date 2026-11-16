@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/09/16
+*	@updated : 2026/11/16
 *============================================================*/
 #include "UIRenderer.h"
 #include "Texture.h"
@@ -81,5 +81,11 @@ UIRenderer* UIRenderer::LoadTexture(const char* fileName, bool isMip)
 {
 	// テクスチャ読み込み
 	_mTexture = TextureManager::getInstance().Load(fileName, isMip);
+	return this;
+}
+
+UIRenderer* UIRenderer::SetTexture(Texture* texture)
+{
+	_mTexture = texture;
 	return this;
 }

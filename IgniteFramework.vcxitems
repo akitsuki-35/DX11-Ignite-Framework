@@ -31,6 +31,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\app\ParticleEmitter..cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Scene.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Shadow.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\app\Sprite2D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\Animator.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.cpp" />
@@ -56,6 +57,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\BufferManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\DeviceManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTargetManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBezier.cpp" />
@@ -81,6 +84,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\model\ModelManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\model\ModelMesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\shader\ShaderManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.cpp" />
@@ -106,6 +111,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\app\ParticleEmitter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Scene.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Shadow.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\app\Sprite2D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\Animator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\AudioPlayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\components\BillboardRenderer.h" />
@@ -136,6 +142,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\DeviceManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Elements.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\Graphics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTarget.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\RenderTargetManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\d3d11\StructuredBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\Particle.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\graphics\particle\ParticleBase.h" />
@@ -167,6 +175,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\model\ModelMesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\shader\Shader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\shader\ShaderManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\DepthTexture.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\ColorTexture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\Texture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\TextureManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)src\resource\texture\WICTextureLoader11.h" />
