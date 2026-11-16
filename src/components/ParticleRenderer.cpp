@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/15
-*	@updated : 2026/11/05
+*	@updated : 2026/11/16
 *============================================================*/
 #include "ParticleRenderer.h"
 #include "ParticleEmitter.h"
@@ -16,6 +16,7 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Instancing.h"
+#include <algorithm>
 
 using namespace DirectX;
 using namespace MeshType;
@@ -128,9 +129,32 @@ void ParticleRenderer::updateInstanceData() const
 		return;
 	}
 
+	// パーティクルを描画しないカメラ距離
+	Camera* camera = Scene::GetGameObject<Camera>();
+	if (!camera) {
+		return;
+	}
+	const Vector3 cameraPos = camera->GetPosition();
+
 	// 有効なParticleだけを描画対象とする
 	for (const Particle& particle : _mEmitter->GetParticles()) {
 		if (!particle.mEnable) {
+			continue;
+		}
+
+		// カメラに近すぎるパーティクルを描画しない
+		const Vector3 dir = { particle.mPosition.x - cameraPos.x, particle.mPosition.y - cameraPos.y,
+			particle.mPosition.z - cameraPos.z };
+		const float distanceSq = dir.Length();
+
+		const float particleScale = std::max({ particle.mScale.x, particle.mScale.y,
+			particle.mScale.z });
+
+		// サイズに応じて近距離除外
+		constexpr float NEAR_CULL_SCALE = 1.5f;
+		const float minDrawDistance = particleScale * NEAR_CULL_SCALE;
+		const float minDrawDistanceSq = minDrawDistance * minDrawDistance;
+		if (distanceSq < minDrawDistanceSq) {
 			continue;
 		}
 

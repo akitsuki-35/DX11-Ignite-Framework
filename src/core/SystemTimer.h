@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/13
-*	@updated : 2026/11/09
+*	@updated : 2026/11/16
 *============================================================*/
 #pragma once
 
@@ -45,7 +45,14 @@ namespace System {
 		LARGE_INTEGER mExecLastTime{};
 		LARGE_INTEGER mCurrentTime{};
 		double mAccumulator{};
-		double mFps{ 1.0 / 60.0 };
+		double mFrameRate{ 1.0 / 60.0 };
+
+#ifndef NDEBUG
+		// FPS計測用
+		double mFps{};
+		double mFpsTimer{};
+		int mFrameCount{};
+#endif
 
 	public:
 		void Initialize();
@@ -63,12 +70,21 @@ namespace System {
 		double GetAccumulator() const { return mAccumulator; }
 
 		// dt取得
-		double GetDeltaTime() const { return mFps; }
+		double GetDeltaTime() const { return mFrameRate; }
 
 		// フレームレート取得
-		int GetFps() const { return static_cast<int>(std::round(1.0 / mFps)); }
+		int GetFrameRate() const { return static_cast<int>(std::round(1.0 / mFrameRate)); }
 
-		// FPS値変更
-		void SetFps(double fps) { mFps = 1.0 / fps; }
+		// フレームレート変更
+		void SetFrameRate(double frameRate) { mFrameRate = 1.0 / frameRate; }
+
+#ifndef NDEBUG
+		// 現在FPS値取得
+		double GetFps() const { return mFps; }
+
+	private:
+		// FPS計測
+		void measureFps();
+#endif
 	};
 }
