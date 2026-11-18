@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 *	@updated : 2026/11/11
-* 　@date	 : 2026/11/11
+* 　@date	 : 2026/11/18
 *============================================================*/
 #pragma once
 
@@ -30,6 +30,9 @@ public:
 
     // 衝突判定
     bool IsHit(const Collider& other) const;
+
+    // 衝突した相手から押し出す量を取得
+    Vector3 GetPushBack(const Collider& other) const;
 
     // 中心位置のセット・取得
     Collider* SetCenter(const Vector3& center);

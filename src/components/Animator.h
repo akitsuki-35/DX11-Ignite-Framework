@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/11/11
+*	@updated : 2026/11/18
 *============================================================*/
 #pragma once
 
@@ -104,6 +104,9 @@ public:
     // Animatorコンポーネントが存在するオブジェクトの場合、
     // 描画時にAnimatorコンポーネントのSkeletonをボーン行列に送る
     Skeleton& GetSkeleton() { return mSkeleton; }
+
+    // アニメーションの現在の経過時間（フレーム）を取得
+    int GetCurrentFrame() const;
 
 private:
     // 単一アニメーションの更新
