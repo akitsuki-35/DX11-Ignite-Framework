@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 *	@updated : 2026/11/11
-* 　@date	 : 2026/11/18
+* 　@date	 : 2026/11/24
 *============================================================*/
 #pragma once
 
@@ -24,6 +24,9 @@ private:
     // コライダーのサイズ
     Vector3 mSize{ 1.0f, 1.0f, 1.0f };
 
+    // コライダー有効状態
+    bool mEnable{ true };
+
 public:
     Collider(GameObject* owner) 
         : Component(owner){}
@@ -41,6 +44,10 @@ public:
     // サイズのセット・取得
     Collider* SetSize(const Vector3& size);
     const Vector3& GetSize() const { return mSize; }
+
+    // 有効状態のセット・取得
+    Collider* SetEnable(const bool& enable);
+    const bool& GetEnable() const { return mEnable; }
 
 private:
     // ワールド座標上の中心座標取得

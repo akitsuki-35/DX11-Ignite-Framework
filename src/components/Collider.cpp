@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 *	@updated : 2026/11/11
-* 　@date	 : 2026/11/18
+* 　@date	 : 2026/11/24
 *============================================================*/
 #include "Collider.h"
 #include "GameObject.h"
@@ -12,6 +12,8 @@
 
 bool Collider::IsHit(const Collider& other) const
 {
+    if (!mEnable) return false;
+
     // 自身と相手の中心位置をワールド座標で取得
     const Vector3 thisCenter = getWorldCenter();
     const Vector3 otherCenter = other.getWorldCenter();
@@ -35,6 +37,8 @@ bool Collider::IsHit(const Collider& other) const
 
 Vector3 Collider::GetPushBack(const Collider& other) const
 {
+    if (!mEnable) return Vector3{};
+
     const Vector3 thisCenter = getWorldCenter();
     const Vector3 otherCenter = other.getWorldCenter();
 
@@ -79,6 +83,12 @@ Collider* Collider::SetCenter(const Vector3& center)
 Collider* Collider::SetSize(const Vector3& size)
 {
     mSize = size;
+    return this;
+}
+
+Collider* Collider::SetEnable(const bool& enable)
+{
+    mEnable = enable;
     return this;
 }
 

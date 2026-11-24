@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/21
-*	@updated : 2026/11/08
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -155,6 +155,62 @@ public:
 
 			value = { GetFloat(row, 1), GetFloat(row, 2), GetFloat(row, 3), GetFloat(row, 4)
 			};
+		}
+
+		// vector<std::string>
+		else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetString(row, i));
+			}
+		}
+
+		// vector<int>
+		else if constexpr (std::is_same_v<T, std::vector<int>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetInt(row, i));
+			}
+		}
+
+		// vector<float>
+		else if constexpr (std::is_same_v<T, std::vector<float>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetFloat(row, i));
+			}
+		}
+
+		// vector<double>
+		else if constexpr (std::is_same_v<T, std::vector<double>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetDouble(row, i));
+			}
 		}
 
 		// 一致する型が存在しない
