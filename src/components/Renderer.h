@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/07/27
-*	@updated : 2026/11/16
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -132,6 +132,7 @@ public:
 	// ゲッター
 	Shader* GetShader() const { return _mShader; }
 	DirectX::XMFLOAT4 GetColor() const { return mColor; }
+	DirectX::XMFLOAT4 GetParameter() const { return mParameter; }
 	SORTKEY& GetSortKey() const { return mSortKey; }
 
 	// セッター

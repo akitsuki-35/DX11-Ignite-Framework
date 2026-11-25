@@ -41,6 +41,9 @@ private:
     // 描画座標オフセット
     Vector3 mOffset{};
 
+    // 有効状態
+    bool mEnable{ true };
+
 public:
     DebugRenderer(GameObject* owner);
 
@@ -60,6 +63,9 @@ public:
 
     // オフセット設定
     void SetOffset(const Vector3& offset) { mOffset = offset; }
+
+    // 有効状態設定
+    void SetEnable(const bool& enable) { mEnable = enable; }
 
 private:
     // 必要に応じて頂点バッファを確保

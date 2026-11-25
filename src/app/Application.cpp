@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/04/21
-*	@updated : 2026/11/05
+*	@updated : 2026/11/25
 *============================================================*/
 #include "Application.h"
 #include "Scene.h"
@@ -97,11 +97,15 @@ void Application::Draw()
 	// 現在シーン描画処理
 	if (_mCurrentScene) {
 		_mCurrentScene->Draw();
+
+#ifndef NDEBUG
+		// デバッグ用GUIなどを描画
+		_mCurrentScene->Debug();
+#endif
 	}
 
 	// トランジションテクスチャを最後に描画
 	Transition::getInstance().Draw();
-
 
 #ifndef NDEBUG
 	ImGuiDebug::End();

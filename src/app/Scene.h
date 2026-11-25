@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2025/09/17
-*	@updated : 2026/10/22
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -43,6 +43,11 @@ public:
 	virtual void Finalize();
 	virtual void Update(double deltaTime);
 	virtual void Draw() const;
+
+#ifndef NDEBUG
+	// デバッグ用
+	virtual void Debug();
+#endif
 
 	// ポーズ・ヒットストップフラグ設定
 	static void SetPause(const bool& isPause) { mPause = isPause; }
@@ -84,7 +89,7 @@ public:
 	// オブジェクト取得（複数）
 	template <typename T>
 	static std::vector<T*> GetGameObjects() {
-		std::vector<T*> objects;
+		std::vector<T*> objects{};
 		for (const auto& gameObject : _mGameObjects) {
 			T* find = dynamic_cast<T*>(gameObject.get());
 			if (find != nullptr) {

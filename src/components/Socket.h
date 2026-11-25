@@ -4,15 +4,13 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/08
-*	@updated : 2026/11/09
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
 #include "Component.h"
 #include "Vector3.h"
 #include <string>
-#include <unordered_map>
-#include <DirectXMath.h>
 
 /*------------------------------------------------------------
 	前方宣言
@@ -25,14 +23,13 @@ class Animator;
 ------------------------------------------------------------*/
 struct SOCKET_DESC
 {
-    std::string Name{};
     std::string ParentJoint{};
 
     Vector3 Position{};
     Vector3 Rotation{};
 
     auto Members() {
-        return std::tie(Name, ParentJoint, Position, Rotation);
+        return std::tie(ParentJoint, Position, Rotation);
     }
 };
 
@@ -45,7 +42,7 @@ struct SOCKET_DATA
     SOCKET_DESC Desc{};
 
     // 子オブジェクト
-    GameObject* Child = nullptr;
+    GameObject* Child{ nullptr };
 };
 
 /*============================================================
@@ -55,8 +52,8 @@ struct SOCKET_DATA
 class Socket final : public Component
 {
 private:
-    // ソケット配列
-    std::unordered_map<std::string, SOCKET_DATA> mSockets{};
+    // ソケット
+    SOCKET_DATA mSocket{};
 
     // Animatorコンポーネント
     Animator* _mAnimator{ nullptr };
@@ -68,15 +65,15 @@ public:
     
     void Update(double deltaTime) override;
 
-    // ソケット探索
-    SOCKET_DATA* FindSocket(const std::string& name);
-
     // CSVファイル読み込み
     Socket* LoadCSV(const char* filePath);
 
     // 子オブジェクト接続
-    Socket* Attach(const std::string& name, GameObject* child);
+    Socket* Attach(GameObject* child);
 
     // 子オブジェクトの接続を解除
-    GameObject* Detach(const std::string& name);
+    GameObject* Detach();
+
+    // 子オブジェクト取得
+    GameObject* GetChildObject();
 };

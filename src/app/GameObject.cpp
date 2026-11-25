@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/09/09
-*	@updated : 2026/11/09
+*	@updated : 2026/11/25
 *============================================================*/
 #include "GameObject.h"
 #include <algorithm>
@@ -23,7 +23,7 @@ bool GameObject::Destroy()
 
 void GameObject::Initialize()
 {
-	std::stable_sort(mComponents.begin(), mComponents.end(),
+	std::stable_sort(_mComponents.begin(), _mComponents.end(),
 		[](const std::unique_ptr<Component>& a, const std::unique_ptr<Component>& b) {
 			return static_cast<int>(a->GetPriority()) > static_cast<int>(b->GetPriority());
 		});
@@ -32,16 +32,16 @@ void GameObject::Initialize()
 void GameObject::Finalize()
 {
 	// コンポーネントの終了処理を呼ぶ
-	for (const auto& component : mComponents) {
+	for (const auto& component : _mComponents) {
 		component->Finalize();
 	}
-	mComponents.clear();
+	_mComponents.clear();
 }
 
 void GameObject::Update(double deltaTime)
 {
 	// コンポーネントの更新処理を呼ぶ
-	for (const auto& component : mComponents) {
+	for (const auto& component : _mComponents) {
 		component->Update(deltaTime);
 	}
 }
@@ -49,7 +49,7 @@ void GameObject::Update(double deltaTime)
 void GameObject::Draw() const
 {
 	// コンポーネントの描画処理を呼ぶ
-	for (const auto& component : mComponents) {
+	for (const auto& component : _mComponents) {
 		component->Draw();
 	}
 }

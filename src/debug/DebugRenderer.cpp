@@ -28,6 +28,10 @@ void DebugRenderer::Finalize()
 
 void DebugRenderer::Draw() const
 {
+    if (!mEnable) {
+        return;
+    }
+
     if (!_mShader) {
         return;
     }

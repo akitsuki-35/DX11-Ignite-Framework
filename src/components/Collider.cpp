@@ -31,9 +31,11 @@ void Collider::Update(double /*deltaTime*/)
         _mAnimator = _mOwner->GetComponent<Animator>();
     }
 
+#ifndef NDEBUG
     if (_mDebug) {
         _mDebug->SetOffset(getWorldCenter() - _mOwner->GetPosition() - mCenter);
     }
+#endif
 }
 
 bool Collider::IsHit(const Collider& other) const
@@ -125,6 +127,13 @@ Collider* Collider::SetSize(const Vector3& size)
 Collider* Collider::SetEnable(const bool& enable)
 {
     mEnable = enable;
+
+#ifndef NDEBUG
+    if (_mDebug) {
+        _mDebug->SetEnable(enable);
+    }
+#endif
+
     return this;
 }
 

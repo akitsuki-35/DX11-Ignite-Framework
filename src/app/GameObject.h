@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/05/12
-*	@updated : 2026/11/08
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -29,7 +29,7 @@ protected:
 
 	// コンポーネント
 	// オブジェクトからAddComponentでアタッチする
-	std::vector<std::unique_ptr<Component>> mComponents{};
+	std::vector<std::unique_ptr<Component>> _mComponents{};
 
 	// タグ
 	std::string mTag{};
@@ -46,6 +46,12 @@ public:
 	virtual void Finalize();
 	virtual void Update(double deltaTime);
 	virtual void Draw() const;
+
+#ifndef NDEBUG
+	// デバッグ用
+	// コンポーネント非依存のため空実装し、オーバーライドして使う
+	virtual void Debug(){}
+#endif
 
 	// 削除処理
 	bool Destroy();
@@ -76,7 +82,7 @@ public:
 		auto component = std::make_unique<T>(object);
 		T* ptr = component.get();
 
-		mComponents.push_back(std::move(component));
+		_mComponents.push_back(std::move(component));
 		ptr->Initialize();
 
 		return ptr;
@@ -85,10 +91,23 @@ public:
 	// コンポーネント取得
 	template <typename T>
 	T* GetComponent() const {
-		for (const auto& component : mComponents) {
+		for (const auto& component : _mComponents) {
 			T* find = dynamic_cast<T*>(component.get());
 			if (find) return find;
 		}
 		return nullptr;
+	}
+
+	// コンポーネント取得（複数）
+	template <typename T>
+	std::vector<T*> GetComponents() {
+		std::vector<T*> components{};
+		for (const auto& component : _mComponents) {
+			T* find = dynamic_cast<T*>(component.get());
+			if (find != nullptr) {
+				components.push_back(find);
+			}
+		}
+		return components;
 	}
 };

@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/15
-*	@updated : 2026/10/22
+*	@updated : 2026/11/25
 *============================================================*/
 #include "Scene.h"
 #include "DeviceManager.h"
@@ -111,3 +111,13 @@ void Scene::Draw() const
 		D3D11::DeviceManager::getInstance().SetDepthStencilState(D3D11::RenderState::Depth::Enable);
 	}
 }
+
+#ifndef NDEBUG
+void Scene::Debug()
+{
+	// デバッグ表示を描画
+	for (const auto& obj : _mGameObjects) {
+		obj->Debug();
+	}
+}
+#endif
