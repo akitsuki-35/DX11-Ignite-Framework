@@ -4,11 +4,37 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 *	@updated : 2026/11/11
-* 　@date	 : 2026/11/24
+* 　@date	 : 2026/11/25
 *============================================================*/
 #include "Collider.h"
+#include "Animator.h"
 #include "GameObject.h"
 #include <cmath>
+
+#ifndef NDEBUG
+#include "DebugRenderer.h"
+#endif
+
+Collider::Collider(GameObject* owner)
+    : Component(owner)
+{
+#ifndef NDEBUG
+    _mDebug = _mOwner->AddComponent<DebugRenderer>(_mOwner);
+    _mDebug->CreateBox(mCenter, mSize);
+#endif
+}
+
+void Collider::Update(double /*deltaTime*/)
+{
+    // Animatorコンポーネント取得
+    if (!_mAnimator) {
+        _mAnimator = _mOwner->GetComponent<Animator>();
+    }
+
+    if (_mDebug) {
+        _mDebug->SetOffset(getWorldCenter() - _mOwner->GetPosition() - mCenter);
+    }
+}
 
 bool Collider::IsHit(const Collider& other) const
 {
@@ -77,12 +103,22 @@ Vector3 Collider::GetPushBack(const Collider& other) const
 Collider* Collider::SetCenter(const Vector3& center)
 {
     mCenter = center;
+
+#ifndef NDEBUG
+    createDebugBox();
+#endif
+
     return this;
 }
 
 Collider* Collider::SetSize(const Vector3& size)
 {
     mSize = size;
+
+#ifndef NDEBUG
+    createDebugBox();
+#endif
+
     return this;
 }
 
@@ -92,8 +128,68 @@ Collider* Collider::SetEnable(const bool& enable)
     return this;
 }
 
+Collider* Collider::SetRootNode(const std::string& name)
+{
+    mRootNode = name;
+    return this;
+}
+
 Vector3 Collider::getWorldCenter() const
 {
-    // オブジェクトのワールド座標にコライダーのローカル座標を加算
-    return _mOwner->GetPosition() + mCenter;
+    // 追従ノードなし
+    if (!_mAnimator || mRootNode.empty()) {
+        return _mOwner->GetPosition() + mCenter;
+    }
+
+    // 追従ノードあり
+    const DirectX::XMFLOAT4X4* nodeMatrix =  _mAnimator->GetNodeGlobalMatrix(mRootNode);
+
+    // ノードが存在しない
+    if (!nodeMatrix) {
+        return _mOwner->GetPosition() + mCenter;
+    }
+
+    // ノードのモデル空間上の位置
+    DirectX::XMVECTOR nodePos = DirectX::XMVectorSet(nodeMatrix->_41, nodeMatrix->_42, 
+        nodeMatrix->_43, 1.0f);
+
+    // +オブジェクトのワールド行列でワールド座標に変換
+    nodePos = DirectX::XMVector3TransformCoord(nodePos, _mOwner->GetTransform().GetWorldMatrix());
+
+    DirectX::XMFLOAT3 worldPos{};
+    DirectX::XMStoreFloat3(&worldPos, nodePos);
+
+    // 追従ノードからのオフセット
+    return Vector3{worldPos.x, worldPos.y, worldPos.z} + mCenter;
 }
+
+/*------------------------------------------------------------
+    デバッグ用描画関連
+------------------------------------------------------------*/
+#ifndef NDEBUG
+Collider* Collider::LoadShader(const std::string& keyname)
+{
+    if (_mDebug) {
+        _mDebug->LoadShader(keyname);
+    }
+
+    return this;
+}
+
+Collider* Collider::SetColor(const DirectX::XMFLOAT4& color)
+{
+    _mDebug->SetColor(color);
+    return this;
+}
+
+void Collider::createDebugBox()
+{
+    if (!_mDebug) {
+        return;
+    }
+
+    _mDebug->Clear();
+    _mDebug->CreateBox(mCenter, mSize);
+}
+
+#endif

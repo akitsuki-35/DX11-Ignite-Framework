@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/11/18
+*	@updated : 2026/11/25
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -138,6 +138,11 @@ bool Animator::IsBlending(std::string keyName) const
 int Animator::GetCurrentFrame() const
 {
     return static_cast<int>(mCurrent.ElapsedTime);
+}
+
+const DirectX::XMFLOAT4X4* Animator::GetNodeGlobalMatrix(const std::string& nodeName) const
+{
+    return mSkeleton.GetGlobalMatrix(nodeName);
 }
 
 void Animator::updateCurrent(double deltaTime)

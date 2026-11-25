@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/11/18
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -107,6 +107,9 @@ public:
 
     // アニメーションの現在の経過時間（フレーム）を取得
     int GetCurrentFrame() const;
+
+    // 指定ノードのグローバル行列取得
+    const DirectX::XMFLOAT4X4* GetNodeGlobalMatrix(const std::string& nodeName) const;
 
 private:
     // 単一アニメーションの更新
