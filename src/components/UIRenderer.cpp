@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/13
-*	@updated : 2026/11/16
+*	@updated : 2026/11/26
 *============================================================*/
 #include "UIRenderer.h"
 #include "Texture.h"
@@ -24,6 +24,8 @@ void UIRenderer::Draw() const
 	D3D11::BufferManager::getInstance().Set2DMatrix();
 	D3D11::BufferManager::getInstance().SetWorldMatrix(getWorldMatrix());
 
+	mCanvas.Bind();
+
 	// マテリアル設定
 	Element::MATERIAL material{};
 	material.Diffuse = mColor;
@@ -32,8 +34,6 @@ void UIRenderer::Draw() const
 
 	// パラメータ設定
 	D3D11::BufferManager::getInstance().SetParameter(mParameter);
-
-	mCanvas.Bind();
 
 	if (material.TextureEnable) {
 		_mTexture->Bind();
@@ -54,13 +54,16 @@ void UIRenderer::Draw(const Transform& transform)
 	D3D11::BufferManager::getInstance().Set2DMatrix();
 	D3D11::BufferManager::getInstance().SetWorldMatrix(transform.GetWorldMatrix());
 
+	mCanvas.Bind();
+
 	// マテリアル設定
 	Element::MATERIAL material{};
 	material.Diffuse = mColor;
 	material.TextureEnable = static_cast<bool>(_mTexture != nullptr);
 	D3D11::BufferManager::getInstance().SetMaterial(material);
 
-	mCanvas.Bind();
+	// パラメータ設定
+	D3D11::BufferManager::getInstance().SetParameter(mParameter);
 
 	if (material.TextureEnable) {
 		_mTexture->Bind();
