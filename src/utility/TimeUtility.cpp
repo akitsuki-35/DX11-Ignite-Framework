@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/11/09
-*	@updated : 2026/11/16
+*	@updated : 2026/11/18
 *============================================================*/
 #include "TimeUtility.h"
 #include "SystemTimer.h"
@@ -21,7 +21,7 @@ double Utility::Time::toSeconds(int frame)
     int frameRate = getFrameRate();
 
     // フレーム→秒に変換
-    double seconds = static_cast<double>(frame / frameRate);
+    double seconds = static_cast<double>(frame) / frameRate;
 
     return seconds;
 }

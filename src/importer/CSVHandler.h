@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/21
-*	@updated : 2026/11/08
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -153,8 +153,94 @@ public:
 		else if constexpr (std::is_same_v<T, DirectX::XMFLOAT4>) {
 			if (row.size() < 5) return false;
 
-			value = { GetFloat(row, 1), GetFloat(row, 2), GetFloat(row, 3), GetFloat(row, 4)
-			};
+			value = { GetFloat(row, 1), GetFloat(row, 2), GetFloat(row, 3), GetFloat(row, 4) };
+		}
+
+		// vector<std::string>
+		else if constexpr (std::is_same_v<T, std::vector<std::string>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetString(row, i));
+			}
+		}
+
+		// vector<int>
+		else if constexpr (std::is_same_v<T, std::vector<int>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetInt(row, i));
+			}
+		}
+
+		// vector<float>
+		else if constexpr (std::is_same_v<T, std::vector<float>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetFloat(row, i));
+			}
+		}
+
+		// vector<double>
+		else if constexpr (std::is_same_v<T, std::vector<double>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i < row.size(); i++) {
+				if (row[i].empty()) {
+					continue;
+				}
+				value.push_back(GetDouble(row, i));
+			}
+		}
+
+		// vector<Vector2>
+		else if constexpr (std::is_same_v<T, std::vector<Vector2>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i + 1 < row.size(); i += 3) {
+				Vector2 vec{};
+				vec.x = GetFloat(row, i);
+				vec.y = GetFloat(row, i + 1);
+
+				value.push_back(vec);
+			}
+		}
+
+		// vector<Vector3>
+		else if constexpr (std::is_same_v<T, std::vector<Vector3>>) {
+			if (row.size() < 2) return false;
+
+			value.clear();
+
+			for (size_t i = 1; i + 2 < row.size(); i += 3) {
+				Vector3 vec{};
+				vec.x = GetFloat(row, i);
+				vec.y = GetFloat(row, i + 1);
+				vec.z = GetFloat(row, i + 2);
+
+				value.push_back(vec);
+			}
 		}
 
 		// 一致する型が存在しない

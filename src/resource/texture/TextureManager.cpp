@@ -57,7 +57,19 @@ bool TextureManager::generateTexture(Texture& texture, const std::string& path, 
 	TexMetadata metaData{};
 	ScratchImage image{};
 
-	HRESULT hr = LoadFromWICFile(wide.c_str(), WIC_FLAGS_NONE, &metaData, image);
+	// ファイル拡張子を取得
+	std::string ext = Utility::File::getFileExtension(path);
+
+	HRESULT hr{};
+	if (ext == "dds") {
+		// ddsファイル読み込み
+		hr = LoadFromDDSFile(wide.c_str(), DDS_FLAGS_NONE, &metaData, image);
+	}
+	else {
+		// 通常の画像読み込み
+		hr = LoadFromWICFile(wide.c_str(), WIC_FLAGS_NONE, &metaData, image);
+	}
+
 	if (FAILED(hr)) return false;
 
 	if (isMip) {

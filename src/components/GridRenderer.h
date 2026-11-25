@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/20
-*	@updated : 2026/09/16
+*	@updated : 2026/11/25
 *============================================================*/
 #pragma once
 
@@ -27,7 +27,7 @@ private:
 	// 頂点バッファ
 	Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexBuffer{};
 
-	// 調点数
+	// 頂点数
 	int mVertexCount{};
 
 	// テクスチャ

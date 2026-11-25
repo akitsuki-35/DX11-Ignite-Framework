@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/07
-*	@updated : 2026/11/11
+*	@updated : 2026/11/25
 *============================================================*/
 #include "Animator.h"
 #include "Model.h"
@@ -12,6 +12,7 @@
 #include "ModelRenderer.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "TimeUtility.h"
 #include <cmath>
 #include <algorithm>
 
@@ -72,6 +73,11 @@ void Animator::Set(const std::string& keyName, const bool& isLoop, const double&
         return;
     }
 
+    // Current, 現Next, 次Nextが全て異なるなら現NextをCurrentに押し出す
+    if (mCurrent._Animation != mNext._Animation) {
+        mCurrent = mNext;
+    }
+
     Animation* animation = AnimationManager::getInstance().Get(keyName);
 
     if (!animation) {
@@ -109,11 +115,15 @@ bool Animator::IsPlaying(std::string keyName) const
 
 bool Animator::IsFinished(std::string keyName) const
 {
-    if (mCurrent.Name != keyName && mNext.Name != keyName) {
-        return false;
+    if (mCurrent.Name == keyName && mCurrent._Animation) {
+        return mCurrent.ElapsedTime >= mCurrent._Animation->GetDuration();
     }
 
-    return mCurrent.ElapsedTime >= mCurrent._Animation->GetDuration();
+    if (mNext.Name == keyName && mNext._Animation) {
+        return mNext.ElapsedTime >= mNext._Animation->GetDuration();
+    }
+
+    return false;
 }
 
 bool Animator::IsBlending(std::string keyName) const
@@ -123,6 +133,16 @@ bool Animator::IsBlending(std::string keyName) const
     }
 
     return mCurrent.Name != mNext.Name;
+}
+
+int Animator::GetCurrentFrame() const
+{
+    return static_cast<int>(mCurrent.ElapsedTime);
+}
+
+const DirectX::XMFLOAT4X4* Animator::GetNodeGlobalMatrix(const std::string& nodeName) const
+{
+    return mSkeleton.GetGlobalMatrix(nodeName);
 }
 
 void Animator::updateCurrent(double deltaTime)
@@ -232,7 +252,6 @@ void Animator::updateBlend(double deltaTime)
 
     // ブレンド完了処理
     if (mBlendTime >= mBlendDuration) {
-        // Current == Next
         mCurrent = mNext;
 
         mBlendTime = 0.0f;
@@ -456,6 +475,9 @@ void Animator::initSpring()
 
 void Animator::updateSpring(const float& dt)
 {
+    // 注）生成AIによる仮組み
+    // ゲーム仮完成まで機能凍結
+
     // スプリングチェーンが存在しない
     if (!mSkeleton.SpringChainEnable()) {
         return;
