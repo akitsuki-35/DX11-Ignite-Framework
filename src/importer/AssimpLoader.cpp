@@ -4,7 +4,7 @@
 *
 * 　@author  : @akitsuki-35（https://github.com/akitsuki-35）
 * 　@date	 : 2026/08/02
-*	@updated : 2026/11/11
+*	@updated : 2026/11/26
 *============================================================*/
 #include "AssimpLoader.h"
 #include "DeviceManager.h"
@@ -101,9 +101,9 @@ namespace {
 		// スカート
 		else if (name.find("Skirt") != std::string::npos) {
 			chain.WindInfluence = 0.0f;
-			chain.TranslationInfluence = 1.0f;
-			chain.MotionInfluence = 1.2f;
-			chain.Stiffness = 80.0f;
+			chain.TranslationInfluence = 5.0f;
+			chain.MotionInfluence = 5.0f;
+			chain.Stiffness = 100.0f;
 			chain.Damping = 12.0f;
 			chain.MaxAngle = 0.75f;
 			chain.UniformWeight = false;
